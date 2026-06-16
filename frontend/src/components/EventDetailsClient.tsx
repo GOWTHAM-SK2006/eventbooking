@@ -83,8 +83,10 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
     setBookingError(null);
 
     try {
-      // Simulate Razorpay window or UPI processing delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Simulate UPI processing delay if it's UPI
+      if (finalPaymentMethod.startsWith('UPI-')) {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
 
       const data = await api.post('/bookings', {
         eventId: id,
@@ -104,9 +106,67 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
       setShowPaymentModal(false);
     } catch (err: any) {
       setBookingError(err.message || 'Failed to complete booking.');
-    } finally {
       setProcessingPayment(false);
     }
+  };
+
+  const loadRazorpay = async () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleRazorpayPayment = async () => {
+    setProcessingPayment(true);
+    setBookingError(null);
+
+    const res = await loadRazorpay();
+    if (!res) {
+      setBookingError('Razorpay SDK failed to load. Are you online?');
+      setProcessingPayment(false);
+      return;
+    }
+
+    const amountInCents = event.price > 0 ? Math.round(event.price * quantity * 100) : 0;
+    if (amountInCents === 0) {
+      // Free ticket, bypass Razorpay
+      confirmPaymentAndBook('FREE');
+      return;
+    }
+
+    const options = {
+      key: 'rzp_test_T2NUwSm1uqZZrX',
+      amount: amountInCents,
+      currency: 'USD',
+      name: 'EVNT. Tickets',
+      description: `Booking for ${event.title}`,
+      handler: function (response: any) {
+        confirmPaymentAndBook(`RAZORPAY-${response.razorpay_payment_id}`);
+      },
+      prefill: {
+        name: session?.firstName ? `${session.firstName} ${session.lastName}` : 'Attendee',
+        email: session?.email || 'attendee@example.com',
+      },
+      theme: {
+        color: '#FF6B00'
+      },
+      modal: {
+        ondismiss: function() {
+          setProcessingPayment(false);
+        }
+      }
+    };
+
+    const paymentObject = new (window as any).Razorpay(options);
+    paymentObject.on('payment.failed', function (response: any) {
+      setBookingError(response.error.description);
+      setProcessingPayment(false);
+    });
+    paymentObject.open();
   };
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
@@ -500,7 +560,7 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
                   You will be securely redirected to Razorpay's checkout gateway to process your card, net banking, or wallet payment.
                 </p>
                 <button
-                  onClick={() => confirmPaymentAndBook('RAZORPAY')}
+                  onClick={handleRazorpayPayment}
                   disabled={processingPayment}
                   className="btn-primary" style={{ width: '100%', padding: '1rem' }}
                 >
