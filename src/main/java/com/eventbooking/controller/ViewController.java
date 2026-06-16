@@ -20,7 +20,7 @@ public class ViewController {
         return "forward:/index.html";
     }
 
-    @GetMapping("/events/{id}")
+    @GetMapping("/events/{id:[^\\.]+}")
     public String forwardEventDetails() {
         return "forward:/events/[id].html";
     }
