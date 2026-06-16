@@ -7,22 +7,36 @@ import { Sparkles, ArrowRight, Activity, Users, ShieldCheck, Star } from 'lucide
 
 export default function HomePage() {
   const [featured, setFeatured] = useState<any[]>([]);
+  const [allEvents, setAllEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchFeatured();
+    fetchData();
   }, []);
 
-  const fetchFeatured = async () => {
+  const fetchData = async () => {
     try {
-      const data = await api.get('/events/featured');
-      setFeatured(data);
+      const [featData, allData] = await Promise.all([
+        api.get('/events/featured'),
+        api.get('/events')
+      ]);
+      setFeatured(featData);
+      setAllEvents(allData);
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
     }
   };
+
+  const totalSlots = allEvents.reduce((acc, ev) => acc + (ev.capacity || 0), 0);
+  const soldTickets = allEvents.reduce((acc, ev) => acc + ((ev.capacity || 0) - (ev.availableSlots || 0)), 0);
+  
+  const statsData = [
+    { label: 'Total Events', value: allEvents.length, icon: <Activity size={20} color="#FF6B00" /> },
+    { label: 'Tickets Sold', value: soldTickets, icon: <Users size={20} color="#FF6B00" /> },
+    { label: 'Total Capacity', value: totalSlots, icon: <ShieldCheck size={20} color="#FF6B00" /> }
+  ];
 
   const categories = [
     { name: 'Tech', count: '12 Events', color: '#3B82F6' },
@@ -115,11 +129,7 @@ export default function HomePage() {
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
         gap: '1.5rem'
       }}>
-        {[
-          { label: 'Total Tickets Sold', value: '45,000+', icon: <Activity size={20} color="#FF6B00" /> },
-          { label: 'Active Users', value: '12,500+', icon: <Users size={20} color="#FF6B00" /> },
-          { label: 'Verified Partners', value: '350+', icon: <ShieldCheck size={20} color="#FF6B00" /> }
-        ].map((stat, i) => (
+        {statsData.map((stat, i) => (
           <div key={i} className="glass-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
             <div style={{ background: 'rgba(255, 107, 0, 0.1)', padding: '0.8rem', borderRadius: '12px' }}>
               {stat.icon}
@@ -200,29 +210,72 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* Testimonials */}
-      <section style={{ width: '100%', maxWidth: '1200px', padding: '4rem 1.5rem' }}>
-        <h2 style={{ fontSize: '2rem', textAlign: 'center', marginBottom: '2.5rem' }}>Loved by Attendees Worldwide</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
-          {[
-            { quote: "Booking tickets for the Tech Summit was incredibly fast. I got my tickets, and checked in at the event via the QR code within seconds.", author: "Sarah Jenkins", role: "Software Engineer" },
-            { quote: "Beautiful, responsive UI. Truly a premium feel. The custom alerts kept me updated about the seat availability in real time.", author: "David Carter", role: "Product Designer" },
-            { quote: "A seamless payment process and excellent dashboard statistics. I can track all my bookings and print tickets easily.", author: "Elena Rostova", role: "Creative Director" }
-          ].map((item, i) => (
-            <div key={i} className="glass-card" style={{ padding: '2rem' }}>
-              <div style={{ display: 'flex', gap: '0.2rem', marginBottom: '1rem' }}>
-                {[1, 2, 3, 4, 5].map((s) => <Star key={s} size={16} fill="#FF6B00" color="#FF6B00" />)}
-              </div>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontStyle: 'italic', lineHeight: 1.6, marginBottom: '1.5rem' }}>
-                "{item.quote}"
-              </p>
-              <div>
-                <h4 style={{ fontWeight: 600 }}>{item.author}</h4>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-dark)' }}>{item.role}</p>
-              </div>
-            </div>
-          ))}
+      {/* All Events Section */}
+      <section style={{ width: '100%', maxWidth: '1200px', padding: '4rem 1.5rem', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
+          <div>
+            <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>All Events</h2>
+            <p style={{ color: 'var(--text-muted)' }}>Discover everything happening across the platform.</p>
+          </div>
+          <Link href="/events" style={{ color: '#FF6B00', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+            Browse Directory <ArrowRight size={16} />
+          </Link>
         </div>
+
+        {loading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="glass-card" style={{ height: '350px', background: 'rgba(255,255,255,0.02)' }} />
+            ))}
+          </div>
+        ) : allEvents.length === 0 ? (
+          <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+            No events available at the moment.
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+            {allEvents.slice(0, 6).map((event) => (
+              <Link href={`/events/${event.id}`} key={event.id} className="glass-card" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                <div style={{ height: '200px', background: '#222', position: 'relative' }}>
+                  <img 
+                    src={event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop&q=60'} 
+                    alt={event.title} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                  <span style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    right: '1rem',
+                    background: 'rgba(15,15,15,0.85)',
+                    padding: '0.3rem 0.8rem',
+                    borderRadius: '20px',
+                    fontSize: '0.8rem',
+                    color: '#FF8C42',
+                    fontWeight: 600
+                  }}>
+                    {event.category}
+                  </span>
+                </div>
+                <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div>
+                    <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: '#FFFFFF' }}>{event.title}</h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem', lineClamp: 2, WebkitLineClamp: 2, display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {event.description}
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FF6B00' }}>
+                      {event.price === 0 ? 'Free' : `$${event.price}`}
+                    </span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      {new Date(event.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Footer */}
