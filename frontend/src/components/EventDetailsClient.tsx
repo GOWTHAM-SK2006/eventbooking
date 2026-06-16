@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { api, getSession } from '../utils/api';
 import { Calendar, MapPin, Tag, Users, ShieldAlert, Sparkles, CreditCard, ChevronRight, Star, Loader, CheckCircle, X, QrCode, Settings, Edit, Trash2, FileText, LayoutDashboard } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -10,9 +10,23 @@ interface EventDetailsClientProps {
   id: string;
 }
 
-export default function EventDetailsClient({ id }: EventDetailsClientProps) {
+export default function EventDetailsClient({ id: propsId }: EventDetailsClientProps) {
   const router = useRouter();
+  const params = useParams();
   
+  // Handle Next.js static export fallback for dynamic routes
+  const [actualId, setActualId] = useState<string>('');
+
+  useEffect(() => {
+    let resolvedId = propsId;
+    if (resolvedId === '%5Bid%5D' || resolvedId === '[id]') {
+      resolvedId = (params?.id as string) || window.location.pathname.split('/').pop() || '';
+    }
+    if (resolvedId) {
+      setActualId(resolvedId);
+    }
+  }, [propsId, params]);
+
   const [event, setEvent] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,18 +53,18 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
   const session = getSession();
 
   useEffect(() => {
-    if (id) {
+    if (actualId) {
       loadData();
     }
-  }, [id]);
+  }, [actualId]);
 
   const loadData = async () => {
     setLoading(true);
     try {
-      const eventData = await api.get(`/events/${id}`);
+      const eventData = await api.get(`/events/${actualId}`);
       setEvent(eventData);
       
-      const reviewsData = await api.get(`/reviews/event/${id}`);
+      const reviewsData = await api.get(`/reviews/event/${actualId}`);
       setReviews(reviewsData);
 
       try {
@@ -89,7 +103,7 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
       }
 
       const data = await api.post('/bookings', {
-        eventId: id,
+        eventId: actualId,
         quantity,
         paymentMethod: finalPaymentMethod
       });
@@ -101,7 +115,7 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
         origin: { y: 0.6 }
       });
       // reload event to get fresh available slots
-      const eventData = await api.get(`/events/${id}`);
+      const eventData = await api.get(`/events/${actualId}`);
       setEvent(eventData);
       setShowPaymentModal(false);
     } catch (err: any) {
@@ -175,7 +189,7 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
     setReviewLoading(true);
     try {
       const newReview = await api.post('/reviews', {
-        eventId: id,
+        eventId: actualId,
         rating,
         comment
       });
@@ -282,7 +296,7 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
                 <button onClick={async () => {
                   if (confirm('Are you sure you want to delete this event?')) {
                     try {
-                      await api.delete(`/events/${id}`);
+                      await api.delete(`/events/${actualId}`);
                       router.push('/events');
                     } catch (e) {
                       alert('Failed to delete event');

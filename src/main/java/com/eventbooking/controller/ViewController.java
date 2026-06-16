@@ -10,7 +10,6 @@ public class ViewController {
         "/login",
         "/signup",
         "/events",
-        "/event",
         "/dashboard",
         "/dashboard/events",
         "/dashboard/bookings",
@@ -19,5 +18,10 @@ public class ViewController {
     })
     public String forward() {
         return "forward:/index.html";
+    }
+
+    @GetMapping("/events/{id}")
+    public String forwardEventDetails() {
+        return "forward:/events/[id].html";
     }
 }

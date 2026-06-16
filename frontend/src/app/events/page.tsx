@@ -115,7 +115,7 @@ export default function EventsPage() {
           {events.map((event) => {
             const isSoldOut = event.availableSlots <= 0;
             return (
-              <Link href={`/event?id=${event.id}`} key={event.id} className="glass-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+              <Link href={`/events/${event.id}`} key={event.id} className="glass-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
                 <div style={{ height: '220px', background: '#222', position: 'relative' }}>
                   <img 
                     src={event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop&q=60'} 
