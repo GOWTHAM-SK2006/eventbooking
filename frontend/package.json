@@ -1,0 +1,26 @@
+{
+  "name": "event-booking-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "react": "^19.0.0-rc-66a305508c-20241107",
+    "react-dom": "^19.0.0-rc-66a305508c-20241107",
+    "next": "15.0.3",
+    "lucide-react": "^0.454.0",
+    "framer-motion": "^11.11.11",
+    "canvas-confetti": "^1.9.3"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/canvas-confetti": "^1.6.4"
+  }
+}
