@@ -32,10 +32,10 @@ public class DataInitializer {
             });
 
             // Initialize Admin User
-            if (!userRepository.existsByEmail("admin")) {
+            if (!userRepository.existsByEmail("admin@123")) {
                 User admin = new User();
-                admin.setEmail("admin");
-                admin.setPassword(passwordEncoder.encode("admin@123"));
+                admin.setEmail("admin@123");
+                admin.setPassword(passwordEncoder.encode("admin"));
                 admin.setFirstName("Super");
                 admin.setLastName("Admin");
                 
@@ -44,7 +44,7 @@ public class DataInitializer {
                 admin.setRoles(roles);
                 
                 userRepository.save(admin);
-                System.out.println("Admin user created: admin / admin@123");
+                System.out.println("Admin user created: admin@123 / admin");
             }
         };
     }
