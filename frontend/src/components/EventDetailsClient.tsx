@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, getSession } from '../utils/api';
-import { Calendar, MapPin, Tag, Users, ShieldAlert, Sparkles, CreditCard, ChevronRight, Star, Loader, CheckCircle, X, QrCode } from 'lucide-react';
+import { Calendar, MapPin, Tag, Users, ShieldAlert, Sparkles, CreditCard, ChevronRight, Star, Loader, CheckCircle, X, QrCode, Settings, Edit, Trash2, FileText, LayoutDashboard } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface EventDetailsClientProps {
@@ -205,6 +205,44 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
         {/* Left Column: Details & Reviews */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
           
+          {/* Admin Management Panel */}
+          {session?.roles?.includes('ROLE_ADMIN') && (
+            <div className="glass-card fade-in" style={{ padding: '2rem', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.2rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.5rem' }}>
+                <Settings size={20} color="#10B981" />
+                <h2 style={{ fontSize: '1.5rem', color: '#10B981' }}>Admin Management</h2>
+              </div>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
+                You have administrative privileges for this event. Quick actions:
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                <button onClick={() => router.push('/dashboard')} className="btn-secondary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', padding: '0.6rem 1rem' }}>
+                  <Edit size={16} /> Edit Event
+                </button>
+                <button onClick={async () => {
+                  if (confirm('Are you sure you want to delete this event?')) {
+                    try {
+                      await api.delete(`/events/${id}`);
+                      router.push('/events');
+                    } catch (e) {
+                      alert('Failed to delete event');
+                    }
+                  }
+                }} className="btn-secondary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', padding: '0.6rem 1rem', color: '#EF4444', borderColor: 'rgba(239,68,68,0.2)' }}>
+                  <Trash2 size={16} /> Delete Event
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '1rem' }}>
+                <button onClick={() => router.push('/dashboard')} className="btn-secondary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', padding: '0.6rem 1rem' }}>
+                  <Users size={16} /> View Bookings & Attendees
+                </button>
+                <button onClick={() => router.push('/dashboard')} className="btn-secondary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', padding: '0.6rem 1rem' }}>
+                  <CreditCard size={16} /> View Payment Details
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* About Event */}
           <div className="glass-card" style={{ padding: '2rem' }}>
             <h2 style={{ fontSize: '1.5rem', marginBottom: '1.2rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.5rem' }}>About this Event</h2>

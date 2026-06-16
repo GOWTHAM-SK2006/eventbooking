@@ -10,7 +10,7 @@ public class ViewController {
         "/login",
         "/signup",
         "/events",
-        "/events/{id}",
+        "/event",
         "/dashboard",
         "/dashboard/events",
         "/dashboard/bookings",
