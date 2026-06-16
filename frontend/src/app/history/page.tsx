@@ -81,13 +81,14 @@ export default function HistoryPage() {
                 <div class="value">${new Date(booking.eventDate).toLocaleString()}</div>
               </div>
               <div class="item">
-                <div class="label">Quantity</div>
-                <div class="value">${booking.quantity} ticket(s)</div>
-              </div>
-              <div class="item">
-                <div class="label">Admission Code(s)</div>
-                <div class="codes">
-                  ${booking.ticketCodes.map((c: string) => `<div>${c}</div>`).join('')}
+                <div class="label">Admission QR Code(s)</div>
+                <div class="codes" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                  ${booking.ticketCodes.map((c: string) => `
+                    <div style="text-align: center; border: 1px solid #ddd; padding: 10px; background: #fff; border-radius: 4px;">
+                      <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${c}" alt="QR" width="100" />
+                      <div style="margin-top: 5px; font-weight: bold; font-family: monospace;">${c}</div>
+                    </div>
+                  `).join('')}
                 </div>
               </div>
             </div>
@@ -191,11 +192,18 @@ export default function HistoryPage() {
                 {/* Admission Codes Panel */}
                 {isConfirmed && (
                   <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.08)', borderRadius: '8px', padding: '1rem' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-dark)', fontWeight: 600, letterSpacing: '0.05em' }}>ADMISSION CODES</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', marginTop: '0.5rem' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-dark)', fontWeight: 600, letterSpacing: '0.05em' }}>ADMISSION CODES & QR IDENTIFIERS</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', marginTop: '0.8rem' }}>
                       {booking.ticketCodes.map((code: string) => (
-                        <div key={code} style={{ fontFamily: 'monospace', fontSize: '0.85rem', color: '#FF8C42', fontWeight: 600 }}>
-                          {code}
+                        <div key={code} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                          <img 
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${code}`} 
+                            alt="Ticket QR" 
+                            style={{ width: '50px', height: '50px', borderRadius: '4px', background: '#FFF', padding: '2px' }}
+                          />
+                          <div style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: '#FF8C42', fontWeight: 600 }}>
+                            {code}
+                          </div>
                         </div>
                       ))}
                     </div>

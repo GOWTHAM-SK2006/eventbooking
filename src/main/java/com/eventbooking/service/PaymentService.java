@@ -19,13 +19,21 @@ public class PaymentService {
 
     @Transactional
     public Payment processPayment(Booking booking, String paymentMethod) {
-        // Simulate a successful payment gateway transaction
-        String transactionId = "TXN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        String transactionId;
+        String actualMethod;
+
+        if (paymentMethod != null && paymentMethod.startsWith("UPI-")) {
+            actualMethod = "UPI QR";
+            transactionId = paymentMethod.substring(4);
+        } else {
+            actualMethod = paymentMethod != null ? paymentMethod : "CARD";
+            transactionId = "TXN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        }
 
         Payment payment = Payment.builder()
                 .booking(booking)
                 .amount(booking.getTotalPrice())
-                .paymentMethod(paymentMethod)
+                .paymentMethod(actualMethod)
                 .transactionId(transactionId)
                 .status("COMPLETED")
                 .paymentDate(LocalDateTime.now())

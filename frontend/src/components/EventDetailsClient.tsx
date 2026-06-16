@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, getSession } from '../utils/api';
-import { Calendar, MapPin, Tag, Users, ShieldAlert, Sparkles, CreditCard, ChevronRight, Star, Loader, CheckCircle } from 'lucide-react';
+import { Calendar, MapPin, Tag, Users, ShieldAlert, Sparkles, CreditCard, ChevronRight, Star, Loader, CheckCircle, X, QrCode } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface EventDetailsClientProps {
@@ -23,6 +23,13 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState<any>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
+
+  // Payment UI State
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentSettings, setPaymentSettings] = useState<any>(null);
+  const [activePaymentTab, setActivePaymentTab] = useState<'RAZORPAY' | 'UPI_QR'>('RAZORPAY');
+  const [upiTransactionId, setUpiTransactionId] = useState('');
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   // Review State
   const [rating, setRating] = useState(5);
@@ -45,6 +52,15 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
       
       const reviewsData = await api.get(`/reviews/event/${id}`);
       setReviews(reviewsData);
+
+      try {
+        const paymentData = await api.get('/settings/payment');
+        if (paymentData && paymentData.value) {
+          setPaymentSettings(JSON.parse(paymentData.value));
+        }
+      } catch (e) {
+        console.warn("Could not load payment settings", e);
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -58,15 +74,22 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
       router.push('/login');
       return;
     }
+    setBookingError(null);
+    setShowPaymentModal(true);
+  };
 
-    setBookingLoading(true);
+  const confirmPaymentAndBook = async (finalPaymentMethod: string) => {
+    setProcessingPayment(true);
     setBookingError(null);
 
     try {
+      // Simulate Razorpay window or UPI processing delay
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       const data = await api.post('/bookings', {
         eventId: id,
         quantity,
-        paymentMethod
+        paymentMethod: finalPaymentMethod
       });
       
       setBookingSuccess(data);
@@ -78,10 +101,11 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
       // reload event to get fresh available slots
       const eventData = await api.get(`/events/${id}`);
       setEvent(eventData);
+      setShowPaymentModal(false);
     } catch (err: any) {
-      setBookingError(err.message || 'Failed to place booking.');
+      setBookingError(err.message || 'Failed to complete booking.');
     } finally {
-      setBookingLoading(false);
+      setProcessingPayment(false);
     }
   };
 
@@ -294,10 +318,17 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
                     {bookingSuccess.transactionId}
                   </div>
 
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-dark)', marginTop: '0.8rem' }}>TICKET CODES</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-dark)', marginTop: '0.8rem' }}>TICKET CODES / QR IDENTIFIERS</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', marginTop: '0.3rem' }}>
                     {bookingSuccess.ticketCodes.map((code: string) => (
-                      <div key={code} style={{ fontSize: '0.8rem', fontFamily: 'monospace', color: '#FFFFFF' }}>{code}</div>
+                      <div key={code} style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
+                        <img 
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${code}`} 
+                          alt="Ticket QR" 
+                          style={{ width: '60px', height: '60px', borderRadius: '4px' }}
+                        />
+                        <div style={{ fontSize: '0.9rem', fontFamily: 'monospace', color: '#FFFFFF' }}>{code}</div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -330,35 +361,12 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
                   </select>
                 </div>
 
-                {/* Payment Selection */}
+                {/* Payment Options visual (Informational only before modal) */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Payment Method</label>
+                  <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Accepted Payments</label>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    {['CARD', 'STRIPE', 'PAYPAL'].map((method) => {
-                      const active = paymentMethod === method;
-                      return (
-                        <button
-                          key={method}
-                          type="button"
-                          onClick={() => setPaymentMethod(method)}
-                          style={{
-                            flex: 1,
-                            background: active ? 'rgba(255, 107, 0, 0.1)' : 'transparent',
-                            border: '1px solid',
-                            borderColor: active ? '#FF6B00' : 'rgba(255,255,255,0.08)',
-                            color: '#FFFFFF',
-                            padding: '0.5rem',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            fontSize: '0.8rem',
-                            fontWeight: 600,
-                            transition: '0.2s'
-                          }}
-                        >
-                          {method}
-                        </button>
-                      );
-                    })}
+                    <div style={{ flex: 1, padding: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', textAlign: 'center', fontSize: '0.8rem', fontWeight: 600, color: '#A3A3A3' }}>RAZORPAY</div>
+                    <div style={{ flex: 1, padding: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', textAlign: 'center', fontSize: '0.8rem', fontWeight: 600, color: '#A3A3A3' }}>UPI QR</div>
                   </div>
                 </div>
 
@@ -397,6 +405,118 @@ export default function EventDetailsClient({ id }: EventDetailsClientProps) {
         </div>
 
       </div>
+
+      {/* PAYMENT MODAL */}
+      {showPaymentModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.85)', zIndex: 300,
+          display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1.5rem',
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div className="glass-card fade-in" style={{
+            width: '100%', maxWidth: '480px', padding: '2.5rem', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1.5rem'
+          }}>
+            <button
+              onClick={() => !processingPayment && setShowPaymentModal(false)}
+              style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'none', border: 'none', color: '#A3A3A3', cursor: 'pointer' }}
+            >
+              <X size={20} />
+            </button>
+
+            <div style={{ textAlign: 'center' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Complete Payment</h2>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#FF6B00', marginTop: '0.5rem' }}>
+                ${totalPrice.toFixed(2)}
+              </div>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>For {quantity} ticket(s) to {event.title}</p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.5rem', padding: '0.3rem', background: 'rgba(0,0,0,0.3)', borderRadius: '8px' }}>
+              <button
+                onClick={() => setActivePaymentTab('RAZORPAY')}
+                style={{
+                  flex: 1, padding: '0.8rem', borderRadius: '6px', border: 'none', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', transition: '0.2s',
+                  background: activePaymentTab === 'RAZORPAY' ? '#FF6B00' : 'transparent',
+                  color: activePaymentTab === 'RAZORPAY' ? '#FFF' : '#A3A3A3'
+                }}
+              >
+                Razorpay
+              </button>
+              <button
+                onClick={() => setActivePaymentTab('UPI_QR')}
+                style={{
+                  flex: 1, padding: '0.8rem', borderRadius: '6px', border: 'none', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', transition: '0.2s',
+                  background: activePaymentTab === 'UPI_QR' ? '#FF6B00' : 'transparent',
+                  color: activePaymentTab === 'UPI_QR' ? '#FFF' : '#A3A3A3'
+                }}
+              >
+                UPI QR Code
+              </button>
+            </div>
+
+            {activePaymentTab === 'RAZORPAY' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center', textAlign: 'center', padding: '1rem 0' }}>
+                <CreditCard size={48} color="#A3A3A3" />
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                  You will be securely redirected to Razorpay's checkout gateway to process your card, net banking, or wallet payment.
+                </p>
+                <button
+                  onClick={() => confirmPaymentAndBook('RAZORPAY')}
+                  disabled={processingPayment}
+                  className="btn-primary" style={{ width: '100%', padding: '1rem' }}
+                >
+                  {processingPayment ? 'Processing Gateway...' : 'Pay with Razorpay'}
+                </button>
+              </div>
+            )}
+
+            {activePaymentTab === 'UPI_QR' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center', textAlign: 'center' }}>
+                {paymentSettings?.qrCodeUrl ? (
+                  <img src={paymentSettings.qrCodeUrl} alt="UPI QR" style={{ width: '180px', height: '180px', borderRadius: '12px', border: '2px solid rgba(255,255,255,0.1)' }} />
+                ) : (
+                  <div style={{ width: '180px', height: '180px', borderRadius: '12px', border: '2px dashed rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <QrCode size={40} color="#6B7280" />
+                  </div>
+                )}
+                
+                <div style={{ fontSize: '0.9rem' }}>
+                  <div style={{ color: 'var(--text-muted)' }}>UPI ID</div>
+                  <div style={{ fontWeight: 600, letterSpacing: '1px' }}>{paymentSettings?.upiId || 'Not Configured'}</div>
+                </div>
+
+                <div style={{ width: '100%', textAlign: 'left', marginTop: '0.5rem' }}>
+                  <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.4rem', display: 'block' }}>Enter UPI Reference / UTR Number</label>
+                  <input
+                    type="text"
+                    required
+                    className="form-input"
+                    placeholder="e.g. 312345678901"
+                    value={upiTransactionId}
+                    onChange={(e) => setUpiTransactionId(e.target.value)}
+                  />
+                </div>
+
+                <button
+                  onClick={() => confirmPaymentAndBook(`UPI-${upiTransactionId}`)}
+                  disabled={processingPayment || upiTransactionId.trim().length < 6}
+                  className="btn-primary" style={{ width: '100%', padding: '1rem' }}
+                >
+                  {processingPayment ? 'Verifying Payment...' : 'Verify & Book Ticket'}
+                </button>
+              </div>
+            )}
+            
+            {bookingError && (
+              <div style={{ color: '#EF4444', fontSize: '0.85rem', textAlign: 'center', padding: '0.5rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '6px' }}>
+                {bookingError}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -13,7 +13,7 @@ export default function DashboardPage() {
   const router = useRouter();
   
   // Tab control
-  const [activeTab, setActiveTab] = useState<'overview' | 'events' | 'bookings' | 'checkin'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'events' | 'bookings' | 'checkin' | 'payment'>('overview');
   
   // Data States
   const [stats, setStats] = useState<any>(null);
@@ -34,6 +34,13 @@ export default function DashboardPage() {
   // Create/Edit Event Modal State
   const [showEventModal, setShowEventModal] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
+
+  // Payment Settings State
+  const [paymentUpiId, setPaymentUpiId] = useState('');
+  const [paymentPhone, setPaymentPhone] = useState('');
+  const [paymentQrUrl, setPaymentQrUrl] = useState('');
+  const [paymentInstructions, setPaymentInstructions] = useState('');
+  const [paymentLoading, setPaymentLoading] = useState(false);
   
   // Event Form Fields
   const [title, setTitle] = useState('');
@@ -70,6 +77,19 @@ export default function DashboardPage() {
 
       const usersData = await api.get('/auth/users');
       setUsers(usersData);
+
+      try {
+        const paymentSettings = await api.get('/settings/payment');
+        if (paymentSettings && paymentSettings.value) {
+          const pData = JSON.parse(paymentSettings.value);
+          setPaymentUpiId(pData.upiId || '');
+          setPaymentPhone(pData.phoneNumber || '');
+          setPaymentQrUrl(pData.qrCodeUrl || '');
+          setPaymentInstructions(pData.instructions || '');
+        }
+      } catch (e) {
+        console.warn("Failed to load payment settings", e);
+      }
     } catch (e) {
       console.error(e);
       setError('Failed to fetch dashboard records');
@@ -163,6 +183,25 @@ export default function DashboardPage() {
     }
   };
 
+  const handlePaymentSettingsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPaymentLoading(true);
+    try {
+      const payload = {
+        upiId: paymentUpiId,
+        phoneNumber: paymentPhone,
+        qrCodeUrl: paymentQrUrl,
+        instructions: paymentInstructions
+      };
+      await api.put('/settings/payment', { value: JSON.stringify(payload) });
+      alert('Payment settings updated successfully!');
+    } catch (e: any) {
+      alert('Failed to update payment settings: ' + (e.message || 'Error'));
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
   // Ticket check-in handler
   const handleTicketCheckIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -209,7 +248,8 @@ export default function DashboardPage() {
           { id: 'overview', label: 'Overview Metrics' },
           { id: 'events', label: 'Manage Events' },
           { id: 'bookings', label: 'Booking Logs' },
-          { id: 'checkin', label: 'Check-in Verify' }
+          { id: 'checkin', label: 'Check-in Verify' },
+          { id: 'payment', label: 'Payment Settings' }
         ].map((tab) => {
           const active = activeTab === tab.id;
           return (
@@ -460,6 +500,68 @@ export default function DashboardPage() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* 5. PAYMENT SETTINGS TAB */}
+      {activeTab === 'payment' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', maxWidth: '600px' }} className="fade-in">
+          <div className="glass-card" style={{ padding: '2.5rem' }}>
+            <h3 style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>Payment Gateway Configuration</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '2rem' }}>
+              Configure the UPI and QR Code settings that attendees will use to pay for event tickets.
+            </p>
+
+            <form onSubmit={handlePaymentSettingsSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>UPI ID</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="e.g. yourname@upi"
+                  value={paymentUpiId}
+                  onChange={(e) => setPaymentUpiId(e.target.value)}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Phone Number</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="e.g. +91 9876543210"
+                  value={paymentPhone}
+                  onChange={(e) => setPaymentPhone(e.target.value)}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>QR Code Image URL</label>
+                <input
+                  type="url"
+                  className="form-input"
+                  placeholder="https://example.com/qr-code.png"
+                  value={paymentQrUrl}
+                  onChange={(e) => setPaymentQrUrl(e.target.value)}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Payment Instructions</label>
+                <textarea
+                  className="form-input"
+                  rows={4}
+                  placeholder="Instructions for the user..."
+                  value={paymentInstructions}
+                  onChange={(e) => setPaymentInstructions(e.target.value)}
+                />
+              </div>
+
+              <button type="submit" disabled={paymentLoading} className="btn-primary" style={{ marginTop: '1rem' }}>
+                {paymentLoading ? 'Saving...' : 'Save Payment Settings'}
+              </button>
+            </form>
           </div>
         </div>
       )}
