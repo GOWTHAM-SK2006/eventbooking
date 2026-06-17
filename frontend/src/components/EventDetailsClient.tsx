@@ -19,13 +19,21 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
 
   useEffect(() => {
     let resolvedId = propsId;
+    console.log("EventDetailsClient initialized with propsId:", propsId);
+    console.log("Current window pathname:", typeof window !== 'undefined' ? window.location.pathname : 'server');
+    
+    // In a static export fallback scenario, Next.js might hydrate params.id with 'fallback'
+    // So we need to explicitly check window.location for the true UUID
     if (resolvedId === '%5Bid%5D' || resolvedId === '[id]' || resolvedId === 'fallback') {
-      resolvedId = (params?.id as string) || window.location.pathname.split('/').pop() || '';
+      resolvedId = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() || '' : '';
     }
-    if (resolvedId) {
+    
+    console.log("Resolved ID before fetching:", resolvedId);
+    
+    if (resolvedId && resolvedId !== 'fallback') {
       setActualId(resolvedId);
     }
-  }, [propsId, params]);
+  }, [propsId]);
 
   const [event, setEvent] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
