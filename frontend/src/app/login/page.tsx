@@ -1,188 +1,97 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { api, setSession, getSession } from '../../utils/api';
-import { Calendar, Mail, Lock, AlertCircle, ArrowRight, Loader, Eye, EyeOff } from 'lucide-react';
+import { api, setSession } from '../../utils/api';
+import { Mail, Lock, Loader, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
-  useEffect(() => {
-    // If already logged in, redirect away
-    const session = getSession();
-    if (session) {
-      if (session.roles.includes('ROLE_ADMIN')) {
-        router.push('/dashboard');
-      } else {
-        router.push('/events');
-      }
-    }
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setError('');
     setLoading(true);
-
     try {
       const data = await api.post('/auth/login', { email, password });
-      setSession(data);
+      setSession({
+        token: data.token,
+        refreshToken: data.refreshToken,
+        id: data.id,
+        email: data.email,
+        roles: data.roles,
+        firstName: data.firstName,
+        lastName: data.lastName,
+      });
+      window.dispatchEvent(new Event('userLogin'));
+      
       if (data.roles.includes('ROLE_ADMIN')) {
         router.push('/dashboard');
       } else {
         router.push('/events');
       }
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please check credentials.');
+      setError(err.message || 'Invalid email or password');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{
-      width: '100%',
-      minHeight: '80vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '2rem 1.5rem',
-      position: 'relative'
-    }}>
-      <div className="glow-spot" style={{ top: '30%', left: '35%' }}></div>
+    <div className="w-full min-h-[85vh] flex items-center justify-center px-4 relative overflow-hidden">
+      <div className="absolute top-1/4 -right-1/4 w-96 h-96 bg-[#FF6B00]/20 rounded-full blur-[120px] mix-blend-screen" />
+      <div className="absolute -bottom-1/4 -left-1/4 w-96 h-96 bg-[#FF8C42]/20 rounded-full blur-[120px] mix-blend-screen" />
 
-      <div className="glass-card fade-in" style={{
-        width: '100%',
-        maxWidth: '420px',
-        padding: '2.5rem',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '2rem'
-      }}>
-        {/* Brand Header */}
-        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #FF6B00 0%, #FF8C42 100%)',
-            padding: '0.6rem',
-            borderRadius: '12px',
-            display: 'inline-flex',
-            marginBottom: '1rem'
-          }}>
-            <Calendar size={24} color="#FFFFFF" />
-          </div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Welcome Back</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.25rem' }}>Sign in to reserve your event slots</p>
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card w-full max-w-md p-8 md:p-10 relative z-10 border border-[#1E1E1E]">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-black text-white tracking-tight mb-2">Welcome Back.</h1>
+          <p className="text-[#A0A0A0] font-medium">Log in to access your tickets and events.</p>
         </div>
 
         {error && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.6rem',
-            background: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid rgba(239, 68, 68, 0.2)',
-            padding: '0.8rem 1rem',
-            borderRadius: '8px',
-            color: '#EF4444',
-            fontSize: '0.85rem'
-          }}>
-            <AlertCircle size={18} />
-            <span>{error}</span>
+          <div className="bg-red-500/10 border border-red-500/30 text-red-500 text-sm font-bold p-4 rounded-xl mb-6 text-center">
+            {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-          {/* Email input */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <label style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-muted)' }}>Email Address</label>
-            <div style={{ position: 'relative' }}>
-              <Mail size={18} color="#6B7280" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
-              <input
-                type="email"
-                required
-                className="form-input"
-                style={{ paddingLeft: '2.8rem' }}
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-[#A0A0A0] ml-1">Email Address</label>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" size={20} />
+              <input 
+                type="email" required value={email} onChange={e => setEmail(e.target.value)}
+                className="input-field w-full pl-12" placeholder="name@company.com"
               />
             </div>
           </div>
 
-          {/* Password input */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-muted)' }}>Password</label>
-            </div>
-            <div style={{ position: 'relative' }}>
-              <Lock size={18} color="#6B7280" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
-              <input
-                type={showPassword ? "text" : "password"}
-                required
-                className="form-input"
-                style={{ paddingLeft: '2.8rem', paddingRight: '2.8rem' }}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-[#A0A0A0] ml-1">Password</label>
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" size={20} />
+              <input 
+                type="password" required value={password} onChange={e => setPassword(e.target.value)}
+                className="input-field w-full pl-12" placeholder="••••••••"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: 'absolute',
-                  right: '0.8rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: '#A3A3A3',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '0.2rem'
-                }}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
             </div>
           </div>
 
-          <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', marginTop: '0.5rem' }}>
-            {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Loader size={18} className="spin" style={{ animation: 'spin 1s linear infinite' }} />
-                Signing In...
-              </span>
-            ) : (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                Sign In
-                <ArrowRight size={18} />
-              </span>
-            )}
+          <button type="submit" disabled={loading} className="btn-primary w-full flex justify-center items-center gap-2 mt-4 text-lg">
+            {loading ? <Loader className="spin" size={20} /> : <>Sign In <ArrowRight size={20} /></>}
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-          Don't have an account?{' '}
-          <Link href="/signup" style={{ color: '#FF6B00', fontWeight: 600 }}>
-            Sign up
-          </Link>
+        <p className="text-center text-[#A0A0A0] mt-8 font-medium">
+          Don't have an account? <Link href="/signup" className="text-[#FF6B00] font-bold hover:text-white transition-colors">Sign up</Link>
         </p>
-      </div>
-
-      <style jsx global>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+      </motion.div>
     </div>
   );
 }

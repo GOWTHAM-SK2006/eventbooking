@@ -3,27 +3,28 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, getSession } from '../../utils/api';
-import { Calendar, Ticket, Download, XCircle, ShieldAlert, CheckCircle, Loader } from 'lucide-react';
+import { Calendar, MapPin, Tag, Users, CheckCircle, Ticket, XCircle, ArrowRight, Loader } from 'lucide-react';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function HistoryPage() {
-  const router = useRouter();
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [cancelLoadingId, setCancelLoadingId] = useState<string | null>(null);
+  const router = useRouter();
+  const session = getSession();
 
   useEffect(() => {
-    const session = getSession();
     if (!session) {
       router.push('/login');
       return;
     }
-    fetchBookings();
+    loadBookings();
   }, []);
 
-  const fetchBookings = async () => {
+  const loadBookings = async () => {
     try {
-      const data = await api.get('/bookings');
-      setBookings(data);
+      const data = await api.get('/bookings/my-bookings');
+      setBookings(data.sort((a: any, b: any) => new Date(b.bookingDate).getTime() - new Date(a.bookingDate).getTime()));
     } catch (e) {
       console.error(e);
     } finally {
@@ -31,209 +32,88 @@ export default function HistoryPage() {
     }
   };
 
-  const handleCancelBooking = async (bookingId: string) => {
-    if (!confirm('Are you sure you want to cancel this booking? This will release your reserved tickets.')) return;
-    setCancelLoadingId(bookingId);
+  const handleCancel = async (bookingId: string) => {
+    if (!confirm('Cancel this booking? This action cannot be undone.')) return;
     try {
       await api.post(`/bookings/${bookingId}/cancel`);
-      fetchBookings();
+      await loadBookings();
     } catch (e) {
-      alert('Failed to cancel booking. Please try again.');
-    } finally {
-      setCancelLoadingId(null);
+      alert('Failed to cancel booking');
     }
   };
 
-  const handleDownloadTicket = (booking: any) => {
-    // Generate a simple print block or simulate downloading a PDF file
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Ticket - ${booking.eventTitle}</title>
-          <style>
-            body { font-family: sans-serif; background: #fafafa; padding: 40px; display: flex; justify-content: center; }
-            .ticket { width: 500px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden; }
-            .header { background: #FF6B00; color: white; padding: 24px; text-align: center; }
-            .content { padding: 30px; }
-            .item { margin-bottom: 15px; }
-            .label { font-size: 11px; color: #888; text-transform: uppercase; font-weight: bold; }
-            .value { font-size: 16px; font-weight: bold; margin-top: 3px; }
-            .codes { font-family: monospace; font-size: 14px; background: #eee; padding: 10px; border-radius: 4px; margin-top: 5px; }
-            .footer { border-top: 1px dashed #ddd; text-align: center; padding: 20px; color: #888; font-size: 12px; }
-          </style>
-        </head>
-        <body>
-          <div class="ticket">
-            <div class="header">
-              <h2 style="margin: 0; font-size: 24px;">EVNT. Ticket</h2>
-              <div style="font-size: 14px; margin-top: 5px;">Admission Pass</div>
-            </div>
-            <div class="content">
-              <div class="item">
-                <div class="label">Event Title</div>
-                <div class="value">${booking.eventTitle}</div>
-              </div>
-              <div class="item">
-                <div class="label">Date and Time</div>
-                <div class="value">${new Date(booking.eventDate).toLocaleString()}</div>
-              </div>
-              <div class="item">
-                <div class="label">Admission QR Code(s)</div>
-                <div class="codes" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                  ${booking.ticketCodes.map((c: string) => `
-                    <div style="text-align: center; border: 1px solid #ddd; padding: 10px; background: #fff; border-radius: 4px;">
-                      <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${c}" alt="QR" width="100" />
-                      <div style="margin-top: 5px; font-weight: bold; font-family: monospace;">${c}</div>
-                    </div>
-                  `).join('')}
-                </div>
-              </div>
-            </div>
-            <div class="footer">
-              Please present these admission codes or printout at the registration desk for verification.
-            </div>
-          </div>
-          <script>
-            window.print();
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-  };
-
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '10rem 0', width: '100%' }}>
-        <Loader size={40} className="spin" style={{ animation: 'spin 1s linear infinite', color: '#FF6B00' }} />
-      </div>
-    );
-  }
+  if (loading) return <div className="flex justify-center items-center h-[70vh]"><Loader size={40} className="spin text-[#FF6B00]" /></div>;
 
   return (
-    <div style={{ width: '100%', maxWidth: '1000px', padding: '3rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      <div>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>My Bookings</h1>
-        <p style={{ color: 'var(--text-muted)' }}>Manage your reservations, download printable passes, or cancel registration.</p>
+    <div className="w-full max-w-5xl mx-auto px-4 py-12 md:py-24">
+      <div className="mb-12">
+        <h1 className="text-4xl md:text-5xl font-black mb-4 text-white">My <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-[#FF8C42]">Tickets.</span></h1>
+        <p className="text-[#A0A0A0] text-lg font-medium">Access your event passes and booking history.</p>
       </div>
 
       {bookings.length === 0 ? (
-        <div className="glass-card" style={{ padding: '4rem 2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-          <h3>No bookings recorded</h3>
-          <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>You haven't reserved tickets for any events yet.</p>
-          <button onClick={() => router.push('/events')} className="btn-primary" style={{ marginTop: '1.5rem' }}>
-            Find Events
-          </button>
+        <div className="glass-card p-16 text-center border-dashed border-2 border-[#1E1E1E]">
+          <div className="w-20 h-20 bg-[#1A1A1A] rounded-full flex items-center justify-center mx-auto mb-6">
+            <Ticket size={32} className="text-[#555]" />
+          </div>
+          <h3 className="text-2xl font-bold mb-2">No tickets yet</h3>
+          <p className="text-[#A0A0A0] font-medium mb-8">You haven't booked any events. Discover what's happening!</p>
+          <Link href="/events" className="btn-primary inline-flex">Explore Events</Link>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {bookings.map((booking) => {
-            const isConfirmed = booking.status === 'CONFIRMED';
-            const isCancelled = booking.status === 'CANCELLED';
-
-            return (
-              <div key={booking.id} className="glass-card fade-in" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <div style={{ background: 'rgba(255, 107, 0, 0.1)', padding: '0.8rem', borderRadius: '12px' }}>
-                      <Ticket size={24} color="#FF6B00" />
-                    </div>
-                    <div>
-                      <h3 style={{ fontSize: '1.25rem', color: '#FFFFFF' }}>{booking.eventTitle}</h3>
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.2rem' }}>
-                        {new Date(booking.eventDate).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
+        <div className="space-y-8">
+          {bookings.map((booking, i) => (
+            <motion.div key={booking.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="glass-card border border-[#1E1E1E] overflow-hidden flex flex-col md:flex-row relative group">
+              
+              <div className="bg-[#121212] p-8 md:w-2/3 flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#1E1E1E] relative">
+                {booking.status === 'CANCELLED' && (
+                  <div className="absolute inset-0 bg-[#050505]/80 backdrop-blur-[2px] z-10 flex items-center justify-center">
+                    <span className="border-4 border-red-500 text-red-500 font-black text-4xl uppercase tracking-widest px-8 py-2 rotate-[-15deg] opacity-80">Cancelled</span>
                   </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                    {isConfirmed ? (
-                      <span style={{
-                        background: 'rgba(16, 185, 129, 0.1)',
-                        border: '1px solid rgba(16, 185, 129, 0.2)',
-                        color: '#10B981',
-                        padding: '0.3rem 0.8rem',
-                        borderRadius: '20px',
-                        fontSize: '0.8rem',
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.3rem'
-                      }}>
-                        <CheckCircle size={14} /> Confirmed
-                      </span>
-                    ) : (
-                      <span style={{
-                        background: 'rgba(239, 68, 68, 0.1)',
-                        border: '1px solid rgba(239, 68, 68, 0.2)',
-                        color: '#EF4444',
-                        padding: '0.3rem 0.8rem',
-                        borderRadius: '20px',
-                        fontSize: '0.8rem',
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.3rem'
-                      }}>
-                        <XCircle size={14} /> Cancelled
-                      </span>
-                    )}
-
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF' }}>₹{booking.totalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-dark)' }}>{booking.quantity} ticket(s)</div>
-                    </div>
+                )}
+                
+                <div>
+                  <div className="flex justify-between items-start mb-4">
+                    <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${booking.status === 'CONFIRMED' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                      {booking.status}
+                    </span>
+                    <span className="text-[#A0A0A0] text-sm font-medium">Booked {new Date(booking.bookingDate).toLocaleDateString()}</span>
+                  </div>
+                  <h3 className="text-3xl font-black text-white mb-4 line-clamp-2">{booking.eventTitle}</h3>
+                  <div className="space-y-2 text-[#A0A0A0] font-medium">
+                    <p className="flex items-center gap-2"><Calendar size={16} className="text-[#FF6B00]" /> {new Date(booking.eventDate).toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric' })} at {new Date(booking.eventDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                    <p className="flex items-center gap-2"><Tag size={16} className="text-[#FF6B00]" /> Order #{booking.id.substring(0,8).toUpperCase()}</p>
                   </div>
                 </div>
 
-                {/* Admission Codes Panel */}
-                {isConfirmed && (
-                  <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.08)', borderRadius: '8px', padding: '1rem' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-dark)', fontWeight: 600, letterSpacing: '0.05em' }}>ADMISSION CODES & QR IDENTIFIERS</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', marginTop: '0.8rem' }}>
-                      {booking.ticketCodes.map((code: string) => (
-                        <div key={code} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                          <img 
-                            src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${code}`} 
-                            alt="Ticket QR" 
-                            style={{ width: '50px', height: '50px', borderRadius: '4px', background: '#FFF', padding: '2px' }}
-                          />
-                          <div style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: '#FF8C42', fontWeight: 600 }}>
-                            {code}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Actions Row */}
-                {isConfirmed && (
-                  <div style={{ display: 'flex', gap: '1rem', borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '1.25rem', justifyContent: 'flex-end' }}>
-                    <button
-                      onClick={() => handleCancelBooking(booking.id)}
-                      disabled={cancelLoadingId === booking.id}
-                      className="btn-secondary"
-                      style={{ padding: '0.5rem 1.2rem', color: '#EF4444', borderColor: 'rgba(239,68,68,0.2)' }}
-                    >
-                      {cancelLoadingId === booking.id ? 'Cancelling...' : 'Cancel Registration'}
-                    </button>
-                    <button
-                      onClick={() => handleDownloadTicket(booking)}
-                      className="btn-primary"
-                      style={{ padding: '0.5rem 1.2rem', fontSize: '0.85rem' }}
-                    >
-                      <Download size={16} />
-                      Download Ticket Pass
-                    </button>
+                {booking.status === 'CONFIRMED' && (
+                  <div className="mt-8 pt-6 border-t border-[#1E1E1E] flex justify-between items-center">
+                    <Link href={`/events/${booking.eventId}`} className="text-[#FF6B00] font-bold flex items-center gap-1 hover:text-white transition-colors">View Event Details <ArrowRight size={16} /></Link>
+                    <button onClick={() => handleCancel(booking.id)} className="text-[#A0A0A0] hover:text-red-500 text-sm font-bold transition-colors">Cancel Ticket</button>
                   </div>
                 )}
               </div>
-            );
-          })}
+
+              <div className="bg-[#0A0A0A] p-8 md:w-1/3 flex flex-col items-center justify-center relative">
+                <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#050505] rounded-full hidden md:block border-r border-[#1E1E1E]" />
+                
+                <h4 className="text-[#A0A0A0] text-sm font-bold uppercase tracking-widest mb-6">Access Passes</h4>
+                <div className="w-full space-y-4">
+                  {booking.ticketCodes?.map((code: string, idx: number) => (
+                    <div key={idx} className="bg-[#121212] border border-[#2A2A2A] rounded-xl p-4 flex flex-col items-center group-hover:border-[#FF6B00]/50 transition-colors">
+                      <img src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${code}`} alt="QR" className="w-24 h-24 mb-3 rounded-lg bg-white p-2" />
+                      <span className="font-mono font-bold text-white tracking-widest">{code}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 text-center">
+                  <p className="text-3xl font-black text-[#FF6B00]">₹{booking.totalPrice.toLocaleString('en-IN')}</p>
+                  <p className="text-[#A0A0A0] text-sm font-medium">{booking.quantity} Pass{booking.quantity > 1 ? 'es' : ''}</p>
+                </div>
+              </div>
+
+            </motion.div>
+          ))}
         </div>
       )}
     </div>

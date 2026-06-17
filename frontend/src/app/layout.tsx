@@ -13,10 +13,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <html lang="en" className="dark">
+      <body className="min-h-screen bg-[#050505] text-white flex flex-col font-sans selection:bg-[#FF6B00] selection:text-white pb-16 md:pb-0">
         <Navbar />
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+        <main className="flex-1 flex flex-col items-center w-full mt-20">
           {children}
         </main>
         <MobileNav />

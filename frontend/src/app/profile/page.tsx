@@ -2,42 +2,37 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { api, getSession, setSession, UserSession } from '../../utils/api';
-import { User, Mail, Phone, Lock, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { api, getSession, setSession, clearSession } from '../../utils/api';
+import { User, Mail, Phone, Loader, LogOut, Shield } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [session, setSessionState] = useState<UserSession | null>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
-  // Form States
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  
-  // Status Alert States
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [updating, setUpdating] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{type: 'success'|'error', text: string} | null>(null);
 
   useEffect(() => {
-    const sess = getSession();
-    if (!sess) {
+    const s = getSession();
+    if (!s) {
       router.push('/login');
       return;
     }
-    setSessionState(sess);
     loadProfile();
   }, []);
 
   const loadProfile = async () => {
     try {
-      const user = await api.get('/auth/profile');
-      setFirstName(user.firstName || '');
-      setLastName(user.lastName || '');
-      setPhone(user.phone || '');
+      const data = await api.get('/auth/profile');
+      setProfile(data);
+      setFirstName(data.firstName || '');
+      setLastName(data.lastName || '');
+      setPhone(data.phone || '');
     } catch (e) {
       console.error(e);
     } finally {
@@ -45,204 +40,103 @@ export default function ProfilePage() {
     }
   };
 
-  const handleProfileUpdate = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
     setMessage(null);
-    setError(null);
-    setUpdating(true);
-
     try {
-      const res = await api.put('/auth/profile', {
-        firstName,
-        lastName,
-        phone,
-        currentPassword: currentPassword.trim() ? currentPassword : null,
-        newPassword: newPassword.trim() ? newPassword : null
-      });
-
-      // Update local storage session values
-      if (session) {
-        const updatedSession = {
-          ...session,
-          firstName,
-          lastName
-        };
-        setSession(updatedSession);
-        setSessionState(updatedSession);
+      const updated = await api.put('/auth/profile', { firstName, lastName, phone });
+      setProfile(updated);
+      
+      // Update session storage
+      const s = getSession();
+      if (s) {
+        setSession({ ...s, firstName: updated.firstName, lastName: updated.lastName });
+        window.dispatchEvent(new Event('userLogin'));
       }
-
-      setMessage(res.message || 'Profile updated successfully!');
-      setCurrentPassword('');
-      setNewPassword('');
+      setMessage({ type: 'success', text: 'Profile updated successfully' });
     } catch (err: any) {
-      setError(err.message || 'Failed to update profile.');
+      setMessage({ type: 'error', text: err.message || 'Failed to update profile' });
     } finally {
-      setUpdating(false);
+      setSaving(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '10rem 0', width: '100%' }}>
-        <Loader size={40} className="spin" style={{ animation: 'spin 1s linear infinite', color: '#FF6B00' }} />
-      </div>
-    );
-  }
+  if (loading) return <div className="flex justify-center items-center h-[70vh]"><Loader size={40} className="spin text-[#FF6B00]" /></div>;
 
   return (
-    <div style={{ width: '100%', maxWidth: '800px', padding: '3rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      <div>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>Account Profile</h1>
-        <p style={{ color: 'var(--text-muted)' }}>Keep your contact details up to date and manage security credentials.</p>
+    <div className="w-full max-w-3xl mx-auto px-4 py-12 md:py-24">
+      <div className="mb-12">
+        <h1 className="text-4xl md:text-5xl font-black mb-4 text-white">Account <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-[#FF8C42]">Settings.</span></h1>
+        <p className="text-[#A0A0A0] text-lg font-medium">Manage your personal information and preferences.</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card border border-[#1E1E1E] overflow-hidden">
         
-        {/* Left Side: General Profile Info Card */}
-        <div className="glass-card" style={{ padding: '2rem', height: 'fit-content' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', textAlign: 'center', marginBottom: '2rem' }}>
-            <div style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #FF6B00 0%, #FF8C42 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '2rem',
-              fontWeight: 800,
-              color: '#FFFFFF'
-            }}>
-              {firstName.charAt(0)}{lastName.charAt(0)}
-            </div>
-            <div>
-              <h3 style={{ fontSize: '1.25rem' }}>{firstName} {lastName}</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{session?.email}</p>
-            </div>
+        <div className="p-8 md:p-10 border-b border-[#1E1E1E] flex items-center gap-6">
+          <div className="w-24 h-24 bg-gradient-to-br from-[#FF6B00] to-[#FF8C42] rounded-full flex items-center justify-center text-4xl font-black text-white shadow-2xl">
+            {profile?.firstName?.charAt(0) || 'U'}
           </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-              <Mail size={16} />
-              <span>{session?.email}</span>
-            </div>
-            {phone && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                <Phone size={16} />
-                <span>{phone}</span>
-              </div>
+          <div>
+            <h2 className="text-2xl font-black text-white mb-1">{profile?.firstName} {profile?.lastName}</h2>
+            <p className="text-[#A0A0A0] font-medium flex items-center gap-2"><Mail size={16} /> {profile?.email}</p>
+            {profile?.roles?.includes('ROLE_ADMIN') && (
+              <span className="inline-flex items-center gap-1 mt-3 px-3 py-1 bg-[#FF6B00]/10 text-[#FF6B00] text-xs font-bold uppercase rounded-md border border-[#FF6B00]/30">
+                <Shield size={12} /> Administrator
+              </span>
             )}
           </div>
         </div>
 
-        {/* Right Side: Update Profile Form */}
-        <div className="glass-card" style={{ padding: '2rem' }}>
-          <h2 style={{ fontSize: '1.4rem', marginBottom: '1.5rem' }}>Account Details</h2>
-
+        <form onSubmit={handleSave} className="p-8 md:p-10 space-y-6">
           {message && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.6rem',
-              background: 'rgba(16, 185, 129, 0.1)',
-              border: '1px solid rgba(16, 185, 129, 0.2)',
-              padding: '0.8rem 1rem',
-              borderRadius: '8px',
-              color: '#10B981',
-              fontSize: '0.85rem',
-              marginBottom: '1.5rem'
-            }}>
-              <CheckCircle size={18} />
-              <span>{message}</span>
+            <div className={`p-4 rounded-xl font-bold text-sm mb-6 border ${message.type === 'success' ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-red-500/10 border-red-500/30 text-red-500'}`}>
+              {message.text}
             </div>
           )}
 
-          {error && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.6rem',
-              background: 'rgba(239, 68, 68, 0.1)',
-              border: '1px solid rgba(239, 68, 68, 0.2)',
-              padding: '0.8rem 1rem',
-              borderRadius: '8px',
-              color: '#EF4444',
-              fontSize: '0.85rem',
-              marginBottom: '1.5rem'
-            }}>
-              <AlertCircle size={18} />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleProfileUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>First Name</label>
-                <input
-                  type="text"
-                  required
-                  className="form-input"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                />
-              </div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Last Name</label>
-                <input
-                  type="text"
-                  required
-                  className="form-input"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Phone Number</label>
-              <input
-                type="tel"
-                className="form-input"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#A0A0A0] ml-1">First Name</label>
+              <input 
+                type="text" value={firstName} onChange={e => setFirstName(e.target.value)} required
+                className="input-field w-full" 
               />
             </div>
-
-            <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', margin: '0.5rem 0', paddingTop: '1rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', color: '#FFFFFF' }}>Change Password</h3>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Current Password</label>
-                  <input
-                    type="password"
-                    className="form-input"
-                    placeholder="••••••••"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                  />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>New Password</label>
-                  <input
-                    type="password"
-                    className="form-input"
-                    placeholder="Minimum 6 characters"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                  />
-                </div>
-              </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#A0A0A0] ml-1">Last Name</label>
+              <input 
+                type="text" value={lastName} onChange={e => setLastName(e.target.value)} required
+                className="input-field w-full" 
+              />
             </div>
+          </div>
 
-            <button type="submit" disabled={updating} className="btn-primary" style={{ width: '100%', marginTop: '0.5rem' }}>
-              {updating ? 'Saving Changes...' : 'Save Profile Details'}
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-[#A0A0A0] ml-1">Phone Number</label>
+            <div className="relative">
+              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" size={20} />
+              <input 
+                type="tel" value={phone} onChange={e => setPhone(e.target.value)}
+                className="input-field w-full pl-12" placeholder="+91 98765 43210"
+              />
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-[#1E1E1E] flex flex-col md:flex-row gap-4 justify-between items-center">
+            <button 
+              type="button" 
+              onClick={() => { clearSession(); router.push('/login'); }}
+              className="text-red-500 font-bold hover:bg-red-500/10 py-3 px-6 rounded-xl transition-colors flex items-center gap-2 w-full md:w-auto justify-center"
+            >
+              <LogOut size={18} /> Sign Out
             </button>
-          </form>
-        </div>
-
-      </div>
+            <button type="submit" disabled={saving} className="btn-primary w-full md:w-auto px-10">
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
+      </motion.div>
     </div>
   );
 }

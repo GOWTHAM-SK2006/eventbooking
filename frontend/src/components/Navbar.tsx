@@ -3,259 +3,100 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { getSession, clearSession, api, UserSession } from '../utils/api';
-import { Calendar, Bell, User as UserIcon, LogOut, Menu, X, CheckSquare, Sparkles } from 'lucide-react';
+import { Calendar, User, LogOut, LayoutDashboard, Settings } from 'lucide-react';
+import { getSession, clearSession } from '../utils/api';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
+  const [session, setSession] = useState<any>(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const [session, setSessionState] = useState<UserSession | null>(null);
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [showNotifDropdown, setShowNotifDropdown] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const sess = getSession();
-    setSessionState(sess);
-    if (sess) {
-      fetchNotifications();
-    }
+    setSession(getSession());
+    
+    // Listen for custom login event
+    const handleLogin = () => setSession(getSession());
+    window.addEventListener('userLogin', handleLogin);
+    return () => window.removeEventListener('userLogin', handleLogin);
   }, [pathname]);
-
-  const fetchNotifications = async () => {
-    try {
-      const data = await api.get('/notifications');
-      setNotifications(data);
-    } catch (e) {
-      console.error('Failed to load notifications', e);
-    }
-  };
-
-  const markAllRead = async () => {
-    try {
-      await api.put('/notifications/read-all');
-      fetchNotifications();
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   const handleLogout = () => {
     clearSession();
-    setSessionState(null);
-    router.push('/');
+    setSession(null);
+    router.push('/login');
   };
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
-  const isAdmin = session?.roles.includes('ROLE_ADMIN');
+  const navLinks = [
+    { name: 'Explore', href: '/events' },
+    { name: 'My Tickets', href: '/history' },
+  ];
 
   return (
-    <nav style={{
-      position: 'sticky',
-      top: 0,
-      zIndex: 100,
-      background: 'rgba(15, 15, 15, 0.8)',
-      backdropFilter: 'blur(12px)',
-      borderBottom: '1px solid rgba(255,255,255,0.06)',
-      display: 'flex',
-      justifyContent: 'center',
-      width: '100%'
-    }}>
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '100%',
-        maxWidth: '1200px',
-        padding: '1rem 1.5rem',
-      }}>
-        {/* Brand */}
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #FF6B00 0%, #FF8C42 100%)',
-            padding: '0.4rem',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Calendar size={20} color="#FFFFFF" />
-          </div>
-          <span style={{
-            fontFamily: "'Outfit', sans-serif",
-            fontWeight: 800,
-            fontSize: '1.4rem',
-            letterSpacing: '-0.03em',
-            color: '#FFFFFF'
-          }}>
-            EVNT<span style={{ color: '#FF6B00' }}>.</span>
-          </span>
-        </Link>
-
-        {/* Desktop Links */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.8rem' }} className="desktop-links">
-          <Link href="/events" style={{
-            color: pathname === '/events' ? '#FF6B00' : '#A3A3A3',
-            fontSize: '0.95rem',
-            fontWeight: 500
-          }}>
-            Explore Events
+    <nav className="w-full fixed top-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-[#1E1E1E]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#FF6B00] to-[#FF8C42] rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-all shadow-[0_0_15px_rgba(255,107,0,0.5)]">
+              <Calendar size={20} color="white" />
+            </div>
+            <span className="text-2xl font-black tracking-tight text-white">EVNT<span className="text-[#FF6B00]">.</span></span>
           </Link>
-          
-          {session && (
-            <>
-              {isAdmin ? (
-                <Link href="/dashboard" style={{
-                  color: pathname.startsWith('/dashboard') ? '#FF6B00' : '#A3A3A3',
-                  fontSize: '0.95rem',
-                  fontWeight: 500
-                }}>
-                  Admin Dashboard
-                </Link>
-              ) : (
-                <Link href="/history" style={{
-                  color: pathname === '/history' ? '#FF6B00' : '#A3A3A3',
-                  fontSize: '0.95rem',
-                  fontWeight: 500
-                }}>
-                  My Bookings
-                </Link>
-              )}
-              <Link href="/profile" style={{
-                color: pathname === '/profile' ? '#FF6B00' : '#A3A3A3',
-                fontSize: '0.95rem',
-                fontWeight: 500
-              }}>
-                Profile
+
+          <div className="hidden md:flex items-center gap-8">
+            {navLinks.map(link => (
+              <Link key={link.name} href={link.href} className={`text-sm font-semibold transition-colors hover:text-white ${pathname === link.href ? 'text-[#FF6B00]' : 'text-[#A0A0A0]'}`}>
+                {link.name}
               </Link>
-            </>
-          )}
-        </div>
+            ))}
 
-        {/* Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          {session ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', position: 'relative' }}>
-              {/* Notification Bell */}
-              <button 
-                onClick={() => setShowNotifDropdown(!showNotifDropdown)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#FFFFFF',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  padding: '0.4rem',
-                  borderRadius: '50%',
-                  transition: '0.2s',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                <Bell size={20} />
-                {unreadCount > 0 && (
-                  <span style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    background: '#FF6B00',
-                    color: '#FFFFFF',
-                    borderRadius: '50%',
-                    fontSize: '0.65rem',
-                    width: '16px',
-                    height: '16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 700
-                  }}>
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
-
-              {/* Notification Dropdown */}
-              {showNotifDropdown && (
-                <div style={{
-                  position: 'absolute',
-                  top: '100%',
-                  right: 0,
-                  marginTop: '0.75rem',
-                  width: '320px',
-                  background: '#171717',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: '12px',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-                  padding: '1rem',
-                  zIndex: 200
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                    <h4 style={{ fontSize: '0.95rem', fontWeight: 600 }}>Notifications</h4>
-                    {unreadCount > 0 && (
-                      <button 
-                        onClick={markAllRead}
-                        style={{ background: 'none', border: 'none', color: '#FF6B00', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 600 }}
-                      >
-                        Mark all read
-                      </button>
-                    )}
-                  </div>
-                  <div style={{ maxHeight: '240px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {notifications.length === 0 ? (
-                      <p style={{ color: '#6B7280', fontSize: '0.8rem', textAlign: 'center', padding: '1rem 0' }}>No notifications</p>
-                    ) : (
-                      notifications.map((notif) => (
-                        <div 
-                          key={notif.id} 
-                          style={{
-                            padding: '0.6rem',
-                            borderRadius: '6px',
-                            background: notif.read ? 'transparent' : 'rgba(255, 107, 0, 0.05)',
-                            borderLeft: notif.read ? 'none' : '3px solid #FF6B00',
-                            fontSize: '0.8rem'
-                          }}
-                        >
-                          <div style={{ fontWeight: 600, color: '#FFFFFF', marginBottom: '0.2rem' }}>{notif.title}</div>
-                          <div style={{ color: '#A3A3A3' }}>{notif.message}</div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Logged-in User indicator */}
-              <div className="desktop-links" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '1rem' }}>
-                <span style={{ fontSize: '0.85rem', color: '#A3A3A3' }}>Hi, {session.firstName}</span>
+            {session ? (
+              <div className="relative">
                 <button 
-                  onClick={handleLogout}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#EF4444',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.3rem',
-                    fontSize: '0.85rem',
-                    fontWeight: 600
-                  }}
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  className="flex items-center gap-3 bg-[#121212] border border-[#1E1E1E] py-2 px-4 rounded-full hover:border-[#FF6B00] transition-colors"
                 >
-                  <LogOut size={16} />
-                  Sign Out
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#FF6B00] to-[#FF8C42] flex items-center justify-center text-sm font-bold text-white">
+                    {session.firstName?.charAt(0) || 'U'}
+                  </div>
+                  <span className="text-sm font-semibold text-white truncate max-w-[100px]">{session.firstName || 'User'}</span>
                 </button>
+
+                <AnimatePresence>
+                  {showProfileMenu && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute right-0 mt-3 w-56 bg-[#121212] border border-[#1E1E1E] rounded-2xl shadow-2xl overflow-hidden py-2"
+                    >
+                      <div className="px-4 py-3 border-b border-[#1E1E1E] mb-2">
+                        <p className="text-sm font-bold text-white truncate">{session.firstName} {session.lastName}</p>
+                        <p className="text-xs text-[#A0A0A0] truncate">{session.email}</p>
+                      </div>
+                      <Link href="/profile" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#A0A0A0] hover:text-white hover:bg-[#1E1E1E] transition-colors">
+                        <User size={16} /> Profile Settings
+                      </Link>
+                      {session.roles?.includes('ROLE_ADMIN') && (
+                        <Link href="/dashboard" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#FF6B00] hover:bg-[#FF6B00]/10 transition-colors">
+                          <LayoutDashboard size={16} /> Admin Console
+                        </Link>
+                      )}
+                      <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-red-500/10 transition-colors mt-2 border-t border-[#1E1E1E] pt-3">
+                        <LogOut size={16} /> Sign Out
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <Link href="/login" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#FFFFFF' }}>
-                Sign In
-              </Link>
-              <Link href="/signup" className="btn-primary" style={{ padding: '0.5rem 1.2rem', fontSize: '0.85rem', borderRadius: '6px' }}>
-                Sign Up
-              </Link>
-            </div>
-          )}
+            ) : (
+              <div className="flex gap-4">
+                <Link href="/login" className="text-sm font-semibold text-[#A0A0A0] hover:text-white py-2 px-4 transition-colors">Log In</Link>
+                <Link href="/signup" className="text-sm font-semibold bg-white text-black py-2 px-6 rounded-full hover:bg-[#FF6B00] hover:text-white transition-all transform hover:scale-105">Get Started</Link>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </nav>

@@ -4,208 +4,100 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '../../utils/api';
-import { Calendar, User, Mail, Lock, Phone, AlertCircle, ArrowRight, Loader } from 'lucide-react';
+import { User, Mail, Lock, Loader, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function SignupPage() {
-  const router = useRouter();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setError('');
     setLoading(true);
-
     try {
-      await api.post('/auth/signup', {
-        firstName,
-        lastName,
-        email,
-        password,
-        phone
-      });
-      setSuccess(true);
-      setTimeout(() => {
-        router.push('/login');
-      }, 2000);
+      await api.post('/auth/register', { firstName, lastName, email, password });
+      router.push('/login');
     } catch (err: any) {
-      setError(err.message || 'Registration failed. Please try again.');
+      setError(err.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{
-      width: '100%',
-      minHeight: '85vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '2rem 1.5rem',
-      position: 'relative'
-    }}>
-      <div className="glow-spot" style={{ top: '20%', left: '30%' }}></div>
+    <div className="w-full min-h-[85vh] flex items-center justify-center px-4 relative overflow-hidden my-12">
+      <div className="absolute -top-1/4 left-1/4 w-96 h-96 bg-[#FF6B00]/20 rounded-full blur-[120px] mix-blend-screen" />
 
-      <div className="glass-card fade-in" style={{
-        width: '100%',
-        maxWidth: '460px',
-        padding: '2.5rem',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1.8rem'
-      }}>
-        {/* Brand Header */}
-        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #FF6B00 0%, #FF8C42 100%)',
-            padding: '0.6rem',
-            borderRadius: '12px',
-            display: 'inline-flex',
-            marginBottom: '1rem'
-          }}>
-            <Calendar size={24} color="#FFFFFF" />
-          </div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Create Account</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.25rem' }}>Join EVNT to book elite tickets</p>
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card w-full max-w-md p-8 md:p-10 relative z-10 border border-[#1E1E1E]">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-black text-white tracking-tight mb-2">Create Account.</h1>
+          <p className="text-[#A0A0A0] font-medium">Join EVNT to discover premium experiences.</p>
         </div>
 
         {error && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.6rem',
-            background: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid rgba(239, 68, 68, 0.2)',
-            padding: '0.8rem 1rem',
-            borderRadius: '8px',
-            color: '#EF4444',
-            fontSize: '0.85rem'
-          }}>
-            <AlertCircle size={18} />
-            <span>{error}</span>
+          <div className="bg-red-500/10 border border-red-500/30 text-red-500 text-sm font-bold p-4 rounded-xl mb-6 text-center">
+            {error}
           </div>
         )}
 
-        {success && (
-          <div style={{
-            background: 'rgba(16, 185, 129, 0.1)',
-            border: '1px solid rgba(16, 185, 129, 0.2)',
-            padding: '0.8rem 1rem',
-            borderRadius: '8px',
-            color: '#10B981',
-            fontSize: '0.85rem',
-            textAlign: 'center'
-          }}>
-            Registration Successful! Redirecting to login...
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
-          {/* Name Row */}
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <label style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-muted)' }}>First Name</label>
-              <input
-                type="text"
-                required
-                className="form-input"
-                placeholder="John"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
+        <form onSubmit={handleSignup} className="space-y-5">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#A0A0A0] ml-1">First Name</label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" size={20} />
+                <input 
+                  type="text" required value={firstName} onChange={e => setFirstName(e.target.value)}
+                  className="input-field w-full pl-11" placeholder="John"
+                />
+              </div>
             </div>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <label style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-muted)' }}>Last Name</label>
-              <input
-                type="text"
-                required
-                className="form-input"
-                placeholder="Doe"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#A0A0A0] ml-1">Last Name</label>
+              <input 
+                type="text" required value={lastName} onChange={e => setLastName(e.target.value)}
+                className="input-field w-full px-4" placeholder="Doe"
               />
             </div>
           </div>
 
-          {/* Email input */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-muted)' }}>Email Address</label>
-            <div style={{ position: 'relative' }}>
-              <Mail size={16} color="#6B7280" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
-              <input
-                type="email"
-                required
-                className="form-input"
-                style={{ paddingLeft: '2.6rem' }}
-                placeholder="john@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-[#A0A0A0] ml-1">Email Address</label>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" size={20} />
+              <input 
+                type="email" required value={email} onChange={e => setEmail(e.target.value)}
+                className="input-field w-full pl-12" placeholder="name@company.com"
               />
             </div>
           </div>
 
-          {/* Phone input */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-muted)' }}>Phone Number (Optional)</label>
-            <div style={{ position: 'relative' }}>
-              <Phone size={16} color="#6B7280" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
-              <input
-                type="tel"
-                className="form-input"
-                style={{ paddingLeft: '2.6rem' }}
-                placeholder="+1 (555) 000-0000"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-[#A0A0A0] ml-1">Password</label>
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" size={20} />
+              <input 
+                type="password" required value={password} onChange={e => setPassword(e.target.value)} minLength={6}
+                className="input-field w-full pl-12" placeholder="••••••••"
               />
             </div>
           </div>
 
-          {/* Password input */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-muted)' }}>Password</label>
-            <div style={{ position: 'relative' }}>
-              <Lock size={16} color="#6B7280" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
-              <input
-                type="password"
-                required
-                className="form-input"
-                style={{ paddingLeft: '2.6rem' }}
-                placeholder="Minimum 6 characters"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <button type="submit" disabled={loading || success} className="btn-primary" style={{ width: '100%', marginTop: '0.5rem' }}>
-            {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Loader size={18} className="spin" style={{ animation: 'spin 1s linear infinite' }} />
-                Creating Account...
-              </span>
-            ) : (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                Register
-                <ArrowRight size={18} />
-              </span>
-            )}
+          <button type="submit" disabled={loading} className="btn-primary w-full flex justify-center items-center gap-2 mt-6 text-lg">
+            {loading ? <Loader className="spin" size={20} /> : <>Create Account <ArrowRight size={20} /></>}
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-          Already have an account?{' '}
-          <Link href="/login" style={{ color: '#FF6B00', fontWeight: 600 }}>
-            Sign in
-          </Link>
+        <p className="text-center text-[#A0A0A0] mt-8 font-medium">
+          Already have an account? <Link href="/login" className="text-[#FF6B00] font-bold hover:text-white transition-colors">Sign in</Link>
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 }
