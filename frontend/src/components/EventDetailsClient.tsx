@@ -198,10 +198,10 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
               <span className="inline-block px-4 py-1.5 bg-[#FF6B00] text-white font-bold text-sm uppercase tracking-wider rounded-lg mb-4 shadow-[0_0_20px_rgba(255,107,0,0.4)]">
                 {event.category}
               </span>
-              <h1 className="text-4xl md:text-6xl font-black text-white leading-tight mb-4 drop-shadow-2xl">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-white leading-tight mb-4 drop-shadow-2xl">
                 {event.title}
               </h1>
-              <div className="flex flex-wrap items-center gap-6 text-white/80 font-medium">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 text-white/80 font-medium">
                 <span className="flex items-center gap-2 text-lg"><Calendar size={20} className="text-[#FF6B00]" /> {new Date(event.startDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
                 <span className="flex items-center gap-2 text-lg"><MapPin size={20} className="text-[#FF6B00]" /> {event.location}</span>
               </div>
@@ -305,7 +305,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
         </div>
 
         {/* Right Column - Booking Card */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1" id="booking-section">
           <div className="sticky top-28 glass-card border-t-4 border-t-[#FF6B00] shadow-2xl">
             <div className="p-8">
               <div className="mb-8">
@@ -368,7 +368,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
             <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 20 }} className="bg-[#121212] border border-[#1E1E1E] rounded-3xl w-full max-w-md overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
               
               {bookingSuccess ? (
-                <div className="p-10 text-center flex flex-col items-center">
+                <div className="p-6 sm:p-10 text-center flex flex-col items-center">
                   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring" }} className="w-24 h-24 bg-[#FF6B00]/20 rounded-full flex items-center justify-center mb-6">
                     <CheckCircle size={48} className="text-[#FF6B00]" />
                   </motion.div>
@@ -384,9 +384,9 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
                   </div>
                   
                   <div className="p-6">
-                    <div className="bg-[#050505] p-6 rounded-2xl border border-[#1E1E1E] mb-8 text-center">
-                      <p className="text-[#A0A0A0] text-sm font-bold uppercase tracking-wider mb-2">Total Amount Due</p>
-                      <h4 className="text-4xl font-black text-[#FF6B00]">₹{totalPrice.toLocaleString('en-IN', {minimumFractionDigits:2})}</h4>
+                    <div className="bg-[#050505] p-4 sm:p-6 rounded-2xl border border-[#1E1E1E] mb-6 sm:mb-8 text-center">
+                      <p className="text-[#A0A0A0] text-xs sm:text-sm font-bold uppercase tracking-wider mb-2">Total Amount Due</p>
+                      <h4 className="text-3xl sm:text-4xl font-black text-[#FF6B00]">₹{totalPrice.toLocaleString('en-IN', {minimumFractionDigits:2})}</h4>
                     </div>
 
                     {event.price > 0 && (
@@ -448,6 +448,24 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Mobile Sticky Booking Bar */}
+      {!loading && event && (
+        <div className="lg:hidden fixed bottom-16 left-0 right-0 bg-[#121212] border-t border-[#1E1E1E] p-4 z-40 flex justify-between items-center shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+          <div>
+            <p className="text-[#A0A0A0] text-xs font-bold uppercase">Price</p>
+            <p className="text-xl font-black text-white">{event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}`}</p>
+          </div>
+          <button 
+            onClick={() => {
+              document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="btn-primary py-3 px-8 text-sm"
+          >
+            Get Passes
+          </button>
+        </div>
+      )}
 
     </div>
   );

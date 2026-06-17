@@ -39,8 +39,8 @@ export default function EventsPage() {
     <div className="w-full max-w-7xl mx-auto px-4 py-12 md:py-24">
       
       {/* Header Section */}
-      <div className="mb-16">
-        <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-5xl md:text-7xl font-black mb-6 tracking-tight">
+      <div className="mb-12 md:mb-16">
+        <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-4xl sm:text-5xl md:text-7xl font-black mb-4 md:mb-6 tracking-tight">
           Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-[#FF8C42]">Events.</span>
         </motion.h1>
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="text-[#A0A0A0] text-xl max-w-2xl font-medium">
@@ -49,7 +49,7 @@ export default function EventsPage() {
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="glass-card p-4 md:p-6 mb-16 flex flex-col md:flex-row gap-4 items-center shadow-2xl relative z-20">
+      <div className="glass-card p-4 md:p-6 mb-12 md:mb-16 flex flex-col lg:flex-row gap-4 items-stretch lg:items-center shadow-2xl relative z-20">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A0A0A0]" size={20} />
           <input 
@@ -57,11 +57,11 @@ export default function EventsPage() {
             placeholder="Search events by title or location..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl py-4 pl-12 pr-4 text-white placeholder-[#A0A0A0] focus:outline-none focus:border-[#FF6B00] focus:ring-1 focus:ring-[#FF6B00] transition-all font-medium"
+            className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl py-3 md:py-4 pl-12 pr-4 text-white placeholder-[#A0A0A0] focus:outline-none focus:border-[#FF6B00] focus:ring-1 focus:ring-[#FF6B00] transition-all font-medium text-sm md:text-base"
           />
         </div>
         
-        <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 hide-scrollbar">
+        <div className="flex gap-2 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 hide-scrollbar">
           <button 
             onClick={() => setCategory('')}
             className={`whitespace-nowrap px-6 py-4 rounded-xl font-bold transition-all ${category === '' ? 'bg-[#FF6B00] text-white shadow-[0_0_15px_rgba(255,107,0,0.4)]' : 'bg-[#1A1A1A] border border-[#2A2A2A] text-[#A0A0A0] hover:text-white hover:border-[#FF6B00]'}`}

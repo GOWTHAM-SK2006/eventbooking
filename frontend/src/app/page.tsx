@@ -76,7 +76,7 @@ export default function HomePage() {
               <span className="text-sm font-bold text-[#A0A0A0]">Over 1,200+ events live right now</span>
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-[1.1] text-white">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-[1.1] text-white">
               Discover & Book <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] via-[#FF8C42] to-yellow-500">
                 Extraordinary Events
@@ -90,16 +90,18 @@ export default function HomePage() {
             {/* Hero Search */}
             <form onSubmit={handleSearch} className="relative w-full max-w-xl mb-10 group">
               <div className="absolute inset-0 bg-gradient-to-r from-[#FF6B00] to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-500" />
-              <div className="relative flex items-center bg-[#121212] border border-[#1E1E1E] rounded-2xl p-2 shadow-2xl">
-                <Search className="text-[#A0A0A0] ml-4" size={24} />
-                <input 
-                  type="text" 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search for events, cities, or categories..."
-                  className="w-full bg-transparent border-none text-white px-4 py-3 focus:outline-none placeholder-[#555] font-medium text-lg"
-                />
-                <button type="submit" className="bg-[#FF6B00] hover:bg-[#e66000] text-white px-8 py-3 rounded-xl font-bold transition-colors">
+              <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center bg-[#121212] border border-[#1E1E1E] rounded-2xl p-2 shadow-2xl gap-2">
+                <div className="flex flex-1 items-center px-2">
+                  <Search className="text-[#A0A0A0] shrink-0" size={24} />
+                  <input 
+                    type="text" 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search events, cities..."
+                    className="w-full bg-transparent border-none text-white px-3 py-3 focus:outline-none placeholder-[#555] font-medium text-base sm:text-lg"
+                  />
+                </div>
+                <button type="submit" className="bg-[#FF6B00] hover:bg-[#e66000] text-white px-8 py-3 rounded-xl font-bold transition-colors w-full sm:w-auto">
                   Search
                 </button>
               </div>
@@ -125,7 +127,7 @@ export default function HomePage() {
             </div>
             <div className="space-y-4">
               <motion.img initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80" alt="Concert" className="w-full h-48 object-cover rounded-3xl border border-[#1E1E1E] shadow-2xl" />
-              <motion.img initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} src="https://images.unsplash.com/photo-1523580494112-071dcb84930d?w=800&q=80" alt="Workshop" className="w-full h-64 object-cover rounded-3xl border border-[#1E1E1E] shadow-2xl" />
+              <motion.img initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80" alt="Workshop" className="w-full h-64 object-cover rounded-3xl border border-[#1E1E1E] shadow-2xl" />
             </div>
             
             {/* Floating UI Elements */}
@@ -308,7 +310,7 @@ export default function HomePage() {
         <div className="glass-card p-12 md:p-20 text-center border border-[#FF6B00]/30 relative overflow-hidden rounded-[3rem]">
           <div className="absolute inset-0 bg-gradient-to-br from-[#FF6B00]/20 to-transparent" />
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-6xl font-black text-white mb-6">Ready to host your own event?</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-white mb-6">Ready to host your own event?</h2>
             <p className="text-xl text-[#A0A0A0] mb-10 max-w-2xl mx-auto font-medium">Join thousands of creators who trust EVNT to manage their ticketing, analytics, and check-ins seamlessly.</p>
             <Link href="/signup" className="btn-primary text-xl px-10 py-5 rounded-2xl shadow-[0_0_40px_rgba(255,107,0,0.4)]">
               Create Organizer Account
