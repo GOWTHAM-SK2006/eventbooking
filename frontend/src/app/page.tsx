@@ -197,7 +197,7 @@ export default function HomePage() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FF6B00' }}>
-                      {event.price === 0 ? 'Free' : `$${event.price}`}
+                      {event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}`}
                     </span>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                       {new Date(event.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
@@ -265,7 +265,7 @@ export default function HomePage() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FF6B00' }}>
-                      {event.price === 0 ? 'Free' : `$${event.price}`}
+                      {event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}`}
                     </span>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                       {new Date(event.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}

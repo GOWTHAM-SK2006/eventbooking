@@ -163,7 +163,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
     const options = {
       key: 'rzp_test_T2NUwSm1uqZZrX',
       amount: amountInCents,
-      currency: 'USD',
+      currency: 'INR',
       name: 'EVNT. Tickets',
       description: `Booking for ${event.title}`,
       handler: function (response: any) {
@@ -462,7 +462,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
                 <div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Ticket Price</div>
                   <div style={{ fontSize: '2rem', fontWeight: 800, color: '#FF6B00', marginTop: '0.2rem' }}>
-                    {event.price === 0 ? 'Free' : `$${event.price}`}
+                    {event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}`}
                   </div>
                 </div>
 
@@ -493,7 +493,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
                 {/* Total Calc */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '1rem' }}>
                   <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Total Amount:</span>
-                  <span style={{ fontSize: '1.25rem', fontWeight: 800 }}>${totalPrice.toFixed(2)}</span>
+                  <span style={{ fontSize: '1.25rem', fontWeight: 800 }}>₹{totalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
 
                 {bookingError && (
@@ -547,7 +547,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
             <div style={{ textAlign: 'center' }}>
               <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Complete Payment</h2>
               <div style={{ fontSize: '2rem', fontWeight: 800, color: '#FF6B00', marginTop: '0.5rem' }}>
-                ${totalPrice.toFixed(2)}
+                ₹{totalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>For {quantity} ticket(s) to {event.title}</p>
             </div>

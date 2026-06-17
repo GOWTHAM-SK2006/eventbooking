@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, getSession } from '../../utils/api';
 import { 
-  BarChart3, Calendar, Users, DollarSign, Plus, Edit3, Trash2, 
+  BarChart3, Calendar, Users, IndianRupee, Plus, Edit3, Trash2, 
   CheckCircle2, ArrowUpRight, CheckSquare, Search, Tag, MapPin, 
   Clock, X, Check, Loader, ShieldAlert 
 } from 'lucide-react';
@@ -281,7 +281,7 @@ export default function DashboardPage() {
           {/* Analytics Cards Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
             {[
-              { label: 'Total Revenue', value: `$${stats.totalRevenue.toFixed(2)}`, icon: <DollarSign size={20} color="#FF6B00" /> },
+              { label: 'Total Revenue', value: `₹${stats.totalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, icon: <IndianRupee size={20} color="#FF6B00" /> },
               { label: 'Confirmed Bookings', value: stats.totalBookings, icon: <CheckSquare size={20} color="#FF6B00" /> },
               { label: 'Total Events', value: stats.totalEvents, icon: <Calendar size={20} color="#FF6B00" /> },
               { label: 'Registered Users', value: stats.totalUsers, icon: <Users size={20} color="#FF6B00" /> }
@@ -331,7 +331,7 @@ export default function DashboardPage() {
                   Object.entries(stats.monthlyRevenue).map(([month, val]: any) => (
                     <div key={month} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem' }}>
                       <span style={{ color: 'var(--text-muted)' }}>{month}</span>
-                      <span style={{ fontWeight: 700, color: '#10B981' }}>${val.toFixed(2)}</span>
+                      <span style={{ fontWeight: 700, color: '#10B981' }}>₹{val.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                   ))
                 )}
@@ -361,7 +361,7 @@ export default function DashboardPage() {
                   <tr key={evt.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
                     <td style={{ padding: '1rem', fontWeight: 600 }}>{evt.title}</td>
                     <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{evt.category}</td>
-                    <td style={{ padding: '1rem', fontWeight: 600 }}>${evt.price}</td>
+                    <td style={{ padding: '1rem', fontWeight: 600 }}>₹{evt.price.toLocaleString('en-IN')}</td>
                     <td style={{ padding: '1rem' }}>
                       {evt.availableSlots} / {evt.capacity}
                     </td>
@@ -414,7 +414,7 @@ export default function DashboardPage() {
                     <td style={{ padding: '1rem', fontWeight: 500 }}>{booking.userEmail}</td>
                     <td style={{ padding: '1rem' }}>{booking.eventTitle}</td>
                     <td style={{ padding: '1rem' }}>{booking.quantity}</td>
-                    <td style={{ padding: '1rem', fontWeight: 600 }}>${booking.totalPrice}</td>
+                    <td style={{ padding: '1rem', fontWeight: 600 }}>₹{booking.totalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td style={{ padding: '1rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                       {new Date(booking.bookingDate).toLocaleDateString()}
                     </td>
@@ -645,7 +645,7 @@ export default function DashboardPage() {
                   </select>
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Ticket Price ($)</label>
+                  <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Ticket Price (₹)</label>
                   <input
                     type="number"
                     required

@@ -183,7 +183,7 @@ export default function HistoryPage() {
                     )}
 
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF' }}>${booking.totalPrice}</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF' }}>₹{booking.totalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-dark)' }}>{booking.quantity} ticket(s)</div>
                     </div>
                   </div>

@@ -184,7 +184,7 @@ export default function EventsPage() {
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#FF6B00' }}>
-                      {event.price === 0 ? 'Free' : `$${event.price}`}
+                      {event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}`}
                     </span>
                     <span style={{ fontSize: '0.8rem', color: event.availableSlots < 10 ? '#EF4444' : 'var(--text-muted)', fontWeight: 600 }}>
                       {event.availableSlots} slots left
