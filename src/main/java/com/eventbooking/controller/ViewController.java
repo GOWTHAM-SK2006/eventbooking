@@ -22,6 +22,6 @@ public class ViewController {
 
     @GetMapping("/events/{id:[^\\.]+}")
     public String forwardEventDetails() {
-        return "forward:/events/[id].html";
+        return "forward:/events/fallback.html";
     }
 }

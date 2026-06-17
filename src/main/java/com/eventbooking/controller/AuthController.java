@@ -39,10 +39,22 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    private UserResponse mapToUserResponse(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phone(user.getPhone())
+                .roles(user.getRoles().stream().map(r -> r.getName()).toList())
+                .createdAt(user.getCreatedAt())
+                .build();
+    }
+
     @GetMapping("/profile")
-    public ResponseEntity<User> getUserProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<UserResponse> getUserProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = authService.getUserById(userDetails.getId());
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(mapToUserResponse(user));
     }
 
     @PutMapping("/profile")
@@ -54,8 +66,9 @@ public class AuthController {
 
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = authService.getAllUsers();
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        List<UserResponse> users = authService.getAllUsers().stream()
+                .map(this::mapToUserResponse).toList();
         return ResponseEntity.ok(users);
     }
 }

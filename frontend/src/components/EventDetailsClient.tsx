@@ -19,7 +19,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
 
   useEffect(() => {
     let resolvedId = propsId;
-    if (resolvedId === '%5Bid%5D' || resolvedId === '[id]') {
+    if (resolvedId === '%5Bid%5D' || resolvedId === '[id]' || resolvedId === 'fallback') {
       resolvedId = (params?.id as string) || window.location.pathname.split('/').pop() || '';
     }
     if (resolvedId) {

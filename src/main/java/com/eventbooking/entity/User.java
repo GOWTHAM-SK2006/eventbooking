@@ -27,6 +27,7 @@ public class User {
     private String email;
 
     @Column(nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private String password;
 
     @Column(name = "first_name")
@@ -53,6 +54,7 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @Builder.Default
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Set<Role> roles = new HashSet<>();
 
     @PrePersist

@@ -1,7 +1,7 @@
 import EventDetailsClient from '../../../components/EventDetailsClient';
 
 export function generateStaticParams() {
-  return [{ id: '[id]' }];
+  return [{ id: 'fallback' }];
 }
 
 export default async function EventPage({ params }: { params: Promise<{ id: string }> }) {
