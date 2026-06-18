@@ -3,8 +3,8 @@ import Navbar from '../components/Navbar';
 import MobileNav from '../components/MobileNav';
 
 export const metadata = {
-  title: 'EventBooking | Premium Event Booking Platform',
-  description: 'Book slots for premium technology, arts, music, and business events.',
+  title: 'EventBooking | Modern Event Booking Platform',
+  description: 'Discover and book premium events. Modern, trusted, professional event management.',
 };
 
 export default function RootLayout({
@@ -13,8 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-screen bg-[#050505] text-white flex flex-col font-sans selection:bg-[#FF6B00] selection:text-white pb-16 md:pb-0">
+    <html lang="en">
+      <body className="min-h-screen bg-[#FAFAFA] text-[#111827] flex flex-col font-sans selection:bg-[#FACC15] selection:text-[#111827] pb-16 md:pb-0">
         <Navbar />
         <main className="flex-1 flex flex-col items-center w-full mt-20">
           {children}

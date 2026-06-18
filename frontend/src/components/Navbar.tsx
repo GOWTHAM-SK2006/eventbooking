@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Calendar, User, LogOut, LayoutDashboard, Settings } from 'lucide-react';
+import { Calendar, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { getSession, clearSession } from '../utils/api';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -15,8 +15,6 @@ export default function Navbar() {
 
   useEffect(() => {
     setSession(getSession());
-    
-    // Listen for custom login event
     const handleLogin = () => setSession(getSession());
     window.addEventListener('userLogin', handleLogin);
     return () => window.removeEventListener('userLogin', handleLogin);
@@ -34,19 +32,19 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="w-full fixed top-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-[#1E1E1E]">
+    <nav className="w-full fixed top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#FF6B00] to-[#FF8C42] rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-all shadow-[0_0_15px_rgba(255,107,0,0.5)]">
-              <Calendar size={20} color="white" />
+            <div className="w-10 h-10 bg-[#FACC15] rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-all">
+              <Calendar size={20} className="text-[#111827]" />
             </div>
-            <span className="text-2xl font-black tracking-tight text-white">EventBooking<span className="text-[#FF6B00]">.</span></span>
+            <span className="text-2xl font-black tracking-tight text-[#111827]">EventBooking<span className="text-[#FACC15]">.</span></span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map(link => (
-              <Link key={link.name} href={link.href} className={`text-sm font-semibold transition-colors hover:text-white ${pathname === link.href ? 'text-[#FF6B00]' : 'text-[#A0A0A0]'}`}>
+              <Link key={link.name} href={link.href} className={`text-sm font-semibold transition-colors ${pathname === link.href ? 'text-[#FACC15]' : 'text-[#6B7280] hover:text-[#111827]'}`}>
                 {link.name}
               </Link>
             ))}
@@ -55,12 +53,12 @@ export default function Navbar() {
               <div className="relative">
                 <button 
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-3 bg-[#121212] border border-[#1E1E1E] py-2 px-4 rounded-full hover:border-[#FF6B00] transition-colors"
+                  className="flex items-center gap-3 bg-gray-100 border border-gray-200 py-2 px-4 rounded-full hover:border-[#FACC15] transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#FF6B00] to-[#FF8C42] flex items-center justify-center text-sm font-bold text-white">
+                  <div className="w-8 h-8 rounded-full bg-[#FACC15] flex items-center justify-center text-sm font-bold text-[#111827]">
                     {session.firstName?.charAt(0) || 'U'}
                   </div>
-                  <span className="text-sm font-semibold text-white truncate max-w-[100px]">{session.firstName || 'User'}</span>
+                  <span className="text-sm font-semibold text-[#111827] truncate max-w-[100px]">{session.firstName || 'User'}</span>
                 </button>
 
                 <AnimatePresence>
@@ -69,21 +67,21 @@ export default function Navbar() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-3 w-56 bg-[#121212] border border-[#1E1E1E] rounded-2xl shadow-2xl overflow-hidden py-2"
+                      className="absolute right-0 mt-3 w-56 bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden py-2"
                     >
-                      <div className="px-4 py-3 border-b border-[#1E1E1E] mb-2">
-                        <p className="text-sm font-bold text-white truncate">{session.firstName} {session.lastName}</p>
-                        <p className="text-xs text-[#A0A0A0] truncate">{session.email}</p>
+                      <div className="px-4 py-3 border-b border-gray-200 mb-2">
+                        <p className="text-sm font-bold text-[#111827] truncate">{session.firstName} {session.lastName}</p>
+                        <p className="text-xs text-[#6B7280] truncate">{session.email}</p>
                       </div>
-                      <Link href="/profile" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#A0A0A0] hover:text-white hover:bg-[#1E1E1E] transition-colors">
+                      <Link href="/profile" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#6B7280] hover:text-[#111827] hover:bg-gray-100 transition-colors">
                         <User size={16} /> Profile Settings
                       </Link>
                       {session.roles?.includes('ROLE_ADMIN') && (
-                        <Link href="/dashboard" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#FF6B00] hover:bg-[#FF6B00]/10 transition-colors">
+                        <Link href="/dashboard" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#FACC15] hover:bg-yellow-50 transition-colors">
                           <LayoutDashboard size={16} /> Admin Console
                         </Link>
                       )}
-                      <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-red-500/10 transition-colors mt-2 border-t border-[#1E1E1E] pt-3">
+                      <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors mt-2 border-t border-gray-200 pt-3">
                         <LogOut size={16} /> Sign Out
                       </button>
                     </motion.div>
@@ -92,8 +90,8 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex gap-4">
-                <Link href="/login" className="text-sm font-semibold text-[#A0A0A0] hover:text-white py-2 px-4 transition-colors">Log In</Link>
-                <Link href="/signup" className="text-sm font-semibold bg-white text-black py-2 px-6 rounded-full hover:bg-[#FF6B00] hover:text-white transition-all transform hover:scale-105">Get Started</Link>
+                <Link href="/login" className="text-sm font-semibold text-[#6B7280] hover:text-[#111827] py-2 px-4 transition-colors">Log In</Link>
+                <Link href="/signup" className="text-sm font-semibold bg-[#FACC15] text-[#111827] py-2 px-6 rounded-full hover:bg-[#EAB308] transition-all font-bold">Get Started</Link>
               </div>
             )}
           </div>
