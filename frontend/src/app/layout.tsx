@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import MobileNav from '../components/MobileNav';
 
 export const metadata = {
-  title: 'EVNT. | Premium Event Booking Platform',
+  title: 'EventBooking | Premium Event Booking Platform',
   description: 'Book slots for premium technology, arts, music, and business events.',
 };
 

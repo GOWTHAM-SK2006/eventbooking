@@ -41,7 +41,7 @@ export default function Navbar() {
             <div className="w-10 h-10 bg-gradient-to-br from-[#FF6B00] to-[#FF8C42] rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-all shadow-[0_0_15px_rgba(255,107,0,0.5)]">
               <Calendar size={20} color="white" />
             </div>
-            <span className="text-2xl font-black tracking-tight text-white">EVNT<span className="text-[#FF6B00]">.</span></span>
+            <span className="text-2xl font-black tracking-tight text-white">EventBooking<span className="text-[#FF6B00]">.</span></span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">

@@ -37,7 +37,7 @@ export default function SignupPage() {
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card w-full max-w-md p-8 md:p-10 relative z-10 border border-[#1E1E1E]">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-black text-white tracking-tight mb-2">Create Account.</h1>
-          <p className="text-[#A0A0A0] font-medium">Join EVNT to discover premium experiences.</p>
+          <p className="text-[#A0A0A0] font-medium">Join EventBooking to discover premium experiences.</p>
         </div>
 
         {error && (

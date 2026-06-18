@@ -245,10 +245,10 @@ export default function HomePage() {
       {/* FOOTER */}
       <footer className="w-full max-w-5xl mx-auto px-6 py-12 mt-16 border-t border-[#121212] flex flex-col md:flex-row justify-between items-center gap-4 text-[#555] text-xs font-semibold">
         <div>
-          <span className="text-white font-extrabold tracking-tight">EVNT.</span> Enterprise Event Management
+          <span className="text-white font-extrabold tracking-tight">EventBooking.</span> Enterprise Event Management
         </div>
         <div>
-          © 2026 EVNT Inc. All rights reserved.
+          © 2026 EventBooking Inc. All rights reserved.
         </div>
       </footer>
 

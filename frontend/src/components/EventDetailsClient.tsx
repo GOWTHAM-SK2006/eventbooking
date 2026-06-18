@@ -129,7 +129,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
       key: 'rzp_test_T2NUwSm1uqZZrX',
       amount: amountInCents,
       currency: 'INR',
-      name: 'EVNT. Premium',
+      name: 'EventBooking Premium',
       description: `Access Pass: ${event.title}`,
       handler: function (response: any) {
         confirmPaymentAndBook(`RAZORPAY-${response.razorpay_payment_id}`);
@@ -352,7 +352,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
                     Reserve Spot Now
                   </button>
                   <p className="text-center text-xs text-[#555] mt-4 flex justify-center items-center gap-1">
-                    <ShieldAlert size={12} /> Secure checkout powered by EVNT
+                    <ShieldAlert size={12} /> Secure checkout powered by EventBooking
                   </p>
                 </form>
               )}
