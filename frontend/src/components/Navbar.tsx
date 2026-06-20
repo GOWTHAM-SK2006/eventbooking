@@ -33,7 +33,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Explore', href: '/events' },
-    { name: 'My Tickets', href: '/history' },
+    { name: 'My Tickets', href: '/tickets' },
     ...(session ? [{ name: 'Wishlist', href: '/wishlist' }] : []),
   ];
 

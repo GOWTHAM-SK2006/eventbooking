@@ -136,7 +136,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
       const bookingRes = await api.post('/bookings', payload);
       setBookingSuccess(bookingRes);
       confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#FACC15', '#FF8C42', '#ffffff'] });
-      setTimeout(() => router.push('/history'), 3000);
+      setTimeout(() => router.push('/tickets'), 3000);
     } catch (err: any) {
       setBookingError(err.message || 'Booking failed');
     } finally {
@@ -450,7 +450,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
                   </motion.div>
                   <h2 className="text-3xl font-black text-[#111827] mb-2">Ticket Confirmed!</h2>
                   <p className="text-[#6B7280] mb-8">We've sent the details to your email.</p>
-                  <button onClick={() => router.push('/history')} className="btn-primary w-full py-4">View My Tickets</button>
+                  <button onClick={() => router.push('/tickets')} className="btn-primary w-full py-4">View My Tickets</button>
                 </div>
               ) : (
                 <div className="flex flex-col h-full">

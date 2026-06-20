@@ -65,7 +65,7 @@ function HistoryContent() {
 
       <div className="flex gap-2 mb-8 overflow-x-auto">
         {tabs.map(t => (
-          <button key={t.id} onClick={() => router.push(`/history?tab=${t.id}`)}
+          <button key={t.id} onClick={() => router.push(`/tickets?tab=${t.id}`)}
             className={`px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap ${tab === t.id ? 'bg-[#FACC15] text-[#111827]' : 'bg-white border border-gray-300 text-[#6B7280]'}`}>
             {t.label}
           </button>
