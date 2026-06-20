@@ -234,7 +234,7 @@ export default function ProfilePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: idx * 0.08 }}
               whileHover={{ y: -3, transition: { duration: 0.2 } }}
-              className="bg-white border border-gray-200/80 p-4.5 rounded-2xl flex flex-col justify-between shadow-2xs relative overflow-hidden group hover:border-yellow-400 transition-colors"
+              className="bg-white border border-gray-200/80 p-5 rounded-2xl flex flex-col justify-between shadow-2xs relative group hover:border-yellow-400 transition-colors"
             >
               <div className="flex justify-between items-start">
                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider leading-tight">{stat.label}</span>
@@ -242,7 +242,7 @@ export default function ProfilePage() {
                   {stat.icon}
                 </div>
               </div>
-              <p className="text-3xl font-black text-gray-900 mt-4 tracking-tight group-hover:text-yellow-600 transition-colors">
+              <p className="text-3xl font-black text-gray-900 mt-4 tracking-tight group-hover:text-yellow-600 transition-colors text-center">
                 {stat.value}
               </p>
             </motion.div>
@@ -445,7 +445,7 @@ export default function ProfilePage() {
                       ) : (
                         <div className="space-y-2.5">
                           {bookings.map(b => (
-                            <div key={b.id} className="bg-white border border-gray-200 p-4.5 rounded-xl flex justify-between items-center shadow-3xs">
+                            <div key={b.id} className="bg-white border border-gray-200 p-5 rounded-xl flex justify-between items-center shadow-3xs">
                               <div>
                                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Transaction #{b.id.slice(0, 8)}</p>
                                 <h5 className="font-extrabold text-sm text-gray-900 mt-1">{b.eventTitle}</h5>
@@ -843,7 +843,7 @@ export default function ProfilePage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <button 
                         onClick={() => alert('Referral URL copied: eventbooking-app.in')}
-                        className="bg-white border border-gray-200 p-4.5 rounded-xl text-left flex items-center gap-3 hover:border-yellow-400 transition-colors shadow-3xs"
+                        className="bg-white border border-gray-200 p-5 rounded-xl text-left flex items-center gap-3 hover:border-yellow-400 transition-colors shadow-3xs"
                       >
                         <Share2 className="text-yellow-600" size={20} />
                         <div>
@@ -854,7 +854,7 @@ export default function ProfilePage() {
 
                       <button 
                         onClick={() => alert('Thank you for rating our app 5 stars!')}
-                        className="bg-white border border-gray-200 p-4.5 rounded-xl text-left flex items-center gap-3 hover:border-yellow-400 transition-colors shadow-3xs"
+                        className="bg-white border border-gray-200 p-5 rounded-xl text-left flex items-center gap-3 hover:border-yellow-400 transition-colors shadow-3xs"
                       >
                         <Star className="text-yellow-600" size={20} />
                         <div>
