@@ -18,10 +18,54 @@ public class NotificationController {
 
     private final NotificationService notificationService;
     private final UserRepository userRepository;
+    private final com.eventbooking.repository.BookingRepository bookingRepository;
 
-    public NotificationController(NotificationService notificationService, UserRepository userRepository) {
+    public NotificationController(NotificationService notificationService, UserRepository userRepository,
+                                  com.eventbooking.repository.BookingRepository bookingRepository) {
         this.notificationService = notificationService;
         this.userRepository = userRepository;
+        this.bookingRepository = bookingRepository;
+    }
+
+    public static class AnnouncementRequest {
+        private String title;
+        private String message;
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+        public String getMessage() { return message; }
+        public void setMessage(String message) { this.message = message; }
+    }
+
+    public static class ReminderRequest {
+        private UUID eventId;
+        private String title;
+        private String message;
+        public UUID getEventId() { return eventId; }
+        public void setEventId(UUID eventId) { this.eventId = eventId; }
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+        public String getMessage() { return message; }
+        public void setMessage(String message) { this.message = message; }
+    }
+
+    @PostMapping("/announcement")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> sendAnnouncement(@RequestBody AnnouncementRequest request) {
+        List<User> users = userRepository.findAll();
+        for (User user : users) {
+            notificationService.sendNotification(user, request.getTitle(), request.getMessage());
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reminder")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> sendReminder(@RequestBody ReminderRequest request) {
+        List<com.eventbooking.entity.Booking> bookings = bookingRepository.findByEventId(request.getEventId());
+        for (com.eventbooking.entity.Booking booking : bookings) {
+            notificationService.sendNotification(booking.getUser(), request.getTitle(), request.getMessage());
+        }
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping
