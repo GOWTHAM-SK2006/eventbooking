@@ -216,7 +216,7 @@ public class EventService {
                 .imageUrl(event.getImageUrl())
                 .status(event.getStatus())
                 .organizerId(organizerId)
-                .organizerName(organizerName.isBlank() ? "Event Organizer" : organizerName)
+                .organizerName(organizerName == null || organizerName.isBlank() ? "Event Organizer" : organizerName)
                 .venueName(event.getVenueName())
                 .venueAddress(event.getVenueAddress())
                 .latitude(event.getLatitude())

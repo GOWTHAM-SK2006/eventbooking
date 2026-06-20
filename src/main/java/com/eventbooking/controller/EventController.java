@@ -128,7 +128,7 @@ public class EventController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EventResponse> createEvent(@Valid @RequestBody EventRequest request,
                                                      @AuthenticationPrincipal UserDetailsImpl user) {
         User currentUser = User.builder().id(user.getId()).build();
@@ -137,14 +137,14 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EventResponse> updateEvent(@PathVariable UUID id, @Valid @RequestBody EventRequest request) {
         Event event = eventService.updateEvent(id, request);
         return ResponseEntity.ok(eventService.mapToResponse(event));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteEvent(@PathVariable UUID id) {
         eventService.deleteEvent(id);
         return ResponseEntity.noContent().build();

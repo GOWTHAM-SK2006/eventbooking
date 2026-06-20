@@ -15,12 +15,15 @@ export default function OrganizerPage() {
   const [attendees, setAttendees] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [session, setSession] = useState<any>(null);
+
   useEffect(() => {
-    const session = getSession();
-    if (!session?.roles.some((r: string) => ['ROLE_ORGANIZER', 'ROLE_ADMIN'].includes(r))) {
+    const currentSession = getSession();
+    if (!currentSession?.roles.some((r: string) => ['ROLE_ORGANIZER', 'ROLE_ADMIN'].includes(r))) {
       router.push('/login');
       return;
     }
+    setSession(currentSession);
     loadData();
   }, []);
 
@@ -70,7 +73,9 @@ export default function OrganizerPage() {
           <div className="space-y-3">
             {events.length === 0 ? (
               <div className="premium-card p-8 text-center text-[#6B7280]">
-                No events yet. <Link href="/dashboard" className="text-[#FACC15] font-bold">Create one</Link>
+                No events yet. {session?.roles?.includes('ROLE_ADMIN') && (
+                  <Link href="/dashboard" className="text-[#FACC15] font-bold">Create one</Link>
+                )}
               </div>
             ) : events.map(ev => (
               <button key={ev.id} onClick={() => loadAttendees(ev.id)}

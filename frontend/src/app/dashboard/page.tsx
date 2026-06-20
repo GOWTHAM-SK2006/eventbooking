@@ -31,7 +31,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const session = getSession();
-    if (!session?.roles.includes('ROLE_ADMIN')) { router.push('/login'); return; }
+    if (!session) { router.push('/login'); return; }
+    if (!session.roles?.includes('ROLE_ADMIN')) { router.push('/'); return; }
     loadData();
   }, []);
 

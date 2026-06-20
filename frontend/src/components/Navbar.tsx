@@ -85,11 +85,6 @@ export default function Navbar() {
                       <Link href="/wishlist" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#6B7280] hover:text-[#111827] hover:bg-gray-100 transition-colors">
                         <Heart size={16} /> Wishlist
                       </Link>
-                      {session.roles?.includes('ROLE_ORGANIZER') && (
-                        <Link href="/organizer" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#FACC15] hover:bg-yellow-50 transition-colors">
-                          <LayoutDashboard size={16} /> Organizer Hub
-                        </Link>
-                      )}
                       <Link href="/profile" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#6B7280] hover:text-[#111827] hover:bg-gray-100 transition-colors">
                         <User size={16} /> Profile Settings
                       </Link>

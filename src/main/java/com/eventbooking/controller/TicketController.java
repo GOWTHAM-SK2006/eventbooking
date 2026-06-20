@@ -21,7 +21,7 @@ public class TicketController {
     }
 
     @PostMapping("/verify")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TicketResponse> verifyTicket(@RequestParam String ticketCode) {
         var ticket = ticketService.verifyAndCheckInTicket(ticketCode);
         return ResponseEntity.ok(ticketService.getTicketDetails(ticket.getTicketCode()));

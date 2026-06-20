@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { api } from '../utils/api';
+import { api, getSession } from '../utils/api';
 import { ArrowRight, Calendar as CalendarIcon, MapPin, Users, Code, Building2, Music, Presentation, Sparkles, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import AnimatedBackground, { FloatingBlobs } from '../components/AnimatedBackground';
@@ -13,7 +13,10 @@ export default function HomePage() {
   const [upcoming, setUpcoming] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [session, setSession] = useState<any>(null);
+
   useEffect(() => {
+    setSession(getSession());
     loadEvents();
   }, []);
 
@@ -115,12 +118,14 @@ export default function HomePage() {
             <span className="relative">Explore Events</span>
             <ArrowRight size={18} className="relative" />
           </Link>
-          <Link
-            href="/dashboard"
-            className="w-full sm:w-auto bg-white text-[#111827] font-bold py-4 px-8 rounded-xl border border-gray-300 hover:border-[#FACC15] hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center"
-          >
-            Create Event
-          </Link>
+          {session?.roles?.includes('ROLE_ADMIN') && (
+            <Link
+              href="/dashboard"
+              className="w-full sm:w-auto bg-white text-[#111827] font-bold py-4 px-8 rounded-xl border border-gray-300 hover:border-[#FACC15] hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center"
+            >
+              Create Event
+            </Link>
+          )}
         </motion.div>
 
         {/* Trust Indicators */}

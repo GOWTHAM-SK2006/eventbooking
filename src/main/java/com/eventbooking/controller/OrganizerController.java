@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/organizer")
-@PreAuthorize("hasAnyRole('ADMIN', 'ORGANIZER')")
+@PreAuthorize("hasRole('ADMIN')")
 public class OrganizerController {
 
     private final EventService eventService;
