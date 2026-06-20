@@ -14,7 +14,7 @@ export default function MobileNav() {
     { name: 'Events', href: '/events', icon: Calendar },
     { name: 'Wishlist', href: '/wishlist', icon: Heart },
     { name: 'Tickets', href: '/tickets', icon: Ticket },
-    { name: 'Account', href: '/profile', icon: User },
+    { name: 'Profile', href: '/profile', icon: User },
   ];
 
   return (

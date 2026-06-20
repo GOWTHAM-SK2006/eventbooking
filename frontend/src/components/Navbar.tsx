@@ -19,9 +19,11 @@ export default function Navbar() {
     const handleLogout = () => setSession(null);
     window.addEventListener('userLogin', handleLogin);
     window.addEventListener('userLogout', handleLogout);
+    window.addEventListener('sessionUpdate', handleLogin);
     return () => {
       window.removeEventListener('userLogin', handleLogin);
       window.removeEventListener('userLogout', handleLogout);
+      window.removeEventListener('sessionUpdate', handleLogin);
     };
   }, [pathname]);
 

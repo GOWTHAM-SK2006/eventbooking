@@ -2,15 +2,20 @@
 
 import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { api } from '../../utils/api';
-import { Search, MapPin, Users, Filter, Sparkles } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { api, getSession } from '../../utils/api';
+import { Search, MapPin, Users, Filter, Sparkles, Calendar as CalendarIcon, Heart, Award } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FloatingBlobs } from '../../components/AnimatedBackground';
 import { ScrollReveal, StaggerContainer, StaggerItem } from '../../components/ScrollReveal';
 
 export default function EventsPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center py-24"><span className="text-[#6B7280]">Loading events...</span></div>}>
+    <Suspense fallback={
+      <div className="flex justify-center items-center h-[70vh]">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-yellow-400"></div>
+      </div>
+    }>
       <EventsContent />
     </Suspense>
   );
@@ -18,19 +23,28 @@ export default function EventsPage() {
 
 function EventsContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [events, setEvents] = useState<any[]>([]);
   const [trending, setTrending] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(searchParams.get('search') || '');
   const [category, setCategory] = useState(searchParams.get('category') || '');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [location, setLocation] = useState('');
+  const [session, setSession] = useState<any>(null);
+  const [wishlistIds, setWishlistIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    setSession(getSession());
+  }, []);
 
   useEffect(() => {
     const cat = searchParams.get('category');
-    if (cat) setCategory(cat);
+    if (cat !== null) setCategory(cat);
+    const q = searchParams.get('search');
+    if (q !== null) setSearch(q);
   }, [searchParams]);
 
   useEffect(() => {
@@ -53,10 +67,38 @@ function EventsContent() {
       ]);
       setEvents(data);
       setTrending(trend);
+
+      const sess = getSession();
+      if (sess) {
+        const wl = await api.get('/wishlist').catch(() => []);
+        setWishlistIds(wl.map((e: any) => e.id));
+      }
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const toggleWishlist = async (eventId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!session) {
+      router.push('/login');
+      return;
+    }
+
+    const isFav = wishlistIds.includes(eventId);
+    try {
+      if (isFav) {
+        await api.delete(`/wishlist/${eventId}`);
+        setWishlistIds(prev => prev.filter(id => id !== eventId));
+      } else {
+        await api.post(`/wishlist/${eventId}`);
+        setWishlistIds(prev => [...prev, eventId]);
+      }
+    } catch (err) {
+      console.error('Wishlist toggle error:', err);
     }
   };
 
@@ -67,8 +109,7 @@ function EventsContent() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
+        staggerChildren: 0.05,
       },
     },
   };
@@ -83,203 +124,231 @@ function EventsContent() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-12 md:py-24">
+    <div className="w-full max-w-7xl mx-auto px-6 py-12 md:py-24 relative min-h-screen">
+      <FloatingBlobs />
       
       {/* Header Section */}
-      <div className="mb-12 md:mb-16">
+      <div className="mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-50 border border-yellow-200 mb-4"
+        >
+          <Sparkles size={12} className="text-[#EAB308]" />
+          <span className="text-[10px] font-black text-[#111827] tracking-wider uppercase">Curated Gatherings</span>
+        </motion.div>
         <motion.h1 
           initial={{ opacity: 0, y: -20 }} 
           animate={{ opacity: 1, y: 0 }} 
           transition={{ duration: 0.6 }}
-          className="text-4xl sm:text-5xl md:text-7xl font-black mb-4 md:mb-6 tracking-tight text-[#111827]"
+          className="text-4xl sm:text-5xl md:text-7xl font-black mb-4 tracking-tight text-[#111827]"
         >
           Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FACC15] to-[#EAB308]">Events</span>
         </motion.h1>
         <motion.p 
           initial={{ opacity: 0, y: 10 }} 
           animate={{ opacity: 1, y: 0 }} 
-          transition={{ delay: 0.2, duration: 0.6 }}
-          className="text-[#6B7280] text-lg md:text-xl max-w-2xl font-medium leading-relaxed"
+          transition={{ delay: 0.1, duration: 0.6 }}
+          className="text-[#6B7280] text-base sm:text-lg max-w-2xl font-medium leading-relaxed"
         >
-          Discover incredible experiences curated from around the world. Secure your spot at the most exclusive gatherings.
+          Discover premium experiences, masterclass workshops, and exclusive networking events. Secure your spot at the frontier of industry and culture.
         </motion.p>
       </div>
 
-      {/* Search & Filter Bar */}
+      {/* Advanced Filter Suite */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.6 }}
-        className="bg-white p-4 md:p-6 mb-12 md:mb-16 flex flex-col lg:flex-row gap-4 items-stretch lg:items-center rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow relative z-20"
+        className="bg-white p-6 mb-12 rounded-3xl border border-gray-200 shadow-lg relative z-20 space-y-6"
       >
-        <motion.div 
-          className="relative flex-1 w-full"
-          whileFocus={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
-        >
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280] pointer-events-none" size={20} />
-          <input 
-            type="text" 
-            placeholder="Search events by title or location..." 
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-gray-50 border border-gray-300 rounded-xl py-3 md:py-4 pl-12 pr-4 text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#FACC15] focus:ring-2 focus:ring-yellow-50 transition-all font-medium text-sm md:text-base hover:bg-white"
-          />
-        </motion.div>
-        
-        <motion.div 
-          className="flex gap-2 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 hide-scrollbar"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          <motion.button 
-            onClick={() => setCategory('')}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className={`whitespace-nowrap px-6 py-4 rounded-xl font-bold transition-all ${category === '' ? 'bg-[#FACC15] text-[#111827] shadow-md' : 'bg-white border border-gray-300 text-[#6B7280] hover:text-[#111827] hover:border-[#FACC15]'}`}
-          >
-            All
-          </motion.button>
-          {categories.map((cat, i) => (
-            <motion.button 
-              key={cat}
-              onClick={() => setCategory(cat)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 + i * 0.05 }}
-              className={`whitespace-nowrap px-6 py-4 rounded-xl font-bold transition-all ${category === cat ? 'bg-[#FACC15] text-[#111827] shadow-md' : 'bg-white border border-gray-300 text-[#6B7280] hover:text-[#111827] hover:border-[#FACC15]'}`}
-            >
-              {cat}
-            </motion.button>
-          ))}
-        </motion.div>
+        <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
+          {/* Main search */}
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input 
+              type="text" 
+              placeholder="Search by title, category, or keyword..." 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3.5 pl-12 pr-4 text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-yellow-400 focus:bg-white transition-all font-medium text-sm"
+            />
+          </div>
 
-        <div className="flex gap-3 flex-wrap">
-          <input type="number" placeholder="Min ₹" value={minPrice} onChange={e => setMinPrice(e.target.value)}
-            className="w-24 px-3 py-2 border border-gray-300 rounded-xl text-sm" />
-          <input type="number" placeholder="Max ₹" value={maxPrice} onChange={e => setMaxPrice(e.target.value)}
-            className="w-24 px-3 py-2 border border-gray-300 rounded-xl text-sm" />
-          <input type="text" placeholder="Location..." value={location} onChange={e => setLocation(e.target.value)}
-            className="flex-1 min-w-[120px] px-3 py-2 border border-gray-300 rounded-xl text-sm" />
+          {/* Category Chips Scrollbar */}
+          <div className="flex gap-2 overflow-x-auto pb-1 lg:pb-0 hide-scrollbar max-w-full lg:max-w-2xl">
+            <button 
+              onClick={() => setCategory('')}
+              className={`whitespace-nowrap px-5 py-3 rounded-xl font-extrabold text-xs transition-all ${category === '' ? 'bg-yellow-400 text-gray-900 shadow-md' : 'bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 hover:border-yellow-400'}`}
+            >
+              All Events
+            </button>
+            {categories.map((cat) => (
+              <button 
+                key={cat}
+                onClick={() => setCategory(cat)}
+                className={`whitespace-nowrap px-5 py-3 rounded-xl font-extrabold text-xs transition-all ${category === cat ? 'bg-yellow-400 text-gray-900 shadow-md' : 'bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 hover:border-yellow-400'}`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Pricing & Location Filters Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+          <div className="space-y-1.5">
+            <label className="text-xs font-black text-gray-400 uppercase tracking-wider block">Min Price (₹)</label>
+            <input 
+              type="number" 
+              placeholder="E.g. 500" 
+              value={minPrice} 
+              onChange={e => setMinPrice(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-yellow-400 focus:bg-white transition-all text-[#111827]" 
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-black text-gray-400 uppercase tracking-wider block">Max Price (₹)</label>
+            <input 
+              type="number" 
+              placeholder="E.g. 5000" 
+              value={maxPrice} 
+              onChange={e => setMaxPrice(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-yellow-400 focus:bg-white transition-all text-[#111827]" 
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-black text-gray-400 uppercase tracking-wider block">Location / Venue</label>
+            <input 
+              type="text" 
+              placeholder="E.g. Bangalore" 
+              value={location} 
+              onChange={e => setLocation(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-yellow-400 focus:bg-white transition-all text-[#111827]" 
+            />
+          </div>
         </div>
       </motion.div>
 
-      {trending.length > 0 && (
-        <div className="mb-12">
-          <h2 className="text-2xl font-black mb-4 flex items-center gap-2"><Sparkles className="text-[#FACC15]" /> Trending Now</h2>
-          <div className="flex gap-4 overflow-x-auto pb-2">
+      {/* Dynamic Trending Row */}
+      {trending.length > 0 && !search && !category && (
+        <div className="mb-14">
+          <h2 className="text-xl font-black mb-5 flex items-center gap-2 text-gray-900">
+            <Award className="text-[#EAB308]" size={20} /> Trending Experiences
+          </h2>
+          <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar">
             {trending.slice(0, 4).map(e => (
-              <Link key={e.id} href={`/events/${e.id}`} className="flex-shrink-0 w-64 premium-card p-4 hover:border-[#FACC15]">
-                <p className="font-bold line-clamp-1">{e.title}</p>
-                <p className="text-[#FACC15] font-black mt-1">{e.price === 0 ? 'Free' : `₹${e.price}`}</p>
+              <Link 
+                key={e.id} 
+                href={`/events/${e.id}`} 
+                className="flex-shrink-0 w-72 bg-white border border-gray-200 rounded-2xl p-4.5 hover:border-yellow-400 hover:shadow-lg transition-all"
+              >
+                <div className="h-32 bg-gray-100 rounded-xl overflow-hidden mb-3">
+                  <img src={e.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400'} alt={e.title} className="w-full h-full object-cover" />
+                </div>
+                <span className="text-[9px] font-black uppercase text-[#EAB308] bg-yellow-50 px-2 py-0.5 rounded">{e.category}</span>
+                <p className="font-extrabold text-gray-900 line-clamp-1 mt-2 mb-1.5">{e.title}</p>
+                <p className="text-yellow-600 font-black text-sm">{e.price === 0 ? 'Free' : `₹${e.price.toLocaleString('en-IN')}`}</p>
               </Link>
             ))}
           </div>
         </div>
       )}
 
-      {/* Event Grid */}
+      {/* Skeletons */}
       {loading ? (
-        <motion.div 
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
-          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[1, 2, 3, 4, 5, 6].map((n) => (
-            <motion.div key={n} variants={itemVariants} className="h-[450px] bg-white border border-gray-200 rounded-2xl animate-pulse" />
+            <div key={n} className="h-[430px] bg-white border border-gray-200 rounded-3xl animate-pulse" />
           ))}
-        </motion.div>
+        </div>
       ) : events.length === 0 ? (
+        /* Empty State */
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white p-16 text-center rounded-2xl border-2 border-dashed border-gray-300"
+          className="bg-white p-16 text-center rounded-3xl border border-gray-200 shadow-md max-w-2xl mx-auto flex flex-col items-center justify-center"
         >
-          <motion.div 
-            className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6"
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <Filter size={32} className="text-[#9CA3AF]" />
-          </motion.div>
-          <h3 className="text-2xl font-bold text-[#111827] mb-2">No Events Available</h3>
-          <p className="text-[#6B7280] font-medium">Please check back later.</p>
-          <motion.button 
-            onClick={() => {setSearch(''); setCategory('');}}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="mt-8 bg-white text-[#111827] font-bold py-3 px-6 rounded-xl border border-gray-300 hover:bg-gray-50 transition-all"
+          <div className="w-20 h-20 bg-yellow-50 rounded-2xl flex items-center justify-center mb-6">
+            <Filter size={32} className="text-[#EAB308]" />
+          </div>
+          <h3 className="text-2xl font-black text-gray-900 mb-2">No Events Available</h3>
+          <p className="text-[#6B7280] font-medium mb-6">Please check back later.</p>
+          <button 
+            onClick={() => { setSearch(''); setCategory(''); setMinPrice(''); setMaxPrice(''); setLocation(''); }}
+            className="bg-gray-900 hover:bg-gray-800 text-white font-extrabold py-3.5 px-8 rounded-xl text-xs transition-all active:scale-95 shadow-md"
           >
             Clear Filters
-          </motion.button>
+          </button>
         </motion.div>
       ) : (
+        /* Event Grid */
         <motion.div 
           initial="hidden"
           animate="visible"
           variants={containerVariants}
-          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
-          {events.map((event) => (
-            <motion.div key={event.id} variants={itemVariants}>
-              <Link href={`/events/${event.id}`} className="block bg-white border border-gray-200 rounded-2xl overflow-hidden group h-[450px] flex flex-col hover:border-[#FACC15] hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <motion.div 
-                  className="h-56 bg-gray-200 relative overflow-hidden"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.5 }}
+          {events.map((event) => {
+            const isFav = wishlistIds.includes(event.id);
+            return (
+              <motion.div key={event.id} variants={itemVariants}>
+                <Link 
+                  href={`/events/${event.id}`} 
+                  className="group block bg-white border border-gray-200 rounded-3xl overflow-hidden hover:border-yellow-400 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col justify-between"
                 >
-                  <img 
-                    src={event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80'} 
-                    alt={event.title} 
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#111827]/80 via-transparent to-transparent opacity-80" />
-                  <motion.span 
-                    className="absolute top-4 left-4 bg-[#FACC15] text-[#111827] px-3 py-1 rounded-full text-xs font-bold border border-[#EAB308]"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    {event.category}
-                  </motion.span>
-                </motion.div>
+                  <div>
+                    <div className="h-56 bg-gray-100 relative overflow-hidden">
+                      <img 
+                        src={event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800'} 
+                        alt={event.title} 
+                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                      />
+                      
+                      <button
+                        onClick={(e) => toggleWishlist(event.id, e)}
+                        className="absolute top-4 right-4 p-2 bg-white/95 backdrop-blur-xs rounded-xl shadow-xs text-gray-400 hover:text-red-500 transition-colors z-20"
+                      >
+                        <Heart size={16} fill={isFav ? '#EF4444' : 'none'} className={isFav ? 'text-red-500' : ''} />
+                      </button>
 
-                <div className="p-6 flex-1 flex flex-col relative bg-white">
-                  <motion.div 
-                    className="bg-yellow-50 border border-yellow-200 rounded-xl p-3 inline-flex flex-col items-center justify-center w-16 shadow-sm mb-4 group-hover:border-[#FACC15] transition-colors z-10 group-hover:scale-110"
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <span className="text-[#FACC15] text-xs font-bold uppercase">{new Date(event.startDate).toLocaleDateString('en-US', { month: 'short' })}</span>
-                    <span className="text-[#111827] text-xl font-black">{new Date(event.startDate).getDate()}</span>
-                  </motion.div>
-
-                  <h3 className="text-lg md:text-xl font-black mb-2 text-[#111827] group-hover:text-[#FACC15] transition-colors line-clamp-1">{event.title}</h3>
-                  <p className="text-[#6B7280] text-sm line-clamp-2 mb-4 font-medium flex-1 leading-relaxed">{event.description}</p>
-                  
-                  <div className="mt-auto pt-4 border-t border-gray-200 flex justify-between items-end">
-                    <div>
-                      <span className="text-xs font-semibold text-[#9CA3AF] block mb-1 uppercase tracking-wider">Price</span>
-                      <span className="text-2xl font-black text-[#111827]">
-                        {event.price === 0 ? 'Free' : <span className="text-[#FACC15]">₹{event.price.toLocaleString('en-IN')}</span>}
+                      <span className="absolute top-4 left-4 bg-gray-900/90 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider">
+                        {event.category}
                       </span>
                     </div>
-                    <div className="text-right">
-                      <span className="text-xs font-semibold text-[#9CA3AF] block mb-1 uppercase tracking-wider">Available</span>
-                      <span className={`text-sm font-bold flex items-center justify-end gap-1 ${event.availableSlots < 10 ? 'text-red-600' : 'text-[#6B7280]'}`}>
-                        <Users size={14} /> {event.availableSlots} left
-                      </span>
+
+                    <div className="p-6">
+                      <div className="flex items-center gap-2 mb-3 text-xs text-gray-400 font-bold">
+                        <CalendarIcon size={13} className="text-[#EAB308]" />
+                        <span>
+                          {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      </div>
+                      
+                      <h3 className="text-xl font-extrabold mb-2 text-gray-900 group-hover:text-yellow-600 transition-colors line-clamp-1 leading-snug">
+                        {event.title}
+                      </h3>
+                      <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed font-medium">
+                        {event.description}
+                      </p>
                     </div>
                   </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+
+                  <div className="px-6 pb-6 pt-4 border-t border-gray-50 flex justify-between items-center bg-gray-50/50 rounded-b-3xl">
+                    <div>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Price</span>
+                      <span className="font-black text-gray-900 text-lg">
+                        {event.price === 0 ? 'Free' : `₹${event.price.toLocaleString('en-IN')}`}
+                      </span>
+                    </div>
+                    <span className="text-xs font-bold text-gray-500 bg-white border border-gray-100 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5 shadow-2xs">
+                      <Users size={12} className="text-[#EAB308]" /> {event.availableSlots} left
+                    </span>
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
         </motion.div>
       )}
     </div>
