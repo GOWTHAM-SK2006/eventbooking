@@ -89,7 +89,7 @@ export default function Navbar() {
                         <User size={16} /> Profile Settings
                       </Link>
                       {session.roles?.includes('ROLE_ADMIN') && (
-                        <Link href="/dashboard" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#FACC15] hover:bg-yellow-50 transition-colors">
+                        <Link href="/admin/dashboard" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#FACC15] hover:bg-yellow-50 transition-colors">
                           <LayoutDashboard size={16} /> Admin Console
                         </Link>
                       )}

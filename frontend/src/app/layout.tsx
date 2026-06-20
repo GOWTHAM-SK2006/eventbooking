@@ -1,7 +1,5 @@
 import '../styles/globals.css';
-import Navbar from '../components/Navbar';
-import MobileNav from '../components/MobileNav';
-import { PageTransition } from '../components/PageTransition';
+import ClientLayoutWrapper from '../components/ClientLayoutWrapper';
 import QueryProvider from '../providers/QueryProvider';
 
 export const metadata = {
@@ -18,13 +16,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen bg-[#FAFAFA] text-[#111827] flex flex-col font-sans selection:bg-[#FACC15] selection:text-[#111827] pb-16 md:pb-0">
         <QueryProvider>
-          <Navbar />
-          <main className="flex-1 flex flex-col items-center w-full mt-20">
-            <PageTransition>
-              {children}
-            </PageTransition>
-          </main>
-          <MobileNav />
+          <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
         </QueryProvider>
       </body>
     </html>

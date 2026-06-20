@@ -33,7 +33,7 @@ export default function LoginPage() {
       window.dispatchEvent(new Event('userLogin'));
       
       if (data.roles.includes('ROLE_ADMIN')) {
-        router.push('/dashboard');
+        router.push('/admin/dashboard');
       } else {
         router.push('/events');
       }
