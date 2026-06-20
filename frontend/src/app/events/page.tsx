@@ -124,7 +124,7 @@ function EventsContent() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-6 py-12 md:py-24 relative min-h-screen">
+    <div className="w-full max-w-7xl xl:max-w-[1400px] mx-auto px-6 py-12 md:py-24 relative min-h-screen">
       <FloatingBlobs />
       
       {/* Header Section */}
@@ -141,7 +141,7 @@ function EventsContent() {
           initial={{ opacity: 0, y: -20 }} 
           animate={{ opacity: 1, y: 0 }} 
           transition={{ duration: 0.6 }}
-          className="text-4xl sm:text-5xl md:text-7xl font-black mb-4 tracking-tight text-[#111827]"
+          className="text-4xl sm:text-5xl md:text-7xl xl:text-8xl font-black mb-4 tracking-tight text-[#111827] leading-none"
         >
           Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FACC15] to-[#EAB308]">Events</span>
         </motion.h1>
@@ -257,7 +257,7 @@ function EventsContent() {
 
       {/* Skeletons */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {[1, 2, 3, 4, 5, 6].map((n) => (
             <div key={n} className="h-[430px] bg-white border border-gray-200 rounded-3xl animate-pulse" />
           ))}
@@ -287,7 +287,7 @@ function EventsContent() {
           initial="hidden"
           animate="visible"
           variants={containerVariants}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
         >
           {events.map((event) => {
             const isFav = wishlistIds.includes(event.id);

@@ -158,65 +158,70 @@ export default function ProfilePage() {
   const attendedEventsCount = bookings.filter(b => new Date(b.eventDate) < new Date() && b.status === 'CONFIRMED').length;
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 md:px-6 py-12 md:py-20 min-h-screen relative flex flex-col justify-between">
+    <div className="w-full max-w-4xl lg:max-w-7xl xl:max-w-[1400px] mx-auto px-4 md:px-6 py-12 md:py-20 min-h-screen relative flex flex-col justify-between">
       <FloatingBlobs />
 
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="space-y-8"
+        className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
       >
         
         {/* ===================================
             1. PROFILE HEADER
             =================================== */}
-        <div className="relative rounded-3xl overflow-hidden border border-gray-250/60 bg-white p-6 md:p-8 shadow-md">
-          {/* Luxury Yellow & Gold mesh gradient backdrop */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-yellow-300/30 via-amber-200/10 to-transparent rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-yellow-50/20 rounded-full blur-2xl pointer-events-none" />
+        <div className="lg:col-span-4 lg:sticky lg:top-28 space-y-6">
+          <div className="relative rounded-3xl overflow-hidden border border-gray-250/60 bg-white p-6 md:p-8 shadow-md">
+            {/* Luxury Yellow & Gold mesh gradient backdrop */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-yellow-300/30 via-amber-200/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-yellow-50/20 rounded-full blur-2xl pointer-events-none" />
 
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-              {/* Large circular profile picture */}
-              <div className="relative group">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-yellow-400 via-[#FACC15] to-amber-500 text-gray-900 font-black text-3xl flex items-center justify-center border-4 border-white shadow-lg transition-transform duration-300 group-hover:scale-105">
-                  {firstName?.charAt(0) || 'U'}
+            <div className="relative z-10 flex flex-col sm:flex-row lg:flex-col items-center justify-between lg:justify-center gap-6 lg:text-center">
+              <div className="flex flex-col sm:flex-row lg:flex-col items-center gap-6 text-center sm:text-left lg:text-center">
+                {/* Large circular profile picture */}
+                <div className="relative group">
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-yellow-400 via-[#FACC15] to-amber-500 text-gray-900 font-black text-3xl flex items-center justify-center border-4 border-white shadow-lg transition-transform duration-300 group-hover:scale-105">
+                    {firstName?.charAt(0) || 'U'}
+                  </div>
+                  {/* Premium / Verified badge overlay */}
+                  <div className="absolute -bottom-1 -right-1 bg-gray-950 text-[#FACC15] p-1.5 rounded-full border-2 border-white shadow-md" title="Verified Account">
+                    <Sparkles size={12} className="animate-spin-slow fill-[#FACC15]" />
+                  </div>
                 </div>
-                {/* Premium / Verified badge overlay */}
-                <div className="absolute -bottom-1 -right-1 bg-gray-950 text-[#FACC15] p-1.5 rounded-full border-2 border-white shadow-md" title="Verified Account">
-                  <Sparkles size={12} className="animate-spin-slow fill-[#FACC15]" />
+
+                <div className="flex flex-col items-center sm:items-start lg:items-center">
+                  <div className="flex flex-col sm:flex-row lg:flex-col items-center gap-2.5">
+                    <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight text-center sm:text-left lg:text-center">{userName}</h1>
+                    <span className={`px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-gradient-to-r ${member.badgeColor} border shadow-2xs`}>
+                      {member.level} Member
+                    </span>
+                  </div>
+                  
+                  <p className="text-xs text-gray-500 font-semibold mt-1.5 flex items-center gap-1.5 justify-center sm:justify-start lg:justify-center">
+                    <Mail size={13} className="text-gray-400" />
+                    <span>{email}</span>
+                  </p>
+
+                  <p className="text-[10px] text-gray-400 font-bold mt-1 flex items-center gap-1 justify-center sm:justify-start lg:justify-center">
+                    <Calendar size={11} className="text-[#EAB308]" />
+                    <span>Member since June 2026</span>
+                  </p>
                 </div>
               </div>
 
-              <div>
-                <div className="flex flex-col sm:flex-row items-center gap-2.5">
-                  <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">{userName}</h1>
-                  <span className={`px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-gradient-to-r ${member.badgeColor} border shadow-2xs`}>
-                    {member.level} Member
-                  </span>
-                </div>
-                
-                <p className="text-xs text-gray-500 font-semibold mt-1.5 flex items-center gap-1.5 justify-center sm:justify-start">
-                  <Mail size={13} className="text-gray-400" />
-                  <span>{email}</span>
-                </p>
-
-                <p className="text-[10px] text-gray-400 font-bold mt-1 flex items-center gap-1 justify-center sm:justify-start">
-                  <Calendar size={11} className="text-[#EAB308]" />
-                  <span>Member since June 2026</span>
-                </p>
-              </div>
+              <button 
+                onClick={() => toggleSection('settings')}
+                className="bg-gray-900 hover:bg-gray-800 text-white font-extrabold px-6 py-3 rounded-2xl text-xs transition-all active:scale-95 shadow-sm flex items-center gap-1.5 w-full sm:w-auto lg:w-full justify-center"
+              >
+                <Settings size={13} /> Edit Profile
+              </button>
             </div>
-
-            <button 
-              onClick={() => toggleSection('settings')}
-              className="bg-gray-900 hover:bg-gray-800 text-white font-extrabold px-6 py-3 rounded-2xl text-xs transition-all active:scale-95 shadow-sm flex items-center gap-1.5"
-            >
-              <Settings size={13} /> Edit Profile
-            </button>
           </div>
         </div>
+
+        {/* RIGHT COLUMN: Quick Stats + Accordion Menu */}
+        <div className="lg:col-span-8 space-y-8">
 
         {/* ===================================
             2. QUICK STATS
@@ -889,7 +894,8 @@ export default function ProfilePage() {
             </button>
           </div>
         )}
-      </motion.div>
+      </div>
+    </motion.div>
 
       {/* Ticket Modal for ticket pass visualization */}
       {selectedTicketCode && (
