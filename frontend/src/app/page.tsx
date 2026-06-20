@@ -196,8 +196,9 @@ export default function HomePage() {
             ))}
           </div>
         ) : featured.length === 0 ? (
-          <div className="bg-white border border-gray-200 p-12 rounded-2xl text-center text-[#6B7280] text-sm">
-            No featured events at this time.
+          <div className="bg-white border border-gray-200 p-12 rounded-2xl text-center text-[#6B7280]">
+            <h3 className="text-xl font-bold text-[#111827] mb-1">No Events Available</h3>
+            <p className="text-sm font-medium">Please check back later.</p>
           </div>
         ) : (
           <motion.div
@@ -275,8 +276,9 @@ export default function HomePage() {
             ))}
           </div>
         ) : upcoming.length === 0 ? (
-          <div className="bg-white border border-gray-200 p-12 rounded-2xl text-center text-[#6B7280] text-sm">
-            No upcoming events scheduled.
+          <div className="bg-white border border-gray-200 p-12 rounded-2xl text-center text-[#6B7280]">
+            <h3 className="text-xl font-bold text-[#111827] mb-1">No Events Available</h3>
+            <p className="text-sm font-medium">Please check back later.</p>
           </div>
         ) : (
           <motion.div

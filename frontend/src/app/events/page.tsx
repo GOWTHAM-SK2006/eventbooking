@@ -207,8 +207,8 @@ function EventsContent() {
           >
             <Filter size={32} className="text-[#9CA3AF]" />
           </motion.div>
-          <h3 className="text-2xl font-bold text-[#111827] mb-2">No events found</h3>
-          <p className="text-[#6B7280] font-medium">Try adjusting your search criteria or explore other categories.</p>
+          <h3 className="text-2xl font-bold text-[#111827] mb-2">No Events Available</h3>
+          <p className="text-[#6B7280] font-medium">Please check back later.</p>
           <motion.button 
             onClick={() => {setSearch(''); setCategory('');}}
             whileHover={{ scale: 1.05 }}
