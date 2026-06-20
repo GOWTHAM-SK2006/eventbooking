@@ -1,5 +1,7 @@
 const API_BASE_URL = typeof window !== 'undefined' 
-  ? `${window.location.protocol}//${window.location.host}/api`
+  ? (window.location.host.includes('localhost:3000') 
+     ? 'http://localhost:8080/api' 
+     : `${window.location.protocol}//${window.location.host}/api`)
   : 'http://localhost:8080/api';
 
 export interface UserSession {

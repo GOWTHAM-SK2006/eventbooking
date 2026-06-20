@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -23,4 +24,19 @@ public class EventResponse {
     private Integer availableSlots;
     private String imageUrl;
     private String status;
+    private UUID organizerId;
+    private String organizerName;
+    private String venueName;
+    private String venueAddress;
+    private BigDecimal latitude;
+    private BigDecimal longitude;
+    private List<String> galleryImages;
+    private boolean featured;
+    private String faqs;
+    private String termsConditions;
+    private String schedule;
+    private Integer bookingCount;
+    private boolean seatSelectionEnabled;
+    private Double averageRating;
+    private Long reviewCount;
 }

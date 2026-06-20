@@ -79,6 +79,56 @@ public class AnalyticsService {
                 .build();
     }
 
+    public DashboardStatsResponse getOrganizerStats(UUID organizerId) {
+        List<com.eventbooking.entity.Event> organizerEvents = eventRepository.findByOrganizerId(organizerId);
+        List<UUID> eventIds = organizerEvents.stream().map(com.eventbooking.entity.Event::getId).toList();
+
+        List<Booking> organizerBookings = bookingRepository.findAll().stream()
+                .filter(b -> eventIds.contains(b.getEvent().getId()))
+                .toList();
+
+        long totalBookings = organizerBookings.stream()
+                .filter(b -> "CONFIRMED".equals(b.getStatus()))
+                .count();
+
+        BigDecimal totalRevenue = organizerBookings.stream()
+                .filter(b -> "CONFIRMED".equals(b.getStatus()))
+                .map(Booking::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        List<BookingResponse> recentBookings = organizerBookings.stream()
+                .sorted(Comparator.comparing(Booking::getBookingDate).reversed())
+                .limit(5)
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+
+        Map<String, Long> categorySales = organizerBookings.stream()
+                .filter(b -> "CONFIRMED".equals(b.getStatus()))
+                .collect(Collectors.groupingBy(
+                        b -> b.getEvent().getCategory() != null ? b.getEvent().getCategory() : "Other",
+                        Collectors.summingLong(Booking::getQuantity)
+                ));
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        Map<String, BigDecimal> monthlyRevenue = organizerBookings.stream()
+                .filter(b -> "CONFIRMED".equals(b.getStatus()))
+                .collect(Collectors.groupingBy(
+                        b -> b.getBookingDate().format(formatter),
+                        TreeMap::new,
+                        Collectors.mapping(Booking::getTotalPrice, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
+                ));
+
+        return DashboardStatsResponse.builder()
+                .totalEvents(organizerEvents.size())
+                .totalBookings(totalBookings)
+                .totalRevenue(totalRevenue)
+                .totalUsers(0)
+                .recentBookings(recentBookings)
+                .categorySales(categorySales)
+                .monthlyRevenue(monthlyRevenue)
+                .build();
+    }
+
     private BookingResponse mapToResponse(Booking booking) {
         List<String> codes = ticketRepository.findByBookingId(booking.getId()).stream()
                 .map(t -> t.getTicketCode())

@@ -41,6 +41,22 @@ public class Payment {
     @Column(name = "payment_date")
     private LocalDateTime paymentDate;
 
+    @Column(name = "razorpay_order_id")
+    private String razorpayOrderId;
+
+    @Column(name = "razorpay_payment_id")
+    private String razorpayPaymentId;
+
+    @Column(name = "gst_amount", precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal gstAmount = BigDecimal.ZERO;
+
+    @Column(name = "invoice_number", length = 50)
+    private String invoiceNumber;
+
+    @Column(name = "coupon_code", length = 50)
+    private String couponCode;
+
     @Builder.Default
     private boolean deleted = false;
 

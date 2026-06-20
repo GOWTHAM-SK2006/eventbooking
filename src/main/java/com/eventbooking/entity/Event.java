@@ -50,6 +50,43 @@ public class Event {
     @Column(name = "image_url", length = 512)
     private String imageUrl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organizer_id")
+    private User organizer;
+
+    @Column(name = "venue_name")
+    private String venueName;
+
+    @Column(name = "venue_address", columnDefinition = "TEXT")
+    private String venueAddress;
+
+    private BigDecimal latitude;
+
+    private BigDecimal longitude;
+
+    @Column(name = "gallery_images", columnDefinition = "TEXT")
+    private String galleryImages;
+
+    @Builder.Default
+    private boolean featured = false;
+
+    @Column(columnDefinition = "TEXT")
+    private String faqs;
+
+    @Column(name = "terms_conditions", columnDefinition = "TEXT")
+    private String termsConditions;
+
+    @Column(columnDefinition = "TEXT")
+    private String schedule;
+
+    @Column(name = "booking_count")
+    @Builder.Default
+    private Integer bookingCount = 0;
+
+    @Column(name = "seat_selection_enabled")
+    @Builder.Default
+    private boolean seatSelectionEnabled = false;
+
     @Column(nullable = false)
     private String status; // e.g., DRAFT, PUBLISHED, CANCELLED
 

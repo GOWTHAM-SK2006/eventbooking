@@ -9,12 +9,20 @@ public class ViewController {
     @GetMapping(value = {
         "/login",
         "/signup",
+        "/forgot-password",
+        "/reset-password",
+        "/verify-email",
         "/events",
         "/dashboard",
+        "/organizer",
         "/dashboard/events",
         "/dashboard/bookings",
         "/profile",
-        "/history"
+        "/history",
+        "/wishlist",
+        "/notifications",
+        "/payments",
+        "/organizer"
     })
     public String forward() {
         return "forward:/index.html";

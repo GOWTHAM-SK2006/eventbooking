@@ -16,6 +16,7 @@ public class UserProfileUpdate {
     @Size(max = 20)
     private String phone;
 
+    private String profilePhotoUrl;
     private String currentPassword;
     private String newPassword;
 }

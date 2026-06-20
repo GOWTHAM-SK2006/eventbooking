@@ -42,6 +42,17 @@ public class NotificationService {
     }
 
     @Transactional
+    public void markAsReadForUser(UUID notificationId, UUID userId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with ID: " + notificationId));
+        if (!notification.getUser().getId().equals(userId)) {
+            throw new com.eventbooking.exception.BadRequestException("Unauthorized");
+        }
+        notification.setRead(true);
+        notificationRepository.save(notification);
+    }
+
+    @Transactional
     public void markAllAsRead(User user) {
         List<Notification> unread = notificationRepository.findByUserAndReadOrderByCreatedAtDesc(user, false);
         unread.forEach(n -> n.setRead(true));

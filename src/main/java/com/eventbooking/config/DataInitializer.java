@@ -31,6 +31,12 @@ public class DataInitializer {
                 return roleRepository.save(role);
             });
 
+            roleRepository.findByName("ROLE_ORGANIZER").orElseGet(() -> {
+                Role role = new Role();
+                role.setName("ROLE_ORGANIZER");
+                return roleRepository.save(role);
+            });
+
             // Initialize Admin User
             if (!userRepository.existsByEmail("admin@123")) {
                 User admin = new User();

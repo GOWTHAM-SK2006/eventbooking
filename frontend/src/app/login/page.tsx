@@ -168,6 +168,10 @@ export default function LoginPage() {
             </motion.button>
           </form>
 
+          <motion.p variants={itemVariants} className="text-center text-[#6B7280] mt-4 font-medium">
+            <Link href="/forgot-password" className="text-[#FACC15] font-bold hover:underline">Forgot password?</Link>
+          </motion.p>
+
           <motion.p variants={itemVariants} className="text-center text-[#6B7280] mt-8 font-medium">
             Don't have an account? <Link href="/signup" className="text-[#FACC15] font-bold hover:text-[#EAB308] transition-colors hover:underline">Sign up</Link>
           </motion.p>

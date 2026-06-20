@@ -6,6 +6,7 @@ import com.eventbooking.entity.*;
 import com.eventbooking.exception.BadRequestException;
 import com.eventbooking.exception.ResourceNotFoundException;
 import com.eventbooking.repository.*;
+import com.eventbooking.util.JsonUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +26,17 @@ public class BookingService {
     private final NotificationService notificationService;
     private final PaymentRepository paymentRepository;
     private final TicketRepository ticketRepository;
+    private final CouponService couponService;
+    private final EventSeatService eventSeatService;
+    private final EventService eventService;
+    private final EmailService emailService;
 
     public BookingService(BookingRepository bookingRepository, EventRepository eventRepository,
                           PaymentService paymentService, TicketService ticketService,
                           NotificationService notificationService, PaymentRepository paymentRepository,
-                          TicketRepository ticketRepository) {
+                          TicketRepository ticketRepository, CouponService couponService,
+                          EventSeatService eventSeatService, EventService eventService,
+                          EmailService emailService) {
         this.bookingRepository = bookingRepository;
         this.eventRepository = eventRepository;
         this.paymentService = paymentService;
@@ -37,6 +44,10 @@ public class BookingService {
         this.notificationService = notificationService;
         this.paymentRepository = paymentRepository;
         this.ticketRepository = ticketRepository;
+        this.couponService = couponService;
+        this.eventSeatService = eventSeatService;
+        this.eventService = eventService;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -52,40 +63,70 @@ public class BookingService {
             throw new BadRequestException("Cannot book slots. The event has already started");
         }
 
-        if (event.getAvailableSlots() < request.getQuantity()) {
+        int quantity = request.getQuantity();
+        if (event.isSeatSelectionEnabled() && request.getSelectedSeats() != null && !request.getSelectedSeats().isEmpty()) {
+            quantity = request.getSelectedSeats().size();
+        }
+
+        if (event.getAvailableSlots() < quantity) {
             throw new BadRequestException("Not enough available tickets. Remaining slots: " + event.getAvailableSlots());
         }
 
-        // Deduct slots
-        event.setAvailableSlots(event.getAvailableSlots() - request.getQuantity());
+        BigDecimal subtotal = event.getPrice().multiply(BigDecimal.valueOf(quantity));
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        String couponCode = null;
+
+        if (request.getCouponCode() != null && !request.getCouponCode().isBlank()) {
+            var validation = couponService.validateCoupon(request.getCouponCode(), subtotal);
+            if (!validation.isValid()) {
+                throw new BadRequestException(validation.getMessage());
+            }
+            discountAmount = validation.getDiscountAmount();
+            couponCode = validation.getCouponCode();
+            couponService.incrementUsage(couponCode);
+        }
+
+        BigDecimal total = subtotal.subtract(discountAmount).max(BigDecimal.ZERO);
+
+        event.setAvailableSlots(event.getAvailableSlots() - quantity);
         eventRepository.save(event);
 
-        BigDecimal total = event.getPrice().multiply(BigDecimal.valueOf(request.getQuantity()));
-
-        // Create Booking (PENDING state)
         Booking booking = Booking.builder()
                 .user(user)
                 .event(event)
-                .quantity(request.getQuantity())
+                .quantity(quantity)
                 .totalPrice(total)
+                .couponCode(couponCode)
+                .discountAmount(discountAmount)
+                .selectedSeats(request.getSelectedSeats() != null ? JsonUtils.toJson(request.getSelectedSeats()) : null)
                 .status("PENDING")
                 .build();
         booking = bookingRepository.save(booking);
 
-        // Process Payment (Saves payment & marks COMPLETED)
-        Payment payment = paymentService.processPayment(booking, request.getPaymentMethod());
+        if (event.isSeatSelectionEnabled() && request.getSelectedSeats() != null) {
+            eventSeatService.reserveSeats(event, request.getSelectedSeats(), booking.getId());
+        }
 
-        // Update Booking (CONFIRMED)
+        String paymentMethod = total.compareTo(BigDecimal.ZERO) == 0 ? "FREE" : request.getPaymentMethod();
+        Payment payment = paymentService.processPayment(booking, paymentMethod, discountAmount, couponCode,
+                request.getRazorpayOrderId(), request.getRazorpayPaymentId(), request.getRazorpaySignature());
+
         booking.setStatus("CONFIRMED");
         booking = bookingRepository.save(booking);
 
-        // Generate Tickets
-        List<Ticket> tickets = ticketService.generateTickets(booking);
+        List<String> seatLabels = request.getSelectedSeats();
+        List<Ticket> tickets = ticketService.generateTickets(booking, seatLabels);
         List<String> ticketCodes = tickets.stream().map(Ticket::getTicketCode).collect(Collectors.toList());
 
-        // Notify user
-        notificationService.sendNotification(user, "Booking Confirmed!", 
-                "Successfully booked " + request.getQuantity() + " slot(s) for event: " + event.getTitle());
+        eventService.incrementBookingCount(event);
+
+        notificationService.sendNotification(user, "Booking Confirmed!",
+                "Successfully booked " + quantity + " ticket(s) for: " + event.getTitle());
+        notificationService.sendNotification(user, "Payment Successful",
+                "Payment of Rs " + total + " received for " + event.getTitle());
+
+        emailService.sendBookingConfirmation(user.getEmail(), event.getTitle(), quantity);
+        tickets.forEach(t -> emailService.sendTicketEmail(user.getEmail(), event.getTitle(), t.getTicketCode()));
 
         return mapToResponse(booking, ticketCodes, payment.getTransactionId());
     }
@@ -103,22 +144,20 @@ public class BookingService {
             throw new BadRequestException("Booking is already cancelled");
         }
 
-        // Cancel tickets
         List<Ticket> tickets = ticketRepository.findByBookingId(bookingId);
         tickets.forEach(ticket -> ticket.setStatus("CANCELLED"));
         ticketRepository.saveAll(tickets);
 
-        // Update booking status
+        eventSeatService.releaseSeats(bookingId);
+
         booking.setStatus("CANCELLED");
         bookingRepository.save(booking);
 
-        // Restore slots
         Event event = booking.getEvent();
         event.setAvailableSlots(event.getAvailableSlots() + booking.getQuantity());
         eventRepository.save(event);
 
-        // Notify user
-        notificationService.sendNotification(booking.getUser(), "Booking Cancelled", 
+        notificationService.sendNotification(booking.getUser(), "Booking Cancelled",
                 "Your booking for event: " + event.getTitle() + " has been cancelled.");
     }
 
@@ -130,6 +169,12 @@ public class BookingService {
 
     public List<BookingResponse> getAllBookings() {
         return bookingRepository.findAll().stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<BookingResponse> getEventBookings(UUID eventId) {
+        return bookingRepository.findByEventId(eventId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

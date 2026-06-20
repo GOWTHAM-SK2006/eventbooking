@@ -38,6 +38,40 @@ public class User {
 
     private String phone;
 
+    @Column(name = "profile_photo_url", length = 512)
+    private String profilePhotoUrl;
+
+    @Column(name = "email_verified")
+    @Builder.Default
+    private boolean emailVerified = false;
+
+    @Builder.Default
+    private boolean blocked = false;
+
+    @Column(name = "google_id")
+    private String googleId;
+
+    @Column(name = "reset_token")
+    private String resetToken;
+
+    @Column(name = "reset_token_expiry")
+    private LocalDateTime resetTokenExpiry;
+
+    @Column(name = "verification_token")
+    private String verificationToken;
+
+    @Column(name = "notification_email")
+    @Builder.Default
+    private boolean notificationEmail = true;
+
+    @Column(name = "notification_push")
+    @Builder.Default
+    private boolean notificationPush = true;
+
+    @Column(name = "notification_reminders")
+    @Builder.Default
+    private boolean notificationReminders = true;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

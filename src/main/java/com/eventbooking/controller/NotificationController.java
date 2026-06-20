@@ -33,8 +33,8 @@ public class NotificationController {
     }
 
     @PutMapping("/{id}/read")
-    public ResponseEntity<Void> markAsRead(@PathVariable UUID id) {
-        notificationService.markAsRead(id);
+    public ResponseEntity<Void> markAsRead(@PathVariable UUID id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        notificationService.markAsReadForUser(id, userDetails.getId());
         return ResponseEntity.noContent().build();
     }
 

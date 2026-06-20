@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -17,5 +18,11 @@ public class BookingRequest {
     private Integer quantity;
 
     @NotNull
-    private String paymentMethod; // e.g. STRIPE, CARD, PAYPAL
+    private String paymentMethod;
+
+    private String couponCode;
+    private List<String> selectedSeats;
+    private String razorpayPaymentId;
+    private String razorpayOrderId;
+    private String razorpaySignature;
 }

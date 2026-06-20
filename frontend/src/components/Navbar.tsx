@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Calendar, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { Calendar, User, LogOut, LayoutDashboard, Bell, Heart } from 'lucide-react';
 import { getSession, clearSession } from '../utils/api';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -16,8 +16,13 @@ export default function Navbar() {
   useEffect(() => {
     setSession(getSession());
     const handleLogin = () => setSession(getSession());
+    const handleLogout = () => setSession(null);
     window.addEventListener('userLogin', handleLogin);
-    return () => window.removeEventListener('userLogin', handleLogin);
+    window.addEventListener('userLogout', handleLogout);
+    return () => {
+      window.removeEventListener('userLogin', handleLogin);
+      window.removeEventListener('userLogout', handleLogout);
+    };
   }, [pathname]);
 
   const handleLogout = () => {
@@ -29,6 +34,7 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Explore', href: '/events' },
     { name: 'My Tickets', href: '/history' },
+    ...(session ? [{ name: 'Wishlist', href: '/wishlist' }] : []),
   ];
 
   return (
@@ -73,6 +79,17 @@ export default function Navbar() {
                         <p className="text-sm font-bold text-[#111827] truncate">{session.firstName} {session.lastName}</p>
                         <p className="text-xs text-[#6B7280] truncate">{session.email}</p>
                       </div>
+                      <Link href="/notifications" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#6B7280] hover:text-[#111827] hover:bg-gray-100 transition-colors">
+                        <Bell size={16} /> Notifications
+                      </Link>
+                      <Link href="/wishlist" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#6B7280] hover:text-[#111827] hover:bg-gray-100 transition-colors">
+                        <Heart size={16} /> Wishlist
+                      </Link>
+                      {session.roles?.includes('ROLE_ORGANIZER') && (
+                        <Link href="/organizer" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#FACC15] hover:bg-yellow-50 transition-colors">
+                          <LayoutDashboard size={16} /> Organizer Hub
+                        </Link>
+                      )}
                       <Link href="/profile" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-[#6B7280] hover:text-[#111827] hover:bg-gray-100 transition-colors">
                         <User size={16} /> Profile Settings
                       </Link>

@@ -34,6 +34,12 @@ public class Ticket {
     @Column(name = "checked_in_at")
     private LocalDateTime checkedInAt;
 
+    @Column(name = "seat_label", length = 20)
+    private String seatLabel;
+
+    @Column(name = "qr_data", columnDefinition = "TEXT")
+    private String qrData;
+
     @Builder.Default
     private boolean deleted = false;
 }

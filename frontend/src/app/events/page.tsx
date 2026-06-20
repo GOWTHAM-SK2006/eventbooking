@@ -1,32 +1,58 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { api } from '../../utils/api';
 import { Search, MapPin, Users, Filter, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ScrollReveal, StaggerContainer, StaggerItem } from '../../components/ScrollReveal';
 
 export default function EventsPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-24"><span className="text-[#6B7280]">Loading events...</span></div>}>
+      <EventsContent />
+    </Suspense>
+  );
+}
+
+function EventsContent() {
+  const searchParams = useSearchParams();
   const [events, setEvents] = useState<any[]>([]);
+  const [trending, setTrending] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState(searchParams.get('category') || '');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [location, setLocation] = useState('');
+
+  useEffect(() => {
+    const cat = searchParams.get('category');
+    if (cat) setCategory(cat);
+  }, [searchParams]);
 
   useEffect(() => {
     fetchEvents();
-  }, [category, search]);
+  }, [category, search, minPrice, maxPrice, location]);
 
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (search) params.append('search', search);
-      if (category) params.append('category', category);
+      const params: Record<string, string> = {};
+      if (search) params.search = search;
+      if (category) params.category = category;
+      if (minPrice) params.minPrice = minPrice;
+      if (maxPrice) params.maxPrice = maxPrice;
+      if (location) params.location = location;
       
-      const data = await api.get(`/events?${params.toString()}`);
+      const [data, trend] = await Promise.all([
+        api.get('/events', { params }),
+        api.get('/events/trending').catch(() => []),
+      ]);
       setEvents(data);
+      setTrending(trend);
     } catch (e) {
       console.error(e);
     } finally {
@@ -130,7 +156,30 @@ export default function EventsPage() {
             </motion.button>
           ))}
         </motion.div>
+
+        <div className="flex gap-3 flex-wrap">
+          <input type="number" placeholder="Min ₹" value={minPrice} onChange={e => setMinPrice(e.target.value)}
+            className="w-24 px-3 py-2 border border-gray-300 rounded-xl text-sm" />
+          <input type="number" placeholder="Max ₹" value={maxPrice} onChange={e => setMaxPrice(e.target.value)}
+            className="w-24 px-3 py-2 border border-gray-300 rounded-xl text-sm" />
+          <input type="text" placeholder="Location..." value={location} onChange={e => setLocation(e.target.value)}
+            className="flex-1 min-w-[120px] px-3 py-2 border border-gray-300 rounded-xl text-sm" />
+        </div>
       </motion.div>
+
+      {trending.length > 0 && (
+        <div className="mb-12">
+          <h2 className="text-2xl font-black mb-4 flex items-center gap-2"><Sparkles className="text-[#FACC15]" /> Trending Now</h2>
+          <div className="flex gap-4 overflow-x-auto pb-2">
+            {trending.slice(0, 4).map(e => (
+              <Link key={e.id} href={`/events/${e.id}`} className="flex-shrink-0 w-64 premium-card p-4 hover:border-[#FACC15]">
+                <p className="font-bold line-clamp-1">{e.title}</p>
+                <p className="text-[#FACC15] font-black mt-1">{e.price === 0 ? 'Free' : `₹${e.price}`}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Event Grid */}
       {loading ? (

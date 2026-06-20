@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api, getSession } from '../utils/api';
-import { Calendar, MapPin, Tag, Users, ShieldAlert, Sparkles, CreditCard, ChevronRight, Star, Loader, CheckCircle, X, QrCode } from 'lucide-react';
+import { Calendar, MapPin, Tag, Users, ShieldAlert, Sparkles, CreditCard, ChevronRight, Star, Loader, CheckCircle, X, QrCode, Heart } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -52,6 +52,12 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
   // Payment Settings State
   const [paymentSettings, setPaymentSettings] = useState<any>(null);
   const [upiTransactionId, setUpiTransactionId] = useState('');
+  const [razorpayKey, setRazorpayKey] = useState('rzp_test_T2NUwSm1uqZZrX');
+  const [couponCode, setCouponCode] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [inWishlist, setInWishlist] = useState(false);
+  const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+  const [seats, setSeats] = useState<any[]>([]);
 
   const session = getSession();
 
@@ -71,7 +77,24 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
       try {
         const pData = await api.get('/settings/payment');
         if (pData && pData.value) setPaymentSettings(JSON.parse(pData.value));
-      } catch (e) { console.warn("No payment settings"); }
+      } catch (e) { /* optional */ }
+
+      try {
+        const config = await api.get('/payments/config');
+        if (config?.keyId) setRazorpayKey(config.keyId);
+      } catch (e) { /* optional */ }
+
+      if (session) {
+        try {
+          const wl = await api.get(`/events/${actualId}/wishlist`);
+          setInWishlist(wl.inWishlist);
+        } catch (e) { /* optional */ }
+      }
+
+      if (eventData.seatSelectionEnabled) {
+        const seatData = await api.get(`/events/${actualId}/seats`);
+        setSeats(seatData);
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -89,27 +112,31 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
     setShowPaymentModal(true);
   };
 
-  const confirmPaymentAndBook = async (finalPaymentMethod: string) => {
+  const confirmPaymentAndBook = async (finalPaymentMethod: string, razorpayData?: { orderId: string; paymentId: string; signature: string }) => {
     setProcessingPayment(true);
     setBookingError(null);
 
-    const isRazorpay = finalPaymentMethod.startsWith('RAZORPAY');
-
     try {
-      const payload = {
+      const payload: any = {
         eventId: actualId,
         quantity,
-        paymentMethod: isRazorpay ? 'CARD' : 'UPI',
-        transactionId: isRazorpay ? finalPaymentMethod.split('-')[1] : finalPaymentMethod.split('-')[1] || 'CASH-TXN'
+        paymentMethod: event.price === 0 ? 'FREE' : (razorpayData ? 'RAZORPAY' : finalPaymentMethod),
+        couponCode: couponCode || undefined,
+        selectedSeats: selectedSeats.length > 0 ? selectedSeats : undefined,
       };
 
+      if (razorpayData) {
+        payload.razorpayOrderId = razorpayData.orderId;
+        payload.razorpayPaymentId = razorpayData.paymentId;
+        payload.razorpaySignature = razorpayData.signature;
+      } else if (finalPaymentMethod.startsWith('UPI-')) {
+        payload.paymentMethod = finalPaymentMethod;
+      }
+
       const bookingRes = await api.post('/bookings', payload);
-      
       setBookingSuccess(bookingRes);
       confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#FACC15', '#FF8C42', '#ffffff'] });
-      setTimeout(() => {
-        router.push('/history');
-      }, 3000);
+      setTimeout(() => router.push('/history'), 3000);
     } catch (err: any) {
       setBookingError(err.message || 'Booking failed');
     } finally {
@@ -122,17 +149,22 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
       setBookingError('Payment gateway unavailable. Please use UPI/QR or try later.');
       return;
     }
-    const totalPrice = quantity * event.price;
-    const amountInCents = Math.round(totalPrice * 100);
+    const subtotal = quantity * event.price;
+    const total = Math.max(0, subtotal - discount);
+    const amountInCents = Math.round(total * 100);
 
     const options = {
-      key: 'rzp_test_T2NUwSm1uqZZrX',
+      key: razorpayKey,
       amount: amountInCents,
       currency: 'INR',
       name: 'EventBooking Premium',
       description: `Access Pass: ${event.title}`,
       handler: function (response: any) {
-        confirmPaymentAndBook(`RAZORPAY-${response.razorpay_payment_id}`);
+        confirmPaymentAndBook('RAZORPAY', {
+          orderId: response.razorpay_order_id,
+          paymentId: response.razorpay_payment_id,
+          signature: response.razorpay_signature,
+        });
       },
       prefill: {
         name: session?.firstName ? `${session.firstName} ${session.lastName}` : 'Guest',
@@ -177,7 +209,34 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
     </div>
   );
 
-  const totalPrice = quantity * event.price;
+  const applyCoupon = async () => {
+    if (!couponCode) return;
+    try {
+      const res = await api.post('/coupons/validate', { code: couponCode, amount: quantity * event.price });
+      if (res.valid) {
+        setDiscount(res.discountAmount);
+        setBookingError(null);
+      } else {
+        setBookingError(res.message);
+        setDiscount(0);
+      }
+    } catch (e: any) { setBookingError(e.message); }
+  };
+
+  const toggleWishlist = async () => {
+    if (!session) { router.push('/login'); return; }
+    try {
+      if (inWishlist) {
+        await api.delete(`/wishlist/${actualId}`);
+        setInWishlist(false);
+      } else {
+        await api.post(`/wishlist/${actualId}`);
+        setInWishlist(true);
+      }
+    } catch (e) { console.error(e); }
+  };
+
+  const totalPrice = Math.max(0, quantity * event.price - discount);
 
   return (
     <div className="w-full pb-24">
@@ -201,6 +260,12 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
               <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-[#111827] leading-tight mb-4 drop-shadow-2xl">
                 {event.title}
               </h1>
+              {session && (
+                <button onClick={toggleWishlist} className="mb-4 flex items-center gap-2 text-sm font-bold">
+                  <Heart size={18} fill={inWishlist ? '#FACC15' : 'none'} className={inWishlist ? 'text-[#FACC15]' : 'text-gray-400'} />
+                  {inWishlist ? 'Saved' : 'Save Event'}
+                </button>
+              )}
               <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 text-[#111827]/80 font-medium">
                 <span className="flex items-center gap-2 text-lg"><Calendar size={20} className="text-[#FACC15]" /> {new Date(event.startDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
                 <span className="flex items-center gap-2 text-lg"><MapPin size={20} className="text-[#FACC15]" /> {event.location}</span>
@@ -337,6 +402,17 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
                     <div className="flex justify-between items-center text-sm mb-2 text-[#6B7280]">
                       <span>Passes ({quantity}x)</span>
                       <span>{event.price === 0 ? 'Free' : `₹${(event.price * quantity).toLocaleString('en-IN')}`}</span>
+                    </div>
+                    {discount > 0 && (
+                      <div className="flex justify-between items-center text-sm mb-2 text-green-600">
+                        <span>Coupon Discount</span>
+                        <span>-₹{discount.toLocaleString('en-IN')}</span>
+                      </div>
+                    )}
+                    <div className="flex gap-2 mb-4">
+                      <input type="text" placeholder="Coupon code" value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+                      <button type="button" onClick={applyCoupon} className="btn-secondary py-2 px-3 text-sm">Apply</button>
                     </div>
                     <div className="flex justify-between items-center text-sm mb-4 text-[#6B7280]">
                       <span>Fees & Taxes</span>

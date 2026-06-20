@@ -1,186 +1,122 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { api, getSession } from '../../utils/api';
-import { Download, Loader, Ticket, Calendar, MapPin, DollarSign, ExternalLink } from 'lucide-react';
+import { Download, Loader, Ticket, Calendar, XCircle, QrCode } from 'lucide-react';
 import { motion } from 'framer-motion';
+import TicketModal from '../../components/TicketModal';
+import type { Booking } from '../../types';
 
-export default function HistoryPage() {
+function HistoryContent() {
   const router = useRouter();
-  const [bookings, setBookings] = useState<any[]>([]);
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab') || 'active';
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
+  const [cancelling, setCancelling] = useState<string | null>(null);
 
   useEffect(() => {
-    const session = getSession();
-    if (!session) {
-      router.push('/login');
-      return;
-    }
+    if (!getSession()) { router.push('/login'); return; }
     fetchBookings();
   }, []);
 
   const fetchBookings = async () => {
-    setLoading(true);
     try {
-      const data = await api.get('/bookings/user-bookings');
+      const data = await api.get('/bookings');
       setBookings(data);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
+    } catch (e) { console.error(e); }
+    finally { setLoading(false); }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
+  const cancelBooking = async (id: string) => {
+    if (!confirm('Cancel this booking?')) return;
+    setCancelling(id);
+    try {
+      await api.post(`/bookings/${id}/cancel`);
+      await fetchBookings();
+    } catch (e: any) { alert(e.message); }
+    finally { setCancelling(null); }
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
-  };
+  const now = new Date();
+  const filtered = bookings.filter(b => {
+    const eventDate = new Date(b.eventDate);
+    if (tab === 'active' || tab === 'upcoming') return b.status === 'CONFIRMED' && eventDate >= now;
+    if (tab === 'past') return b.status === 'CONFIRMED' && eventDate < now;
+    if (tab === 'cancelled') return b.status === 'CANCELLED';
+    return true;
+  });
 
-  if (loading) return (
-    <div className="flex justify-center items-center h-[70vh]">
-      <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity }}>
-        <Loader size={40} className="text-[#FACC15]" />
-      </motion.div>
-    </div>
-  );
+  const tabs = [
+    { id: 'active', label: 'Active' },
+    { id: 'upcoming', label: 'Upcoming' },
+    { id: 'past', label: 'Past' },
+    { id: 'cancelled', label: 'Cancelled' },
+  ];
+
+  if (loading) return <div className="flex justify-center items-center h-[70vh]"><Loader className="spin text-[#FACC15]" size={40} /></div>;
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 py-12 md:py-24">
-      
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="mb-12"
-      >
-        <h1 className="text-4xl md:text-5xl font-black text-[#111827] mb-2">
-          Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FACC15] to-[#EAB308]">Tickets</span>
-        </h1>
-        <p className="text-[#6B7280] font-medium">View and download your event tickets.</p>
-      </motion.div>
+    <div className="w-full max-w-4xl mx-auto px-4 py-12">
+      <h1 className="text-4xl font-black mb-2">My <span className="text-[#FACC15]">Tickets</span></h1>
+      <p className="text-[#6B7280] mb-8">View, download, and manage your event tickets.</p>
 
-      {/* Tickets List */}
-      {bookings.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-16 text-center"
-        >
-          <motion.div
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6"
-          >
-            <Ticket size={32} className="text-[#9CA3AF]" />
-          </motion.div>
-          <h3 className="text-2xl font-bold text-[#111827] mb-2">No tickets yet</h3>
-          <p className="text-[#6B7280] font-medium">Book an event to get started!</p>
-        </motion.div>
+      <div className="flex gap-2 mb-8 overflow-x-auto">
+        {tabs.map(t => (
+          <button key={t.id} onClick={() => router.push(`/history?tab=${t.id}`)}
+            className={`px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap ${tab === t.id ? 'bg-[#FACC15] text-[#111827]' : 'bg-white border border-gray-300 text-[#6B7280]'}`}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="premium-card p-16 text-center">
+          <Ticket size={48} className="text-gray-300 mx-auto mb-4" />
+          <p className="text-[#6B7280]">No tickets in this category.</p>
+        </div>
       ) : (
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
-          className="space-y-4"
-        >
-          {bookings.map((booking) => (
-            <motion.div
-              key={booking.id}
-              variants={itemVariants}
-              whileHover={{ y: -4, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}
-              transition={{ duration: 0.3 }}
-              className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 hover:border-[#FACC15] transition-colors duration-300"
-            >
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div className="flex-1">
-                  <h3 className="text-xl md:text-2xl font-black text-[#111827] mb-3">
-                    {booking.eventName}
-                  </h3>
-                  <div className="space-y-2 text-sm md:text-base">
-                    <div className="flex items-center gap-3 text-[#6B7280]">
-                      <Calendar size={16} className="flex-shrink-0" />
-                      <span>{new Date(booking.eventDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-[#6B7280]">
-                      <MapPin size={16} className="flex-shrink-0" />
-                      <span>{booking.eventLocation}</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-[#6B7280]">
-                      <Ticket size={16} className="flex-shrink-0" />
-                      <span className="font-bold">{booking.quantity} ticket{booking.quantity !== 1 ? 's' : ''}</span>
-                    </div>
-                  </div>
+        <div className="space-y-4">
+          {filtered.map((booking, i) => (
+            <motion.div key={booking.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              className="premium-card p-6">
+              <div className="flex flex-col md:flex-row justify-between gap-4">
+                <div>
+                  <span className={`badge-${booking.status === 'CONFIRMED' ? 'success' : 'warning'} text-xs`}>{booking.status}</span>
+                  <h3 className="text-xl font-black mt-2 mb-2">{booking.eventTitle}</h3>
+                  <p className="text-sm text-[#6B7280] flex items-center gap-2"><Calendar size={14} />{new Date(booking.eventDate).toLocaleString()}</p>
+                  <p className="text-sm text-[#6B7280] mt-1">{booking.quantity} ticket(s) · ₹{booking.totalPrice}</p>
                 </div>
-
-                <div className="flex flex-col items-end gap-4 w-full md:w-auto">
-                  <div className="text-right">
-                    <span className="text-xs font-bold text-[#9CA3AF] uppercase tracking-wider block mb-1">Total Paid</span>
-                    <span className="text-2xl md:text-3xl font-black text-[#FACC15]">
-                      ₹{(booking.totalPrice || 0).toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                  
-                  <div className="flex gap-2 w-full md:w-auto">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="flex-1 md:flex-none bg-[#FACC15] hover:bg-[#EAB308] text-[#111827] font-bold py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md text-sm"
-                    >
-                      <Download size={16} /> Download
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="flex-1 md:flex-none bg-white border border-gray-300 hover:border-[#FACC15] text-[#111827] font-bold py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm"
-                    >
-                      <ExternalLink size={16} /> View
-                    </motion.button>
-                  </div>
+                <div className="flex flex-col gap-2">
+                  {booking.ticketCodes?.map(code => (
+                    <button key={code} onClick={() => setSelectedTicket(code)}
+                      className="btn-secondary py-2 px-4 text-sm flex items-center gap-2">
+                      <QrCode size={16} /> {code}
+                    </button>
+                  ))}
+                  {booking.status === 'CONFIRMED' && new Date(booking.eventDate) > now && (
+                    <button onClick={() => cancelBooking(booking.id)} disabled={cancelling === booking.id}
+                      className="text-red-500 text-sm font-bold flex items-center gap-1 hover:underline">
+                      <XCircle size={14} /> {cancelling === booking.id ? 'Cancelling...' : 'Cancel Booking'}
+                    </button>
+                  )}
                 </div>
-              </div>
-
-              <motion.div
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-                className="mt-6 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent origin-left"
-              />
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {booking.tickets && booking.tickets.map((ticket: any, i: number) => (
-                  <motion.span
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.2 + i * 0.1 }}
-                    className="bg-yellow-50 border border-yellow-200 px-3 py-1 rounded-lg text-xs font-bold text-[#FACC15]"
-                  >
-                    Ticket #{ticket.code || i + 1}
-                  </motion.span>
-                ))}
               </div>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       )}
+      {selectedTicket && <TicketModal ticketCode={selectedTicket} onClose={() => setSelectedTicket(null)} />}
     </div>
+  );
+}
+
+export default function HistoryPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center h-[70vh]"><Loader className="spin text-[#FACC15]" size={40} /></div>}>
+      <HistoryContent />
+    </Suspense>
   );
 }

@@ -41,6 +41,16 @@ public class Booking {
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
 
+    @Column(name = "coupon_code", length = 50)
+    private String couponCode;
+
+    @Column(name = "discount_amount", precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal discountAmount = BigDecimal.ZERO;
+
+    @Column(name = "selected_seats", columnDefinition = "TEXT")
+    private String selectedSeats;
+
     @Column(nullable = false)
     private String status; // e.g., PENDING, CONFIRMED, CANCELLED
 

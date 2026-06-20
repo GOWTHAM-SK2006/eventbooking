@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -16,7 +18,6 @@ public class EventRequest {
     private String title;
 
     private String description;
-
     private String location;
 
     @NotBlank
@@ -37,7 +38,18 @@ public class EventRequest {
     private Integer capacity;
 
     private String imageUrl;
+    private UUID organizerId;
+    private String venueName;
+    private String venueAddress;
+    private BigDecimal latitude;
+    private BigDecimal longitude;
+    private List<String> galleryImages;
+    private Boolean featured;
+    private String faqs;
+    private String termsConditions;
+    private String schedule;
+    private Boolean seatSelectionEnabled;
 
     @NotBlank
-    private String status; // DRAFT, PUBLISHED, CANCELLED
+    private String status;
 }

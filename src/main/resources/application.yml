@@ -31,3 +31,19 @@ app:
     secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970} # 256-bit hex key
     access-token-expiration-ms: 3600000 # 1 hour
     refresh-token-expiration-ms: 604800000 # 7 days
+  razorpay:
+    key-id: ${RAZORPAY_KEY_ID:rzp_test_T2NUwSm1uqZZrX}
+    key-secret: ${RAZORPAY_KEY_SECRET:}
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:}
+  gst-rate: ${GST_RATE:18}
+  frontend-url: ${FRONTEND_URL:http://localhost:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized

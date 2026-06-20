@@ -19,12 +19,13 @@ export default function HomePage() {
 
   const loadEvents = async () => {
     try {
-      const [featData, allData] = await Promise.all([
+      const [featData, trendData, upcomingData] = await Promise.all([
         api.get('/events/featured'),
-        api.get('/events')
+        api.get('/events/trending').catch(() => []),
+        api.get('/events/upcoming').catch(() => api.get('/events')),
       ]);
       setFeatured(featData.slice(0, 3));
-      const sortedEvents = [...allData].sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+      const sortedEvents = [...(upcomingData.length ? upcomingData : trendData)].sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
       setUpcoming(sortedEvents.slice(0, 4));
     } catch (e) {
       console.error('Error loading events:', e);

@@ -30,6 +30,11 @@ public class ReviewService {
         Event event = eventRepository.findById(request.getEventId())
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with ID: " + request.getEventId()));
 
+        reviewRepository.findByEventIdOrderByCreatedAtDesc(event.getId()).stream()
+                .filter(r -> r.getUser().getId().equals(user.getId()))
+                .findFirst()
+                .ifPresent(r -> { throw new com.eventbooking.exception.BadRequestException("You have already reviewed this event"); });
+
         Review review = Review.builder()
                 .user(user)
                 .event(event)

@@ -1,5 +1,6 @@
 package com.eventbooking.service;
 
+import com.eventbooking.config.AppProperties;
 import com.eventbooking.dto.*;
 import com.eventbooking.entity.Role;
 import com.eventbooking.entity.User;
@@ -17,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,16 +31,21 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
     private final RefreshTokenService refreshTokenService;
+    private final EmailService emailService;
+    private final AppProperties appProperties;
 
     public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository,
                        RoleRepository roleRepository, PasswordEncoder encoder, JwtUtils jwtUtils,
-                       RefreshTokenService refreshTokenService) {
+                       RefreshTokenService refreshTokenService, EmailService emailService,
+                       AppProperties appProperties) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.encoder = encoder;
         this.jwtUtils = jwtUtils;
         this.refreshTokenService = refreshTokenService;
+        this.emailService = emailService;
+        this.appProperties = appProperties;
     }
 
     @Transactional
@@ -47,35 +54,123 @@ public class AuthService {
             throw new BadRequestException("Error: Email is already in use!");
         }
 
-        // Create new user's account
+        String verificationToken = UUID.randomUUID().toString();
+
         User user = User.builder()
                 .email(signUpRequest.getEmail())
                 .password(encoder.encode(signUpRequest.getPassword()))
                 .firstName(signUpRequest.getFirstName())
                 .lastName(signUpRequest.getLastName())
                 .phone(signUpRequest.getPhone())
+                .verificationToken(verificationToken)
+                .emailVerified(false)
                 .build();
 
         Set<Role> roles = new HashSet<>();
-
-        // If email is admin@eventbooking.com, automatically seed as ADMIN, otherwise USER
         if (signUpRequest.getEmail().equalsIgnoreCase("admin@eventbooking.com")) {
-            Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-                    .orElseThrow(() -> new ResourceNotFoundException("Error: Role ROLE_ADMIN is not found."));
-            roles.add(adminRole);
+            roles.add(roleRepository.findByName("ROLE_ADMIN")
+                    .orElseThrow(() -> new ResourceNotFoundException("Role ROLE_ADMIN not found")));
+            user.setEmailVerified(true);
         } else {
-            Role userRole = roleRepository.findByName("ROLE_USER")
-                    .orElseThrow(() -> new ResourceNotFoundException("Error: Role ROLE_USER is not found."));
-            roles.add(userRole);
+            roles.add(roleRepository.findByName("ROLE_USER")
+                    .orElseThrow(() -> new ResourceNotFoundException("Role ROLE_USER not found")));
         }
 
         user.setRoles(roles);
         userRepository.save(user);
 
-        return new MessageResponse("User registered successfully!");
+        emailService.sendVerificationEmail(user.getEmail(), verificationToken, appProperties.getFrontendUrl());
+
+        return new MessageResponse("User registered successfully! Please verify your email.");
+    }
+
+    @Transactional
+    public MessageResponse verifyEmail(String token) {
+        User user = userRepository.findByVerificationToken(token)
+                .orElseThrow(() -> new BadRequestException("Invalid verification token"));
+        user.setEmailVerified(true);
+        user.setVerificationToken(null);
+        userRepository.save(user);
+        return new MessageResponse("Email verified successfully!");
+    }
+
+    @Transactional
+    public MessageResponse forgotPassword(ForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new BadRequestException("If the email exists, a reset link has been sent"));
+
+        String token = UUID.randomUUID().toString();
+        user.setResetToken(token);
+        user.setResetTokenExpiry(LocalDateTime.now().plusHours(1));
+        userRepository.save(user);
+
+        emailService.sendPasswordResetEmail(user.getEmail(), token, appProperties.getFrontendUrl());
+        return new MessageResponse("Password reset link sent to your email");
+    }
+
+    @Transactional
+    public MessageResponse resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByResetToken(request.getToken())
+                .orElseThrow(() -> new BadRequestException("Invalid or expired reset token"));
+
+        if (user.getResetTokenExpiry() == null || user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("Reset token has expired");
+        }
+
+        user.setPassword(encoder.encode(request.getNewPassword()));
+        user.setResetToken(null);
+        user.setResetTokenExpiry(null);
+        userRepository.save(user);
+
+        return new MessageResponse("Password reset successfully!");
+    }
+
+    @Transactional
+    public JwtResponse googleLogin(GoogleLoginRequest request) {
+        User user = userRepository.findByGoogleId(request.getGoogleId())
+                .or(() -> userRepository.findByEmail(request.getEmail()))
+                .orElse(null);
+
+        if (user == null) {
+            user = User.builder()
+                    .email(request.getEmail())
+                    .password(encoder.encode(UUID.randomUUID().toString()))
+                    .firstName(request.getFirstName())
+                    .lastName(request.getLastName())
+                    .googleId(request.getGoogleId())
+                    .profilePhotoUrl(request.getProfilePhotoUrl())
+                    .emailVerified(true)
+                    .build();
+            Role userRole = roleRepository.findByName("ROLE_USER")
+                    .orElseThrow(() -> new ResourceNotFoundException("Role ROLE_USER not found"));
+            user.setRoles(Set.of(userRole));
+            user = userRepository.save(user);
+        } else {
+            if (user.getGoogleId() == null) {
+                user.setGoogleId(request.getGoogleId());
+            }
+            if (request.getProfilePhotoUrl() != null) {
+                user.setProfilePhotoUrl(request.getProfilePhotoUrl());
+            }
+            user.setEmailVerified(true);
+            user = userRepository.save(user);
+        }
+
+        if (user.isBlocked()) {
+            throw new BadRequestException("Your account has been blocked");
+        }
+
+        return buildJwtResponse(user);
     }
 
     public JwtResponse authenticateUser(LoginRequest loginRequest) {
+        User user = userRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new BadRequestException("Invalid email or password"));
+
+        if (user.isBlocked()) {
+            throw new BadRequestException("Your account has been blocked");
+        }
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
@@ -83,26 +178,18 @@ public class AuthService {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         String jwt = jwtUtils.generateJwtToken(userDetails);
-
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         var refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
-        return new JwtResponse(
-                jwt,
-                refreshToken.getToken(),
-                userDetails.getId(),
-                userDetails.getEmail(),
-                userDetails.getFirstName(),
-                userDetails.getLastName(),
-                roles);
+        return new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
+                userDetails.getEmail(), userDetails.getFirstName(), userDetails.getLastName(), roles);
     }
 
     public TokenRefreshResponse refreshAccessToken(TokenRefreshRequest request) {
         String requestRefreshToken = request.getRefreshToken();
-
         return refreshTokenService.findByToken(requestRefreshToken)
                 .map(refreshTokenService::verifyExpiration)
                 .map(token -> {
@@ -129,6 +216,7 @@ public class AuthService {
         if (updateDto.getFirstName() != null) user.setFirstName(updateDto.getFirstName());
         if (updateDto.getLastName() != null) user.setLastName(updateDto.getLastName());
         if (updateDto.getPhone() != null) user.setPhone(updateDto.getPhone());
+        if (updateDto.getProfilePhotoUrl() != null) user.setProfilePhotoUrl(updateDto.getProfilePhotoUrl());
 
         if (updateDto.getNewPassword() != null && !updateDto.getNewPassword().trim().isEmpty()) {
             if (updateDto.getCurrentPassword() == null || !encoder.matches(updateDto.getCurrentPassword(), user.getPassword())) {
@@ -139,5 +227,71 @@ public class AuthService {
 
         userRepository.save(user);
         return new MessageResponse("Profile updated successfully!");
+    }
+
+    @Transactional
+    public MessageResponse updateNotificationSettings(UUID id, NotificationSettingsUpdate update) {
+        User user = getUserById(id);
+        if (update.getNotificationEmail() != null) user.setNotificationEmail(update.getNotificationEmail());
+        if (update.getNotificationPush() != null) user.setNotificationPush(update.getNotificationPush());
+        if (update.getNotificationReminders() != null) user.setNotificationReminders(update.getNotificationReminders());
+        userRepository.save(user);
+        return new MessageResponse("Notification settings updated!");
+    }
+
+    @Transactional
+    public MessageResponse blockUser(UUID userId, boolean blocked) {
+        User user = getUserById(userId);
+        user.setBlocked(blocked);
+        userRepository.save(user);
+        return new MessageResponse(blocked ? "User blocked" : "User unblocked");
+    }
+
+    @Transactional
+    public MessageResponse deleteUser(UUID userId) {
+        User user = getUserById(userId);
+        userRepository.delete(user);
+        return new MessageResponse("User deleted");
+    }
+
+    @Transactional
+    public MessageResponse updateUserRoles(RoleUpdateRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Set<Role> roles = new HashSet<>();
+        for (String roleName : request.getRoles()) {
+            roles.add(roleRepository.findByName(roleName)
+                    .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleName)));
+        }
+        user.setRoles(roles);
+        userRepository.save(user);
+        return new MessageResponse("Roles updated successfully");
+    }
+
+    public UserResponse mapToUserResponse(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phone(user.getPhone())
+                .profilePhotoUrl(user.getProfilePhotoUrl())
+                .emailVerified(user.isEmailVerified())
+                .blocked(user.isBlocked())
+                .notificationEmail(user.isNotificationEmail())
+                .notificationPush(user.isNotificationPush())
+                .notificationReminders(user.isNotificationReminders())
+                .roles(user.getRoles().stream().map(Role::getName).toList())
+                .createdAt(user.getCreatedAt())
+                .build();
+    }
+
+    private JwtResponse buildJwtResponse(User user) {
+        String jwt = jwtUtils.generateTokenFromUsername(user.getEmail());
+        var refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        List<String> roles = user.getRoles().stream().map(Role::getName).toList();
+        return new JwtResponse(jwt, refreshToken.getToken(), user.getId(),
+                user.getEmail(), user.getFirstName(), user.getLastName(), roles);
     }
 }
