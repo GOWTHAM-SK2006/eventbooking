@@ -6,7 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { getSession, clearSession } from '../../utils/api';
 import { 
   BarChart3, Calendar, Users, IndianRupee, Plus, FileSpreadsheet, 
-  CreditCard, Bell, TrendingUp, Settings, LogOut, Menu, X, Shield, ChevronRight
+  CreditCard, Bell, TrendingUp, Settings, LogOut, Menu, X, Shield, ChevronRight, ChevronLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -16,6 +16,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('admin_sidebar_collapsed') === 'true';
+    }
+    return false;
+  });
+
+  const toggleSidebar = () => {
+    setIsCollapsed(prev => {
+      const newVal = !prev;
+      localStorage.setItem('admin_sidebar_collapsed', String(newVal));
+      return newVal;
+    });
+  };
 
   useEffect(() => {
     const activeSession = getSession();
@@ -58,7 +72,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] flex flex-col md:flex-row w-full">
+    <div className="min-h-screen bg-[#F8F9FC] flex flex-col md:flex-row w-full">
       {/* Mobile Top Bar */}
       <header className="md:hidden w-full h-16 bg-white border-b border-gray-200 flex justify-between items-center px-4 sticky top-0 z-40">
         <div className="flex items-center gap-2">
@@ -147,16 +161,42 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </AnimatePresence>
 
       {/* Desktop Sticky Sidebar */}
-      <aside className="hidden md:flex w-64 shrink-0 bg-white border-r border-gray-200 flex-col justify-between p-6 sticky top-0 h-screen z-30">
+      <aside className={`hidden md:flex ${isCollapsed ? 'w-20' : 'w-64'} shrink-0 bg-white border-r border-gray-200 flex-col justify-between p-5 sticky top-0 h-screen z-30 transition-all duration-200`}>
         <div className="space-y-8 overflow-y-auto pr-1">
-          <div className="flex items-center gap-2.5 px-2">
-            <div className="w-9 h-9 bg-yellow-400 rounded-xl flex items-center justify-center transform hover:rotate-6 transition-all duration-300">
-              <Shield size={18} className="text-gray-900" />
-            </div>
-            <div>
-              <span className="text-xl font-black text-gray-900 tracking-tight">AdminConsole<span className="text-yellow-400">.</span></span>
-            </div>
+          <div className="flex items-center justify-between px-1">
+            {!isCollapsed ? (
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 bg-yellow-400 rounded-xl flex items-center justify-center transform hover:rotate-6 transition-all duration-300">
+                  <Shield size={18} className="text-gray-900" />
+                </div>
+                <span className="text-lg font-black text-gray-900 tracking-tight">AdminConsole<span className="text-yellow-400">.</span></span>
+              </div>
+            ) : (
+              <div className="w-9 h-9 bg-yellow-400 rounded-xl flex items-center justify-center mx-auto transform hover:rotate-6 transition-all duration-300">
+                <Shield size={18} className="text-gray-900" />
+              </div>
+            )}
+            
+            <button 
+              onClick={toggleSidebar}
+              className={`p-1.5 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-500 transition-colors ${isCollapsed ? 'mx-auto mt-2 hidden' : ''}`}
+              title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+            >
+              <ChevronLeft size={14} />
+            </button>
           </div>
+
+          {isCollapsed && (
+            <div className="flex justify-center -mt-4">
+              <button 
+                onClick={toggleSidebar}
+                className="p-1.5 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-500 transition-colors"
+                title="Expand Sidebar"
+              >
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          )}
 
           <nav className="space-y-1">
             {navItems.map(item => {
@@ -166,44 +206,49 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link 
                   key={item.name} 
                   href={item.href} 
-                  className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all group ${
+                  className={`flex items-center ${isCollapsed ? 'justify-center py-3' : 'justify-between px-4 py-3'} rounded-xl font-bold text-sm transition-all group ${
                     active 
                       ? 'bg-yellow-400 text-gray-900 shadow-sm' 
                       : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
                   }`}
+                  title={isCollapsed ? item.name : undefined}
                 >
                   <div className="flex items-center gap-3">
                     <Icon size={18} className={active ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-600'} />
-                    {item.name}
+                    {!isCollapsed && <span>{item.name}</span>}
                   </div>
-                  {active && <ChevronRight size={14} className="text-gray-900" />}
+                  {!isCollapsed && active && <ChevronRight size={14} className="text-gray-900" />}
                 </Link>
               );
             })}
           </nav>
         </div>
 
-        <div className="border-t border-gray-200 pt-6 space-y-4">
-          <div className="flex items-center gap-3 px-2">
-            <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center font-bold text-gray-900">
+        <div className="border-t border-gray-200 pt-5 space-y-4">
+          <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3 px-1'}`}>
+            <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center font-bold text-gray-900 shrink-0">
               {session?.firstName?.charAt(0) || 'A'}
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-bold text-gray-900 truncate">{session?.firstName} {session?.lastName}</p>
-              <p className="text-xs text-gray-400 font-medium truncate">{session?.email}</p>
-            </div>
+            {!isCollapsed && (
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-gray-900 truncate">{session?.firstName} {session?.lastName}</p>
+                <p className="text-xs text-gray-400 font-medium truncate">{session?.email}</p>
+              </div>
+            )}
           </div>
           <button 
             onClick={handleSignOut}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-red-100 hover:bg-red-50 text-red-500 hover:text-red-700 font-bold rounded-xl text-sm transition-all duration-200"
+            className={`w-full flex items-center justify-center ${isCollapsed ? 'p-3' : 'gap-2 px-4 py-3'} border border-red-100 hover:bg-red-50 text-red-500 hover:text-red-700 font-bold rounded-xl text-sm transition-all duration-200`}
+            title={isCollapsed ? 'Sign Out' : undefined}
           >
-            <LogOut size={16} /> Sign Out
+            <LogOut size={16} />
+            {!isCollapsed && <span>Sign Out</span>}
           </button>
         </div>
       </aside>
 
       {/* Admin Pages Render Window */}
-      <main className="flex-1 min-w-0 flex flex-col p-4 md:p-8 max-w-6xl mx-auto w-full pb-20 md:pb-8">
+      <main className="flex-1 min-w-0 flex flex-col p-4 md:p-8 max-w-[1600px] mx-auto w-full pb-20 md:pb-8">
         {children}
       </main>
     </div>
