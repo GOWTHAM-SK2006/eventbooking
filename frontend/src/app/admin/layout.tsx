@@ -161,9 +161,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </AnimatePresence>
 
       {/* Desktop Sticky Sidebar */}
-      <aside className={`hidden md:flex ${isCollapsed ? 'w-20' : 'w-64'} shrink-0 bg-white border-r border-gray-200 flex-col justify-between p-5 sticky top-0 h-screen z-30 transition-all duration-200`}>
+      <aside className={`hidden md:flex ${isCollapsed ? 'w-20' : 'w-64'} shrink-0 bg-white border-r border-gray-200 flex-col justify-between p-5 sticky top-0 h-screen z-30 transition-all duration-200 relative`}>
+        {/* Floating Collapse/Expand Trigger Button on Right Border */}
+        <button 
+          onClick={toggleSidebar}
+          className="absolute -right-3 top-7 w-6 h-6 rounded-full border border-gray-200 bg-white hover:bg-gray-50 text-gray-500 hover:text-gray-700 transition-all shadow-[0_2px_8px_rgba(0,0,0,0.06)] flex items-center justify-center z-40 focus:outline-none"
+          title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+        >
+          {isCollapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
+        </button>
+
         <div className="space-y-8 overflow-y-auto pr-1">
-          <div className="flex items-center justify-between px-1">
+          <div className="flex items-center px-1">
             {!isCollapsed ? (
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 bg-yellow-400 rounded-xl flex items-center justify-center transform hover:rotate-6 transition-all duration-300">
@@ -176,27 +185,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Shield size={18} className="text-gray-900" />
               </div>
             )}
-            
-            <button 
-              onClick={toggleSidebar}
-              className={`p-1.5 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-500 transition-colors ${isCollapsed ? 'mx-auto mt-2 hidden' : ''}`}
-              title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-            >
-              <ChevronLeft size={14} />
-            </button>
           </div>
-
-          {isCollapsed && (
-            <div className="flex justify-center -mt-4">
-              <button 
-                onClick={toggleSidebar}
-                className="p-1.5 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-500 transition-colors"
-                title="Expand Sidebar"
-              >
-                <ChevronRight size={14} />
-              </button>
-            </div>
-          )}
 
           <nav className="space-y-1">
             {navItems.map(item => {

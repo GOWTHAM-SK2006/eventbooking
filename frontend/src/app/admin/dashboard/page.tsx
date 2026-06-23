@@ -313,8 +313,8 @@ export default function AdminDashboardPage() {
         {/* TOP HEADER */}
         <header className="flex items-center justify-between pb-6 border-b border-gray-200/80">
           <div>
-            <h1 className="text-2xl font-black text-gray-900 tracking-tight">Dashboard</h1>
-            <p className="text-xs text-gray-400 font-semibold mt-0.5">Overview, analytics, & activity details</p>
+            <div className="text-2xl font-black text-gray-900 tracking-tight">Dashboard</div>
+            <p className="text-xs text-gray-400 font-semibold mt-1">Overview, analytics, & activity details</p>
           </div>
 
           {/* Center: Global Search Bar */}
@@ -434,7 +434,7 @@ export default function AdminDashboardPage() {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <TrendingUp className="text-yellow-500" size={16} />
-                <h2 className="text-sm font-bold text-gray-900">Revenue & Bookings Trend</h2>
+                <div className="text-sm font-bold text-gray-900">Revenue & Bookings Trend</div>
               </div>
               
               {/* Chart Tabs */}
@@ -581,7 +581,7 @@ export default function AdminDashboardPage() {
         {/* ROW 3: Upcoming Events Table */}
         <section className="bg-white border border-gray-200/80 rounded-[20px] p-5 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.03)]">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-bold text-gray-900">Upcoming Scheduled Events</h2>
+            <div className="text-sm font-bold text-gray-900">Upcoming Scheduled Events</div>
             <span className="text-[10px] font-bold text-gray-400 uppercase">{upcomingFilteredEvents.length} events matching query</span>
           </div>
 
@@ -672,7 +672,7 @@ export default function AdminDashboardPage() {
           <div className="bg-white border border-gray-200/80 rounded-[20px] p-5 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.03)] flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-bold text-gray-900">Recent Booking Log</h2>
+                <div className="text-sm font-bold text-gray-900">Recent Booking Log</div>
                 <Link href="/admin/bookings" className="text-[10px] font-bold text-yellow-600 hover:text-yellow-700 flex items-center gap-0.5 uppercase">
                   View full history <ArrowUpRight size={12} />
                 </Link>
@@ -719,7 +719,7 @@ export default function AdminDashboardPage() {
           {/* System Activity Feed (Right) */}
           <div className="bg-white border border-gray-200/80 rounded-[20px] p-5 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.03)]">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-bold text-gray-900">System Activity Feed</h2>
+              <div className="text-sm font-bold text-gray-900">System Activity Feed</div>
               <button 
                 onClick={loadData}
                 className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 transition-colors flex items-center gap-1 text-[10px] font-bold uppercase"
