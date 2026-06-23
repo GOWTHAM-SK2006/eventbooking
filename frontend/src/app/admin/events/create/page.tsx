@@ -46,8 +46,8 @@ export default function AdminCreateEventPage() {
           <ArrowLeft size={16} />
         </Link>
         <div>
-          <h1 className="text-2xl font-black text-gray-900">Create Event</h1>
-          <p className="text-xs text-gray-400 font-semibold mt-0.5">Publish a new event to the catalog</p>
+          <div className="text-2xl font-black text-gray-900 leading-none">Create Event</div>
+          <p className="text-xs text-gray-400 font-semibold mt-1">Publish a new event to the catalog</p>
         </div>
       </div>
 

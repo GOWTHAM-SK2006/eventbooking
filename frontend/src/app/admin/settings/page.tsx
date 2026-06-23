@@ -86,7 +86,7 @@ export default function AdminSettingsPage() {
     <div className="space-y-8 w-full max-w-4xl">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-black text-gray-900">Settings</h1>
+        <div className="text-3xl font-black text-gray-900 leading-none">Settings</div>
         <p className="text-sm text-gray-500 font-semibold mt-1">Configure payment gateways, email templates, and platform rules</p>
       </div>
 
@@ -97,7 +97,7 @@ export default function AdminSettingsPage() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Shield className="text-yellow-500" size={20} />
-              <h2 className="text-lg font-black text-gray-900">Razorpay Integration</h2>
+              <div className="text-lg font-black text-gray-900">Razorpay Integration</div>
             </div>
             <p className="text-xs text-gray-400 font-semibold mb-6">Manage API keys and transaction environments for credit card and UPI processing.</p>
             
@@ -150,7 +150,7 @@ export default function AdminSettingsPage() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Mail className="text-yellow-500" size={20} />
-              <h2 className="text-lg font-black text-gray-900">Email Notification Templates</h2>
+              <div className="text-lg font-black text-gray-900">Email Notification Templates</div>
             </div>
             <p className="text-xs text-gray-400 font-semibold mb-6">Customize subject lines and bodies dispatched automatically during ticket reservation events.</p>
             

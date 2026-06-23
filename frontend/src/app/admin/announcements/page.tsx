@@ -85,7 +85,7 @@ export default function AdminAnnouncementsPage() {
     <div className="space-y-8 w-full max-w-4xl">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-black text-gray-900">Announcements</h1>
+        <div className="text-3xl font-black text-gray-900 leading-none">Announcements</div>
         <p className="text-sm text-gray-500 font-semibold mt-1">Broadcast real-time push alerts and ticket reminder updates to users</p>
       </div>
 
@@ -96,7 +96,7 @@ export default function AdminAnnouncementsPage() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Megaphone className="text-yellow-500" size={20} />
-              <h2 className="text-lg font-black text-gray-900">Broadcast Announcement</h2>
+              <div className="text-lg font-black text-gray-900">Broadcast Announcement</div>
             </div>
             <p className="text-xs text-gray-400 font-semibold mb-6">Dispatches push alerts and email copies to all active platform user accounts.</p>
             
@@ -137,7 +137,7 @@ export default function AdminAnnouncementsPage() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Bell className="text-yellow-500" size={20} />
-              <h2 className="text-lg font-black text-gray-900">Event ticket reminder</h2>
+              <div className="text-lg font-black text-gray-900">Event ticket reminder</div>
             </div>
             <p className="text-xs text-gray-400 font-semibold mb-6">Send urgent schedules, venue updates, and reminders specifically to ticket holders of the selected event.</p>
             

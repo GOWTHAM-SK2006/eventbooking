@@ -51,7 +51,7 @@ export default function AdminAnalyticsPage() {
     <div className="space-y-10 w-full">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-black text-gray-900">Analytics</h1>
+        <div className="text-3xl font-black text-gray-900 leading-none">Analytics</div>
         <p className="text-sm text-gray-500 font-semibold mt-1">Deep analysis, daily registration metrics, and revenue charts</p>
       </div>
 
@@ -97,7 +97,7 @@ export default function AdminAnalyticsPage() {
         
         {/* Revenue Progress Chart */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-4">
-          <h2 className="text-lg font-black text-gray-900">Revenue Progression</h2>
+          <div className="text-lg font-black text-gray-900">Revenue Progression</div>
           <div className="h-56 flex items-end">
             <svg className="w-full h-full" viewBox="0 0 300 150">
               <defs>
@@ -131,7 +131,7 @@ export default function AdminAnalyticsPage() {
 
         {/* Daily Registrations Bar Chart */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-4">
-          <h2 className="text-lg font-black text-gray-900">Daily Registrations</h2>
+          <div className="text-lg font-black text-gray-900">Daily Registrations</div>
           <div className="h-56 flex items-end justify-between gap-3 pt-6 px-4">
             {[35, 60, 45, 90, 75, 110, 85].map((val, idx) => (
               <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
@@ -160,7 +160,7 @@ export default function AdminAnalyticsPage() {
 
       {/* Detailed Event Performance Table */}
       <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-4">
-        <h2 className="text-lg font-black text-gray-900">Event Performance Analysis</h2>
+        <div className="text-lg font-black text-gray-900">Event Performance Analysis</div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

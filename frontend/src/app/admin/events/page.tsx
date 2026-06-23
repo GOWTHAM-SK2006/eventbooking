@@ -97,7 +97,7 @@ export default function AdminEventsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-black text-gray-900">Events</h1>
+          <div className="text-3xl font-black text-gray-900 leading-none">Events</div>
           <p className="text-sm text-gray-500 font-semibold mt-1">Manage events, pricing, and configurations</p>
         </div>
         <Link 
@@ -222,7 +222,7 @@ export default function AdminEventsPage() {
               className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 shadow-xl relative"
             >
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-black text-gray-900">Edit Event Settings</h2>
+                <div className="text-xl font-black text-gray-900">Edit Event Settings</div>
                 <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-900 transition-all">
                   <X size={20} />
                 </button>

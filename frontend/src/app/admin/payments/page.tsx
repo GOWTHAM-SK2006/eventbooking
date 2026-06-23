@@ -77,7 +77,7 @@ export default function AdminPaymentsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-black text-gray-900">Payments</h1>
+          <div className="text-3xl font-black text-gray-900 leading-none">Payments</div>
           <p className="text-sm text-gray-500 font-semibold mt-1">Audit transactions, refunds, and financial logs</p>
         </div>
         <button onClick={exportPayments} className="bg-white border border-gray-200 text-gray-950 font-bold px-4 py-2.5 rounded-xl text-xs hover:bg-gray-50 flex items-center gap-1.5 shadow-xs transition-all">
@@ -87,7 +87,7 @@ export default function AdminPaymentsPage() {
 
       {/* Payment History Block */}
       <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-4">
-        <h2 className="text-lg font-black text-gray-900">Transaction History</h2>
+        <div className="text-lg font-black text-gray-900">Transaction History</div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -117,7 +117,7 @@ export default function AdminPaymentsPage() {
       <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-4">
         <div className="flex items-center gap-2">
           <RefreshCw className="text-red-500" size={18} />
-          <h2 className="text-lg font-black text-gray-900">Refund Requests</h2>
+          <div className="text-lg font-black text-gray-900">Refund Requests</div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

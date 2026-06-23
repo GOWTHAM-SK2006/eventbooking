@@ -80,7 +80,7 @@ export default function AdminUsersPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-black text-gray-900">Users</h1>
+          <div className="text-3xl font-black text-gray-900 leading-none">Users</div>
           <p className="text-sm text-gray-500 font-semibold mt-1">Manage user profiles, accounts status, and registration logs</p>
         </div>
       </div>
@@ -176,7 +176,7 @@ export default function AdminUsersPage() {
             >
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="text-xl font-black text-gray-900">User Ticket Reservations</h2>
+                  <div className="text-xl font-black text-gray-900">User Ticket Reservations</div>
                   <p className="text-xs font-bold text-gray-400 mt-1">{selectedUser.firstName} {selectedUser.lastName} ({selectedUser.email})</p>
                 </div>
                 <button onClick={() => setShowHistoryModal(false)} className="text-gray-400 hover:text-gray-900 transition-all">

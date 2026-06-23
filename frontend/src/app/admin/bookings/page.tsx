@@ -77,7 +77,7 @@ export default function AdminBookingsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-black text-gray-900">Bookings</h1>
+          <div className="text-3xl font-black text-gray-900 leading-none">Bookings</div>
           <p className="text-sm text-gray-500 font-semibold mt-1">Audit customer ticket reservations and registration records</p>
         </div>
       </div>
