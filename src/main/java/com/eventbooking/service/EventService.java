@@ -187,6 +187,10 @@ public class EventService {
     }
 
     public EventResponse mapToResponse(Event event) {
+        if (event == null) {
+            return null;
+        }
+
         Double avgRating = reviewRepository.findByEventIdOrderByCreatedAtDesc(event.getId()).stream()
                 .mapToInt(r -> r.getRating())
                 .average()
@@ -196,10 +200,15 @@ public class EventService {
         String organizerName = null;
         UUID organizerId = null;
         if (event.getOrganizer() != null) {
-            organizerId = event.getOrganizer().getId();
-            organizerName = (event.getOrganizer().getFirstName() != null ? event.getOrganizer().getFirstName() : "")
-                    + " " + (event.getOrganizer().getLastName() != null ? event.getOrganizer().getLastName() : "");
-            organizerName = organizerName.trim();
+            try {
+                organizerId = event.getOrganizer().getId();
+                String firstName = event.getOrganizer().getFirstName();
+                String lastName = event.getOrganizer().getLastName();
+                organizerName = (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
+                organizerName = organizerName.trim();
+            } catch (Exception e) {
+                organizerName = "Event Organizer";
+            }
         }
 
         return EventResponse.builder()

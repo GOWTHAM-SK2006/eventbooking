@@ -1,75 +1,45 @@
 'use client';
 
-import React, { useEffect, useRef, ReactNode } from 'react';
-import { motion, useInView, useAnimation } from 'framer-motion';
+import React, { ReactNode } from 'react';
+import { motion } from 'framer-motion';
 
 interface ScrollRevealProps {
   children: ReactNode;
   delay?: number;
   duration?: number;
-  direction?: 'up' | 'down' | 'left' | 'right';
+  direction?: 'up' | 'none';
   className?: string;
 }
 
 export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   children,
   delay = 0,
-  duration = 0.6,
+  duration = 0.25,
   direction = 'up',
   className = '',
 }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
-  const controls = useAnimation();
-
-  useEffect(() => {
-    if (isInView) {
-      controls.start('visible');
-    }
-  }, [isInView, controls]);
-
-  const getVariants = (dir: string) => {
-    const base = {
-      hidden: { opacity: 0 },
-      visible: { opacity: 1, transition: { duration, delay } },
-    };
-
-    switch (dir) {
-      case 'up':
-        return {
-          ...base,
-          hidden: { ...base.hidden, y: 40 },
-          visible: { ...base.visible, y: 0 },
-        };
-      case 'down':
-        return {
-          ...base,
-          hidden: { ...base.hidden, y: -40 },
-          visible: { ...base.visible, y: 0 },
-        };
-      case 'left':
-        return {
-          ...base,
-          hidden: { ...base.hidden, x: 40 },
-          visible: { ...base.visible, x: 0 },
-        };
-      case 'right':
-        return {
-          ...base,
-          hidden: { ...base.hidden, x: -40 },
-          visible: { ...base.visible, x: 0 },
-        };
-      default:
-        return base;
-    }
+  const variants = {
+    hidden: { 
+      opacity: 0, 
+      y: direction === 'up' ? 15 : 0 
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        duration, 
+        delay, 
+        ease: [0.16, 1, 0.3, 1] 
+      } 
+    },
   };
 
   return (
     <motion.div
-      ref={ref}
       initial="hidden"
-      animate={controls}
-      variants={getVariants(direction)}
+      whileInView="visible"
+      viewport={{ once: true, margin: '-50px' }}
+      variants={variants}
       className={className}
     >
       {children}
@@ -85,7 +55,7 @@ interface StaggerContainerProps {
 
 export const StaggerContainer: React.FC<StaggerContainerProps> = ({
   children,
-  staggerDelay = 0.1,
+  staggerDelay = 0.05,
   className = '',
 }) => {
   const containerVariants = {
@@ -94,7 +64,6 @@ export const StaggerContainer: React.FC<StaggerContainerProps> = ({
       opacity: 1,
       transition: {
         staggerChildren: staggerDelay,
-        delayChildren: 0.2,
       },
     },
   };
@@ -103,7 +72,7 @@ export const StaggerContainer: React.FC<StaggerContainerProps> = ({
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: 0.3 }}
+      viewport={{ once: true, margin: '-50px' }}
       variants={containerVariants}
       className={className}
     >
@@ -119,12 +88,12 @@ interface StaggerItemProps {
 
 export const StaggerItem: React.FC<StaggerItemProps> = ({ children, className = '' }) => {
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 15 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.5,
+        duration: 0.25,
         ease: 'easeOut',
       },
     },

@@ -29,6 +29,7 @@ public class WishlistService {
     public List<EventResponse> getWishlist(User user) {
         return wishlistRepository.findByUserOrderByCreatedAtDesc(user).stream()
                 .map(w -> eventService.mapToResponse(w.getEvent()))
+                .filter(java.util.Objects::nonNull)
                 .toList();
     }
 

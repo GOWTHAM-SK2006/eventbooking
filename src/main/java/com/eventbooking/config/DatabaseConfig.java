@@ -26,7 +26,7 @@ public class DatabaseConfig {
             }
             String password = System.getenv("DATABASE_PASSWORD");
             if (password == null) {
-                password = "postgres";
+                password = "123456";
             }
             return DataSourceBuilder.create()
                     .url(url)

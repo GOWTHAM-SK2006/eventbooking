@@ -164,18 +164,21 @@ public class BookingService {
     public List<BookingResponse> getUserBookings(User user) {
         return bookingRepository.findByUserOrderByBookingDateDesc(user).stream()
                 .map(this::mapToResponse)
+                .filter(java.util.Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
     public List<BookingResponse> getAllBookings() {
         return bookingRepository.findAll().stream()
                 .map(this::mapToResponse)
+                .filter(java.util.Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
     public List<BookingResponse> getEventBookings(UUID eventId) {
         return bookingRepository.findByEventId(eventId).stream()
                 .map(this::mapToResponse)
+                .filter(java.util.Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -191,6 +194,9 @@ public class BookingService {
     }
 
     private BookingResponse mapToResponse(Booking booking) {
+        if (booking == null) {
+            return null;
+        }
         List<Ticket> tickets = ticketRepository.findByBookingId(booking.getId());
         List<String> codes = tickets.stream().map(Ticket::getTicketCode).collect(Collectors.toList());
         String transactionId = paymentRepository.findByBookingId(booking.getId())
@@ -199,14 +205,24 @@ public class BookingService {
     }
 
     private BookingResponse mapToResponse(Booking booking, List<String> ticketCodes, String transactionId) {
+        if (booking == null) {
+            return null;
+        }
+        UUID userId = booking.getUser() != null ? booking.getUser().getId() : null;
+        String userEmail = booking.getUser() != null ? booking.getUser().getEmail() : null;
+        UUID eventId = booking.getEvent() != null ? booking.getEvent().getId() : null;
+        String eventTitle = booking.getEvent() != null ? booking.getEvent().getTitle() : null;
+        LocalDateTime eventDate = booking.getEvent() != null ? booking.getEvent().getStartDate() : null;
+        BigDecimal eventPrice = booking.getEvent() != null ? booking.getEvent().getPrice() : null;
+
         return BookingResponse.builder()
                 .id(booking.getId())
-                .userId(booking.getUser().getId())
-                .userEmail(booking.getUser().getEmail())
-                .eventId(booking.getEvent().getId())
-                .eventTitle(booking.getEvent().getTitle())
-                .eventDate(booking.getEvent().getStartDate())
-                .eventPrice(booking.getEvent().getPrice())
+                .userId(userId)
+                .userEmail(userEmail)
+                .eventId(eventId)
+                .eventTitle(eventTitle)
+                .eventDate(eventDate)
+                .eventPrice(eventPrice)
                 .quantity(booking.getQuantity())
                 .totalPrice(booking.getTotalPrice())
                 .status(booking.getStatus())

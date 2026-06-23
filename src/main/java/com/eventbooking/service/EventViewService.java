@@ -41,6 +41,7 @@ public class EventViewService {
         return eventViewRepository.findRecentByUser(user).stream()
                 .limit(10)
                 .map(v -> eventService.mapToResponse(v.getEvent()))
+                .filter(java.util.Objects::nonNull)
                 .toList();
     }
 }
