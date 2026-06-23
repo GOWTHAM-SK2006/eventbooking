@@ -4,7 +4,7 @@ import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { api, getSession } from '../../utils/api';
-import { Search, MapPin, Users, Filter, Sparkles, Calendar as CalendarIcon, Heart, Award } from 'lucide-react';
+import { Search, MapPin, Users, Filter, Sparkles, Calendar as CalendarIcon, Heart, Award, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FloatingBlobs } from '../../components/AnimatedBackground';
 import { ScrollReveal, StaggerContainer, StaggerItem } from '../../components/ScrollReveal';
@@ -35,6 +35,7 @@ function EventsContent() {
   const [location, setLocation] = useState('');
   const [session, setSession] = useState<any>(null);
   const [wishlistIds, setWishlistIds] = useState<string[]>([]);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
     setSession(getSession());
@@ -102,7 +103,38 @@ function EventsContent() {
     }
   };
 
-  const categories = ['Tech', 'Music', 'Business', 'Arts', 'Sports', 'Workshop'];
+  const categories = [
+    'Tech', 
+    'Music', 
+    'Business', 
+    'Arts', 
+    'Sports', 
+    'Workshop', 
+    'Conference', 
+    'Startup', 
+    'AI', 
+    'Hackathon', 
+    'Seminar', 
+    'Meetup'
+  ];
+
+  const categoryEmojis: Record<string, string> = {
+    'Tech': '💻',
+    'Music': '🎵',
+    'Business': '💼',
+    'Arts': '🎨',
+    'Sports': '⚽',
+    'Workshop': '🛠️',
+    'Conference': '🎤',
+    'Startup': '🚀',
+    'AI': '🤖',
+    'Hackathon': '🏆',
+    'Seminar': '📚',
+    'Meetup': '🤝'
+  };
+
+  const mobileVisibleCategories = ['Tech', 'Music', 'Business', 'Arts'];
+  const isExtraActive = category !== '' && !mobileVisibleCategories.includes(category);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -162,9 +194,9 @@ function EventsContent() {
         transition={{ delay: 0.1, duration: 0.6 }}
         className="bg-white p-6 mb-12 rounded-3xl border border-gray-200 shadow-lg relative z-20 space-y-6"
       >
-        <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
+        <div className="flex flex-col gap-6">
           {/* Main search */}
-          <div className="relative flex-1">
+          <div className="relative w-full">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input 
               type="text" 
@@ -175,23 +207,85 @@ function EventsContent() {
             />
           </div>
 
-          {/* Category Chips Scrollbar */}
-          <div className="flex gap-2 overflow-x-auto pb-1 lg:pb-0 hide-scrollbar max-w-full lg:max-w-2xl">
-            <button 
-              onClick={() => setCategory('')}
-              className={`whitespace-nowrap px-5 py-3 rounded-xl font-extrabold text-xs transition-all ${category === '' ? 'bg-yellow-400 text-gray-900 shadow-md' : 'bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 hover:border-yellow-400'}`}
-            >
-              All Events
-            </button>
-            {categories.map((cat) => (
+          {/* Category Filter Section */}
+          <div className="w-full relative min-h-[48px]">
+            {/* Desktop View: All categories visible, wrap into multiple rows, no hidden categories */}
+            <div className="hidden md:flex flex-wrap gap-2.5 items-center">
               <button 
-                key={cat}
-                onClick={() => setCategory(cat)}
-                className={`whitespace-nowrap px-5 py-3 rounded-xl font-extrabold text-xs transition-all ${category === cat ? 'bg-yellow-400 text-gray-900 shadow-md' : 'bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 hover:border-yellow-400'}`}
+                onClick={() => setCategory('')}
+                className={`whitespace-nowrap px-5 py-3 rounded-xl font-extrabold text-xs transition-all duration-300 active:scale-95 ${
+                  category === '' 
+                    ? 'bg-yellow-400 text-gray-900 shadow-md scale-105' 
+                    : 'bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 hover:border-yellow-400'
+                }`}
               >
-                {cat}
+                🌐 All Events
               </button>
-            ))}
+              {categories.map((cat) => (
+                <button 
+                  key={cat}
+                  onClick={() => setCategory(cat)}
+                  className={`whitespace-nowrap px-5 py-3 rounded-xl font-extrabold text-xs transition-all duration-300 active:scale-95 ${
+                    category === cat 
+                      ? 'bg-yellow-400 text-gray-900 shadow-md scale-105' 
+                      : 'bg-gray-50 border border-gray-200 text-gray-600 hover:text-gray-900 hover:border-yellow-400'
+                  }`}
+                >
+                  <span className="mr-1.5">{categoryEmojis[cat]}</span>
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Mobile View: First 5 categories (including All Events) + More button with right fade/overlay */}
+            <div className="md:hidden relative w-full flex items-center">
+              {/* Right fade-out gradient indicator with More button */}
+              <div className="absolute right-0 top-0 bottom-0 flex items-center pl-6 bg-gradient-to-l from-white via-white/95 to-transparent z-10">
+                <button 
+                  onClick={() => setIsDrawerOpen(true)}
+                  className="whitespace-nowrap px-4 py-2.5 rounded-xl font-black text-xs bg-white border border-yellow-300 text-yellow-600 hover:border-yellow-400 shadow-sm flex items-center gap-1 transition-all active:scale-95"
+                >
+                  More <span className="text-[10px] font-black">&gt;</span>
+                </button>
+              </div>
+
+              {/* Horizontal Scroll list */}
+              <div className="flex-1 overflow-x-auto hide-scrollbar scroll-smooth flex gap-2 pr-20 py-1">
+                <button 
+                  onClick={() => setCategory('')}
+                  className={`whitespace-nowrap px-5 py-2.5 rounded-xl font-extrabold text-xs transition-all active:scale-95 ${
+                    category === '' 
+                      ? 'bg-yellow-400 text-gray-900 shadow-md' 
+                      : 'bg-gray-50 border border-gray-200 text-gray-600'
+                  }`}
+                >
+                  🌐 All
+                </button>
+                {mobileVisibleCategories.map((cat) => (
+                  <button 
+                    key={cat}
+                    onClick={() => setCategory(cat)}
+                    className={`whitespace-nowrap px-5 py-2.5 rounded-xl font-extrabold text-xs transition-all active:scale-95 ${
+                      category === cat 
+                        ? 'bg-yellow-400 text-gray-900 shadow-md' 
+                        : 'bg-gray-50 border border-gray-200 text-gray-600'
+                    }`}
+                  >
+                    <span className="mr-1.5">{categoryEmojis[cat]}</span>
+                    {cat}
+                  </button>
+                ))}
+                {isExtraActive && (
+                  <button 
+                    onClick={() => setCategory(category)}
+                    className="whitespace-nowrap px-5 py-2.5 rounded-xl font-extrabold text-xs transition-all bg-yellow-400 text-gray-900 shadow-md active:scale-95"
+                  >
+                    <span className="mr-1.5">{categoryEmojis[category]}</span>
+                    {category}
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -351,6 +445,83 @@ function EventsContent() {
           })}
         </motion.div>
       )}
+
+      {/* Category Selection Bottom Drawer for Mobile */}
+      <AnimatePresence>
+        {isDrawerOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsDrawerOpen(false)}
+              className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 md:hidden"
+            />
+            
+            {/* Slide-up Sheet */}
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+              className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2.5rem] border-t border-gray-100 p-6 pb-10 shadow-2xl z-50 md:hidden max-h-[85vh] overflow-y-auto"
+            >
+              {/* Drag Handle indicator */}
+              <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6" />
+
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-xl font-black text-gray-900">Filter by Category</h3>
+                  <p className="text-xs text-gray-400 font-semibold mt-0.5">Choose an event category to explore</p>
+                </div>
+                <button 
+                  onClick={() => setIsDrawerOpen(false)}
+                  className="p-2.5 rounded-full bg-gray-50 border border-gray-100 text-gray-400 hover:text-gray-900 transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Grid of Categories */}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => {
+                    setCategory('');
+                    setIsDrawerOpen(false);
+                  }}
+                  className={`flex items-center gap-3 px-4 py-4 rounded-2xl font-bold text-sm transition-all duration-300 ${
+                    category === ''
+                      ? 'bg-yellow-400 text-gray-900 shadow-md border-transparent scale-[1.02]'
+                      : 'bg-gray-50 border border-gray-200/80 text-gray-700 active:bg-gray-100'
+                  }`}
+                >
+                  <span className="text-lg">🌐</span>
+                  <span>All Events</span>
+                </button>
+
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      setCategory(cat);
+                      setIsDrawerOpen(false);
+                    }}
+                    className={`flex items-center gap-3 px-4 py-4 rounded-2xl font-bold text-sm transition-all duration-300 ${
+                      category === cat
+                        ? 'bg-yellow-400 text-gray-900 shadow-md border-transparent scale-[1.02]'
+                        : 'bg-gray-50 border border-gray-200/80 text-gray-700 active:bg-gray-100'
+                    }`}
+                  >
+                    <span className="text-lg">{categoryEmojis[cat] || '✨'}</span>
+                    <span>{cat}</span>
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -75,7 +75,7 @@ export default function AdminEventsPage() {
     }
   };
 
-  const categories = ['ALL', 'Tech', 'Music', 'Business', 'Arts', 'Sports', 'Workshop'];
+  const categories = ['ALL', 'Tech', 'Music', 'Business', 'Arts', 'Sports', 'Workshop', 'Conference', 'Startup', 'AI', 'Hackathon', 'Seminar', 'Meetup'];
 
   const filteredEvents = events.filter(ev => {
     const matchesSearch = ev.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -262,6 +262,12 @@ export default function AdminEventsPage() {
                       <option value="Arts">Arts</option>
                       <option value="Sports">Sports</option>
                       <option value="Workshop">Workshop</option>
+                      <option value="Conference">Conference</option>
+                      <option value="Startup">Startup</option>
+                      <option value="AI">AI</option>
+                      <option value="Hackathon">Hackathon</option>
+                      <option value="Seminar">Seminar</option>
+                      <option value="Meetup">Meetup</option>
                     </select>
                   </div>
                   <div>

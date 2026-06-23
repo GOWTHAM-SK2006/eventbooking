@@ -88,6 +88,12 @@ export default function AdminCreateEventPage() {
                 <option value="Arts">Arts</option>
                 <option value="Sports">Sports</option>
                 <option value="Workshop">Workshop</option>
+                <option value="Conference">Conference</option>
+                <option value="Startup">Startup</option>
+                <option value="AI">AI</option>
+                <option value="Hackathon">Hackathon</option>
+                <option value="Seminar">Seminar</option>
+                <option value="Meetup">Meetup</option>
               </select>
             </div>
             <div>
