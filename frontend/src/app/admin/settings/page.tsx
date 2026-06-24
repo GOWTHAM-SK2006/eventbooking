@@ -93,7 +93,7 @@ export default function AdminSettingsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
         {/* Razorpay Config Card */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Shield className="text-yellow-500" size={20} />
@@ -146,7 +146,7 @@ export default function AdminSettingsPage() {
         </div>
 
         {/* Email Templates Config Card */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Mail className="text-yellow-500" size={20} />

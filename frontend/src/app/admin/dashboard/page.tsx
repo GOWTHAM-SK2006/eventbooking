@@ -371,7 +371,7 @@ export default function AdminDashboardPage() {
         </header>
 
         {/* ROW 1: 4 Premium KPI Cards */}
-        <section className="grid grid-cols-4 gap-6">
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-5">
           {[
             { 
               label: 'Total Events', 
@@ -410,7 +410,7 @@ export default function AdminDashboardPage() {
             return (
               <div 
                 key={i} 
-                className="bg-white border border-gray-200/80 rounded-[20px] p-5 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.03)] flex flex-col justify-between hover:-translate-y-[3px] transition-all duration-200 group"
+                className="bg-white border border-gray-100 rounded-2xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] flex flex-col justify-between hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.07)] transition-all duration-300 group relative overflow-hidden"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{s.label}</span>
@@ -430,7 +430,7 @@ export default function AdminDashboardPage() {
         {/* ROW 2: Left 70% Chart & Right 30% Quick Stats */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Revenue Analytics Chart (70%) */}
-          <div className="lg:col-span-2 bg-white border border-gray-200/80 rounded-[20px] p-5 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.03)]">
+          <div className="lg:col-span-2 bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)]">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <TrendingUp className="text-yellow-500" size={16} />
@@ -533,7 +533,7 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Quick Stats (30%) */}
-          <div className="bg-white border border-gray-200/80 rounded-[20px] p-5 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.03)] flex flex-col justify-between">
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
                 <h3 className="text-sm font-bold text-gray-900">Real-Time Action Center</h3>
@@ -579,7 +579,7 @@ export default function AdminDashboardPage() {
         </section>
 
         {/* ROW 3: Upcoming Events Table */}
-        <section className="bg-white border border-gray-200/80 rounded-[20px] p-5 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.03)]">
+        <section className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)]">
           <div className="flex items-center justify-between mb-4">
             <div className="text-sm font-bold text-gray-900">Upcoming Scheduled Events</div>
             <span className="text-[10px] font-bold text-gray-400 uppercase">{upcomingFilteredEvents.length} events matching query</span>
@@ -603,7 +603,7 @@ export default function AdminDashboardPage() {
                   const sold = ev.capacity - ev.availableSlots;
                   const ratio = ev.capacity > 0 ? (sold / ev.capacity) * 100 : 0;
                   return (
-                    <tr key={ev.id} className="hover:bg-gray-50/50 transition-colors">
+                    <tr key={ev.id} className="hover:bg-yellow-50/40 transition-colors duration-150">
                       <td className="py-3 px-4 font-bold text-gray-900 min-w-[200px] max-w-[280px] truncate">
                         {ev.title}
                       </td>
@@ -669,7 +669,7 @@ export default function AdminDashboardPage() {
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* Recent Bookings (Left) */}
-          <div className="bg-white border border-gray-200/80 rounded-[20px] p-5 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.03)] flex flex-col justify-between">
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="text-sm font-bold text-gray-900">Recent Booking Log</div>
@@ -717,7 +717,7 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* System Activity Feed (Right) */}
-          <div className="bg-white border border-gray-200/80 rounded-[20px] p-5 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.03)]">
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)]">
             <div className="flex items-center justify-between mb-4">
               <div className="text-sm font-bold text-gray-900">System Activity Feed</div>
               <button 

@@ -98,7 +98,7 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden">
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -106,7 +106,7 @@ export default function AdminUsersPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredUsers.map(u => (
-                <tr key={u.id} className="hover:bg-gray-50/20">
+                <tr key={u.id} className="hover:bg-yellow-50/40 transition-colors duration-150">
                   <td className="p-4 font-bold text-gray-950">{u.firstName} {u.lastName}</td>
                   <td className="p-4 font-medium text-gray-500">{u.email}</td>
                   <td className="p-4">
@@ -172,7 +172,7 @@ export default function AdminUsersPage() {
               initial={{ scale: 0.95 }} 
               animate={{ scale: 1 }} 
               exit={{ scale: 0.95 }}
-              className="bg-white rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6 shadow-xl"
+              className="bg-white rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6 shadow-[0_24px_48px_rgba(0,0,0,0.12)] border border-gray-100"
             >
               <div className="flex justify-between items-center mb-6">
                 <div>

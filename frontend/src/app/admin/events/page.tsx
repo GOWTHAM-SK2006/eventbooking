@@ -140,7 +140,7 @@ export default function AdminEventsPage() {
       {/* Events Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredEvents.map(ev => (
-          <div key={ev.id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:border-gray-300 transition-all flex flex-col justify-between">
+          <div key={ev.id} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.07)] hover:-translate-y-1 hover:border-gray-200 transition-all duration-300 flex flex-col justify-between">
             <div>
               {/* Event Image */}
               <div className="h-44 bg-gray-100 relative">
@@ -200,7 +200,7 @@ export default function AdminEventsPage() {
         ))}
 
         {filteredEvents.length === 0 && (
-          <div className="col-span-2 text-center py-16 bg-white border border-gray-200 rounded-2xl text-gray-400 font-medium">
+          <div className="col-span-2 text-center py-16 bg-white border border-gray-100 rounded-2xl text-gray-400 font-medium shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
             No events found in database.
           </div>
         )}
@@ -219,7 +219,7 @@ export default function AdminEventsPage() {
               initial={{ scale: 0.95 }} 
               animate={{ scale: 1 }} 
               exit={{ scale: 0.95 }}
-              className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 shadow-xl relative"
+              className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 shadow-[0_24px_48px_rgba(0,0,0,0.12)] relative border border-gray-100"
             >
               <div className="flex justify-between items-center mb-6">
                 <div className="text-xl font-black text-gray-900">Edit Event Settings</div>

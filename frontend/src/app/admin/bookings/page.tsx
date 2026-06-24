@@ -117,7 +117,7 @@ export default function AdminBookingsPage() {
       </div>
 
       {/* Bookings Table */}
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden">
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -125,7 +125,7 @@ export default function AdminBookingsPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredBookings.map(b => (
-                <tr key={b.id} className="hover:bg-gray-50/20">
+                <tr key={b.id} className="hover:bg-yellow-50/40 transition-colors duration-150">
                   <td className="p-4 font-mono text-xs text-gray-400">{b.id.slice(0, 8)}...</td>
                   <td className="p-4 text-gray-950 font-bold">{b.userEmail}</td>
                   <td className="p-4 text-gray-600 font-medium">{b.eventTitle}</td>

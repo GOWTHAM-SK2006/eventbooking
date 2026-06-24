@@ -57,7 +57,7 @@ export default function AdminAnalyticsPage() {
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs flex items-center gap-4">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-yellow-50 border border-yellow-100 flex items-center justify-center text-yellow-600 shrink-0">
             <DollarSign size={20} />
           </div>
@@ -66,7 +66,7 @@ export default function AdminAnalyticsPage() {
             <p className="text-2xl font-black text-gray-900 mt-1">₹{(stats?.totalRevenue || 0).toLocaleString('en-IN')}</p>
           </div>
         </div>
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs flex items-center gap-4">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
             <Award size={20} />
           </div>
@@ -76,7 +76,7 @@ export default function AdminAnalyticsPage() {
             <p className="text-[10px] text-gray-400 font-bold uppercase mt-0.5">{popularEvent ? `${popularEvent.capacity - popularEvent.availableSlots} tickets sold` : ''}</p>
           </div>
         </div>
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs flex items-center gap-4">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
             <Calendar size={20} />
           </div>
@@ -96,7 +96,7 @@ export default function AdminAnalyticsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
         {/* Revenue Progress Chart */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-4">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] space-y-4">
           <div className="text-lg font-black text-gray-900">Revenue Progression</div>
           <div className="h-56 flex items-end">
             <svg className="w-full h-full" viewBox="0 0 300 150">
@@ -130,7 +130,7 @@ export default function AdminAnalyticsPage() {
         </div>
 
         {/* Daily Registrations Bar Chart */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-4">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] space-y-4">
           <div className="text-lg font-black text-gray-900">Daily Registrations</div>
           <div className="h-56 flex items-end justify-between gap-3 pt-6 px-4">
             {[35, 60, 45, 90, 75, 110, 85].map((val, idx) => (
@@ -159,7 +159,7 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* Detailed Event Performance Table */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] space-y-4">
         <div className="text-lg font-black text-gray-900">Event Performance Analysis</div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -171,7 +171,7 @@ export default function AdminAnalyticsPage() {
                 const sold = ev.capacity - ev.availableSlots;
                 const ratio = ev.capacity > 0 ? Math.round((sold / ev.capacity) * 100) : 0;
                 return (
-                  <tr key={ev.id} className="hover:bg-gray-50/10">
+                  <tr key={ev.id} className="hover:bg-yellow-50/40 transition-colors duration-150">
                     <td className="py-3.5 px-4 font-bold text-gray-950 max-w-[250px] truncate">{ev.title}</td>
                     <td className="py-3.5 px-4"><span className="bg-gray-100 text-gray-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">{ev.category}</span></td>
                     <td className="py-3.5 px-4 text-right text-gray-500 font-bold">{sold}</td>

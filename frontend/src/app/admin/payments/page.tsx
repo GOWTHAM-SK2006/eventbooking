@@ -86,7 +86,7 @@ export default function AdminPaymentsPage() {
       </div>
 
       {/* Payment History Block */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] space-y-4">
         <div className="text-lg font-black text-gray-900">Transaction History</div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -95,7 +95,7 @@ export default function AdminPaymentsPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {payments.map(p => (
-                <tr key={p.id} className="hover:bg-gray-50/10">
+                <tr key={p.id} className="hover:bg-yellow-50/40 transition-colors duration-150">
                   <td className="py-3.5 px-4 font-mono text-xs text-gray-900">{p.invoiceNumber || 'N/A'}</td>
                   <td className="py-3.5 px-4 text-gray-600 font-bold max-w-[200px] truncate">{p.eventTitle || 'N/A'}</td>
                   <td className="py-3.5 px-4 text-gray-400 font-semibold uppercase">{p.paymentMethod || 'Razorpay'}</td>
@@ -114,7 +114,7 @@ export default function AdminPaymentsPage() {
       </div>
 
       {/* Refund Management Block */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] space-y-4">
         <div className="flex items-center gap-2">
           <RefreshCw className="text-red-500" size={18} />
           <div className="text-lg font-black text-gray-900">Refund Requests</div>
@@ -126,7 +126,7 @@ export default function AdminPaymentsPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {refunds.map(rf => (
-                <tr key={rf.id} className="hover:bg-gray-50/10">
+                <tr key={rf.id} className="hover:bg-yellow-50/40 transition-colors duration-150">
                   <td className="py-3.5 px-4 font-mono text-xs text-gray-400">{rf.id.slice(0, 8)}...</td>
                   <td className="py-3.5 px-4">
                     <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border ${
