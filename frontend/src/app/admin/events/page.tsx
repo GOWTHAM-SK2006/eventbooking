@@ -2,14 +2,31 @@
 
 import React, { useEffect, useState } from 'react';
 import { api } from '../../../utils/api';
-import { Plus, Edit3, Trash2, Search, X, Loader, Calendar, Shield } from 'lucide-react';
+import { Plus, Edit3, Trash2, Search, X, Loader, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import ImageUpload from '../../../components/ImageUpload';
 
 const emptyEvent = {
   title: '', description: '', location: '', category: 'Tech',
   startDate: '', endDate: '', price: 0, capacity: 100, imageUrl: '',
+  galleryImages: [] as string[],
   status: 'PUBLISHED', venueName: '', venueAddress: '', featured: false,
+};
+
+const CATEGORY_FALLBACKS: Record<string, string> = {
+  Tech: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800',
+  Music: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800',
+  Business: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800',
+  Arts: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800',
+  Sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800',
+  Workshop: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800',
+  Conference: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800',
+  Startup: 'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800',
+  AI: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=800',
+  Hackathon: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800',
+  Seminar: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800',
+  Meetup: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800',
 };
 
 export default function AdminEventsPage() {
@@ -43,6 +60,7 @@ export default function AdminEventsPage() {
     setEditingEvent(ev);
     setForm({
       ...ev,
+      galleryImages: ev.galleryImages || [],
       startDate: ev.startDate?.slice(0, 16) || '',
       endDate: ev.endDate?.slice(0, 16) || '',
     });
@@ -51,8 +69,10 @@ export default function AdminEventsPage() {
 
   const saveEditedEvent = async (e: React.FormEvent) => {
     e.preventDefault();
+    const fallbackUrl = CATEGORY_FALLBACKS[form.category] || CATEGORY_FALLBACKS['Tech'];
     const payload = { 
       ...form, 
+      imageUrl: form.imageUrl || fallbackUrl,
       startDate: new Date(form.startDate).toISOString().slice(0, 19), 
       endDate: new Date(form.endDate).toISOString().slice(0, 19) 
     };
@@ -139,65 +159,68 @@ export default function AdminEventsPage() {
 
       {/* Events Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredEvents.map(ev => (
-          <div key={ev.id} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.07)] hover:-translate-y-1 hover:border-gray-200 transition-all duration-300 flex flex-col justify-between">
-            <div>
-              {/* Event Image */}
-              <div className="h-44 bg-gray-100 relative">
-                {ev.imageUrl ? (
-                  <img src={ev.imageUrl} alt={ev.title} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-yellow-50 text-yellow-600">
-                    <Calendar size={40} />
+        {filteredEvents.map(ev => {
+          const mainImage = (ev.galleryImages && ev.galleryImages.length > 0) ? ev.galleryImages[0] : ev.imageUrl;
+          return (
+            <div key={ev.id} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.07)] hover:-translate-y-1 hover:border-gray-200 transition-all duration-300 flex flex-col justify-between">
+              <div>
+                {/* Event Image */}
+                <div className="h-44 bg-gray-100 relative">
+                  {mainImage ? (
+                    <img src={mainImage} alt={ev.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-yellow-50 text-yellow-600">
+                      <Calendar size={40} />
+                    </div>
+                  )}
+                  <div className="absolute top-4 left-4 flex gap-1.5 flex-wrap">
+                    <span className="bg-white/90 backdrop-blur-xs text-gray-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase shadow-xs">
+                      {ev.category}
+                    </span>
+                    <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase shadow-xs ${
+                      ev.status === 'PUBLISHED' 
+                        ? 'bg-emerald-500 text-white' 
+                        : 'bg-red-500 text-white'
+                    }`}>
+                      {ev.status === 'PUBLISHED' ? 'Active' : 'Closed'}
+                    </span>
                   </div>
-                )}
-                <div className="absolute top-4 left-4 flex gap-1.5 flex-wrap">
-                  <span className="bg-white/90 backdrop-blur-xs text-gray-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase shadow-xs">
-                    {ev.category}
-                  </span>
-                  <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase shadow-xs ${
-                    ev.status === 'PUBLISHED' 
-                      ? 'bg-emerald-500 text-white' 
-                      : 'bg-red-500 text-white'
-                  }`}>
-                    {ev.status === 'PUBLISHED' ? 'Active' : 'Closed'}
-                  </span>
+                </div>
+
+                {/* Event Info */}
+                <div className="p-6">
+                  <h3 className="font-extrabold text-lg text-gray-900 leading-tight line-clamp-1">{ev.title}</h3>
+                  <p className="text-xs font-semibold text-gray-400 mt-1">{new Date(ev.startDate).toLocaleString()} · {ev.location}</p>
+                  <p className="text-xs text-gray-500 mt-3 line-clamp-2">{ev.description}</p>
                 </div>
               </div>
 
-              {/* Event Info */}
-              <div className="p-6">
-                <h3 className="font-extrabold text-lg text-gray-900 leading-tight line-clamp-1">{ev.title}</h3>
-                <p className="text-xs font-semibold text-gray-400 mt-1">{new Date(ev.startDate).toLocaleString()} · {ev.location}</p>
-                <p className="text-xs text-gray-500 mt-3 line-clamp-2">{ev.description}</p>
+              {/* Event Pricing & Slots Footer */}
+              <div className="px-6 pb-6 pt-4 border-t border-gray-50 flex justify-between items-center bg-gray-50/50">
+                <div>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Price / Slots</p>
+                  <p className="font-black text-gray-900 text-sm mt-0.5">
+                    {ev.price === 0 ? 'Free' : `₹${ev.price}`} <span className="text-gray-400 font-medium">· {ev.availableSlots}/{ev.capacity} slots</span>
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => openEdit(ev)} 
+                    className="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-500 hover:text-gray-900 transition-all shadow-xs"
+                  >
+                    <Edit3 size={15} />
+                  </button>
+                  <button 
+                    onClick={() => deleteEvent(ev.id)} 
+                    className="p-2.5 rounded-xl border border-red-100 bg-white hover:bg-red-50 text-red-500 transition-all shadow-xs"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
               </div>
             </div>
-
-            {/* Event Pricing & Slots Footer */}
-            <div className="px-6 pb-6 pt-4 border-t border-gray-50 flex justify-between items-center bg-gray-50/50">
-              <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Price / Slots</p>
-                <p className="font-black text-gray-900 text-sm mt-0.5">
-                  {ev.price === 0 ? 'Free' : `₹${ev.price}`} <span className="text-gray-400 font-medium">· {ev.availableSlots}/{ev.capacity} slots</span>
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => openEdit(ev)} 
-                  className="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-500 hover:text-gray-900 transition-all shadow-xs"
-                >
-                  <Edit3 size={15} />
-                </button>
-                <button 
-                  onClick={() => deleteEvent(ev.id)} 
-                  className="p-2.5 rounded-xl border border-red-100 bg-white hover:bg-red-50 text-red-500 transition-all shadow-xs"
-                >
-                  <Trash2 size={15} />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
 
         {filteredEvents.length === 0 && (
           <div className="col-span-2 text-center py-16 bg-white border border-gray-100 rounded-2xl text-gray-400 font-medium shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
@@ -325,15 +348,26 @@ export default function AdminEventsPage() {
                     />
                   </div>
                 </div>
-                <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Banner Image URL</label>
-                  <input 
-                    placeholder="https://images.unsplash.com/..." 
-                    value={form.imageUrl} 
-                    onChange={e => setForm({ ...form, imageUrl: e.target.value })}
-                    className="w-full bg-white border border-gray-300 rounded-xl p-3 text-sm focus:outline-none focus:border-yellow-400" 
+
+                {/* Professional Image Upload Section */}
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block">
+                    Event Images & Gallery
+                  </label>
+                  <ImageUpload 
+                    images={form.galleryImages || []} 
+                    onChange={(newImages) => {
+                      const featured = newImages[0] || '';
+                      setForm({
+                        ...form,
+                        imageUrl: featured,
+                        galleryImages: newImages
+                      });
+                    }}
+                    maxCount={10}
                   />
                 </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Venue Name</label>

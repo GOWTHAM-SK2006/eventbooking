@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api, getSession } from '../utils/api';
-import { Calendar, MapPin, Users, ShieldAlert, Sparkles, CreditCard, Star, CheckCircle, X, QrCode, Heart } from 'lucide-react';
+import { Calendar, MapPin, Users, ShieldAlert, Sparkles, CreditCard, Star, CheckCircle, X, QrCode, Heart, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -59,12 +59,37 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
   const [inWishlist, setInWishlist] = useState(false);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [seats, setSeats] = useState<any[]>([]);
+  const [activeLightboxIndex, setActiveLightboxIndex] = useState<number | null>(null);
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
 
   const session = getSession();
 
   useEffect(() => {
     if (actualId) loadData();
   }, [actualId]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (activeLightboxIndex === null) return;
+      const remainingImages = event?.galleryImages?.slice(1) || [];
+      if (e.key === 'Escape') {
+        setActiveLightboxIndex(null);
+        setZoomLevel(1);
+      } else if (e.key === 'ArrowRight') {
+        if (activeLightboxIndex < remainingImages.length - 1) {
+          setActiveLightboxIndex(activeLightboxIndex + 1);
+          setZoomLevel(1);
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (activeLightboxIndex > 0) {
+          setActiveLightboxIndex(activeLightboxIndex - 1);
+          setZoomLevel(1);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeLightboxIndex, event]);
 
   const loadData = async () => {
     setLoading(true);
@@ -264,7 +289,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
       {/* Hero Banner */}
       <div className="w-full h-[40vh] md:h-[55vh] relative bg-white border-b border-[#E5E7EB]">
         <img 
-          src={event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80'} 
+          src={(event.galleryImages && event.galleryImages[0]) || event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80'} 
           alt={event.title} 
           className="w-full h-full object-cover opacity-80"
         />
@@ -307,6 +332,38 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
               {event.description}
             </div>
           </section>
+
+          {/* Gallery Section */}
+          {event.galleryImages && event.galleryImages.length > 1 && (
+            <section>
+              <h2 className="font-black mb-6 flex items-center gap-3" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.5rem)' }}>
+                <Sparkles className="text-[#FFD400]" size={24} /> Event Gallery
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {event.galleryImages.slice(1).map((imgUrl: string, idx: number) => (
+                  <div 
+                    key={idx} 
+                    onClick={() => {
+                      setActiveLightboxIndex(idx);
+                      setZoomLevel(1);
+                    }}
+                    className="relative aspect-video rounded-2xl overflow-hidden border border-[#E5E7EB] bg-gray-50 cursor-pointer group hover:border-[#FFD400] hover:shadow-md transition-all duration-300"
+                  >
+                    <img 
+                      src={imgUrl} 
+                      alt={`Gallery Image ${idx + 1}`} 
+                      className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" 
+                    />
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
+                      <span className="bg-white/90 text-gray-900 text-xs font-bold px-3 py-1.5 rounded-xl shadow-sm">
+                        View Image
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Location & Time */}
           <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -475,7 +532,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
                 <Link href={`/events/${e.id}`} className="group block">
                   <div className="h-48 bg-gray-100 relative overflow-hidden">
                     <img 
-                      src={e.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600'} 
+                      src={(e.galleryImages && e.galleryImages[0]) || e.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600'} 
                       alt={e.title} 
                       loading="lazy" 
                       className="w-full h-full object-cover transform group-hover:scale-102 transition-transform duration-300"
@@ -601,6 +658,91 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
           </button>
         </div>
       )}
+
+      {/* Fullscreen Lightbox */}
+      <AnimatePresence>
+        {activeLightboxIndex !== null && event?.galleryImages && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] flex flex-col items-center justify-center p-4 bg-black/95 select-none"
+            onClick={() => {
+              setActiveLightboxIndex(null);
+              setZoomLevel(1);
+            }}
+          >
+            {/* Top Toolbar */}
+            <div className="absolute top-4 inset-x-4 flex justify-between items-center z-20">
+              <span className="text-white text-xs font-bold bg-white/10 px-3 py-1.5 rounded-full">
+                {activeLightboxIndex + 1} / {event.galleryImages.length - 1}
+              </span>
+              <div className="flex gap-2">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setZoomLevel(prev => prev === 1 ? 1.5 : prev === 1.5 ? 2 : 1);
+                  }}
+                  className="text-white hover:text-yellow-400 bg-white/10 p-2.5 rounded-full transition-colors flex items-center gap-1.5 text-xs font-bold"
+                >
+                  <ZoomIn size={16} /> Zoom ({zoomLevel}x)
+                </button>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveLightboxIndex(null);
+                    setZoomLevel(1);
+                  }}
+                  className="text-white hover:text-yellow-400 bg-white/10 p-2.5 rounded-full transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="relative w-full max-w-5xl h-[80vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+              {/* Prev Button */}
+              {activeLightboxIndex > 0 && (
+                <button 
+                  onClick={() => {
+                    setActiveLightboxIndex(activeLightboxIndex - 1);
+                    setZoomLevel(1);
+                  }}
+                  className="absolute left-0 md:left-4 z-10 text-white hover:text-yellow-400 bg-white/10 hover:bg-white/20 p-3 rounded-full transition-colors"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+              )}
+
+              {/* Next Button */}
+              {activeLightboxIndex < event.galleryImages.length - 2 && (
+                <button 
+                  onClick={() => {
+                    setActiveLightboxIndex(activeLightboxIndex + 1);
+                    setZoomLevel(1);
+                  }}
+                  className="absolute right-0 md:right-4 z-10 text-white hover:text-yellow-400 bg-white/10 hover:bg-white/20 p-3 rounded-full transition-colors"
+                >
+                  <ChevronRight size={24} />
+                </button>
+              )}
+
+              {/* Image Container */}
+              <div className="overflow-hidden max-w-[90%] max-h-full rounded-xl flex items-center justify-center">
+                <motion.img 
+                  animate={{ scale: zoomLevel }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                  src={event.galleryImages.slice(1)[activeLightboxIndex]} 
+                  alt="Gallery Lightbox" 
+                  className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl cursor-zoom-in"
+                  onClick={() => setZoomLevel(prev => prev === 1 ? 1.5 : prev === 1.5 ? 2 : 1)}
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

@@ -3,13 +3,30 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '../../../../utils/api';
-import { Calendar, ArrowLeft, Loader } from 'lucide-react';
+import { ArrowLeft, Loader } from 'lucide-react';
 import Link from 'next/link';
+import ImageUpload from '../../../../components/ImageUpload';
 
 const emptyEvent = {
   title: '', description: '', location: '', category: 'Tech',
   startDate: '', endDate: '', price: 0, capacity: 100, imageUrl: '',
+  galleryImages: [] as string[],
   status: 'PUBLISHED', venueName: '', venueAddress: '', featured: false,
+};
+
+const CATEGORY_FALLBACKS: Record<string, string> = {
+  Tech: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800',
+  Music: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800',
+  Business: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800',
+  Arts: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800',
+  Sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800',
+  Workshop: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800',
+  Conference: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800',
+  Startup: 'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800',
+  AI: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=800',
+  Hackathon: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800',
+  Seminar: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800',
+  Meetup: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800',
 };
 
 export default function AdminCreateEventPage() {
@@ -21,11 +38,16 @@ export default function AdminCreateEventPage() {
     e.preventDefault();
     setSaving(true);
     try {
+      const fallbackUrl = CATEGORY_FALLBACKS[form.category] || CATEGORY_FALLBACKS['Tech'];
+      
       const payload = { 
         ...form, 
+        // imageUrl is populated from the first uploaded image, or falls back to category stock image
+        imageUrl: form.imageUrl || fallbackUrl,
         startDate: new Date(form.startDate).toISOString().slice(0, 19), 
         endDate: new Date(form.endDate).toISOString().slice(0, 19) 
       };
+      
       await api.post('/events', payload);
       router.push('/admin/events');
     } catch (err) {
@@ -151,15 +173,26 @@ export default function AdminCreateEventPage() {
               />
             </div>
           </div>
-          <div>
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Banner Image URL</label>
-            <input 
-              placeholder="https://images.unsplash.com/photo-..." 
-              value={form.imageUrl} 
-              onChange={e => setForm({ ...form, imageUrl: e.target.value })}
-              className="w-full bg-white border border-gray-300 rounded-xl p-3.5 text-sm focus:outline-none focus:border-yellow-400" 
+
+          {/* Professional Image Upload Section */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block">
+              Event Images & Gallery
+            </label>
+            <ImageUpload 
+              images={form.galleryImages || []} 
+              onChange={(newImages) => {
+                const featured = newImages[0] || '';
+                setForm({
+                  ...form,
+                  imageUrl: featured, // first image becomes the featured image
+                  galleryImages: newImages
+                });
+              }}
+              maxCount={10}
             />
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Venue Name</label>

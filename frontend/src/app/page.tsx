@@ -232,9 +232,9 @@ export default function HomePage() {
                     <div key={event.id} className="premium-card flex flex-col justify-between h-full bg-white border border-[#E5E7EB] rounded-[16px] overflow-hidden transition-all duration-[250ms] hover:translate-y-[-4px] hover:shadow-md">
                       <Link href={`/events/${event.id}`} className="group block">
                         <div className="relative h-52 bg-gray-100 overflow-hidden">
-                          {event.imageUrl ? (
+                          {(event.galleryImages && event.galleryImages.length > 0) || event.imageUrl ? (
                             <img
-                              src={event.imageUrl}
+                              src={(event.galleryImages && event.galleryImages[0]) || event.imageUrl}
                               alt={event.title}
                               loading="lazy"
                               className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
@@ -333,9 +333,9 @@ export default function HomePage() {
                         className="group block bg-[#FFFFFF] border border-[#E5E7EB] rounded-xl overflow-hidden hover:border-[#FFD400] hover:shadow-xs transition-all duration-[250ms]"
                       >
                         <div className="relative h-40 bg-gray-100">
-                          {event.imageUrl ? (
+                          {(event.galleryImages && event.galleryImages.length > 0) || event.imageUrl ? (
                             <img
-                              src={event.imageUrl}
+                              src={(event.galleryImages && event.galleryImages[0]) || event.imageUrl}
                               alt={event.title}
                               loading="lazy"
                               className="w-full h-full object-cover"
@@ -426,9 +426,9 @@ export default function HomePage() {
                       className="group bg-white border border-[#E5E7EB] rounded-2xl p-5 flex items-start gap-5 hover:border-[#FFD400] hover:shadow-xs transition-all duration-[250ms]"
                     >
                       <div className="relative w-28 h-28 rounded-xl bg-gray-50 flex-shrink-0 overflow-hidden">
-                        {event.imageUrl ? (
+                        {(event.galleryImages && event.galleryImages.length > 0) || event.imageUrl ? (
                           <img
-                            src={event.imageUrl}
+                            src={(event.galleryImages && event.galleryImages[0]) || event.imageUrl}
                             alt={event.title}
                             loading="lazy"
                             className="w-full h-full object-cover"

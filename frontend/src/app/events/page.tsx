@@ -298,7 +298,7 @@ function EventsContent() {
                 className="flex-shrink-0 w-72 bg-white border border-[#E5E7EB] rounded-2xl p-4.5 hover:border-[#FFD400] hover:shadow-xs transition-all duration-[200ms]"
               >
                 <div className="h-32 bg-gray-100 rounded-xl overflow-hidden mb-3">
-                  <img src={e.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400'} alt={e.title} className="w-full h-full object-cover" loading="lazy" />
+                  <img src={(e.galleryImages && e.galleryImages[0]) || e.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400'} alt={e.title} className="w-full h-full object-cover" loading="lazy" />
                 </div>
                 <span className="text-[9px] font-black uppercase text-[#FFD400] bg-yellow-50 px-2 py-0.5 rounded">{e.category}</span>
                 <p className="font-extrabold text-gray-900 line-clamp-1 mt-2 mb-1.5">{e.title}</p>
@@ -341,7 +341,7 @@ function EventsContent() {
                 <Link href={`/events/${event.id}`} className="group block">
                   <div className="h-56 bg-gray-100 relative overflow-hidden">
                     <img 
-                      src={event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800'} 
+                      src={(event.galleryImages && event.galleryImages[0]) || event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800'} 
                       alt={event.title} 
                       loading="lazy"
                       className="w-full h-full object-cover transform group-hover:scale-102 transition-transform duration-300"
