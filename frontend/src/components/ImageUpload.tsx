@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { UploadCloud, X, ArrowLeft, ArrowRight, Trash2, Star, RefreshCw, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getAuthToken, resolveImageUrl } from '../utils/api';
 
 interface ImageUploadProps {
   images: string[];
@@ -71,27 +72,56 @@ export default function ImageUpload({ images, onChange, maxCount = 10 }: ImageUp
     });
   };
 
-  const simulateProgress = (fileId: string, file: File, callback: (dataUrl: string) => void) => {
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += Math.floor(Math.random() * 15) + 5;
-      if (progress >= 100) {
-        progress = 100;
-        clearInterval(interval);
-        compressImage(file)
-          .then((dataUrl) => {
-            callback(dataUrl);
-            setUploadingFiles((prev) => prev.filter((f) => f.id !== fileId));
-          })
-          .catch(() => {
-            setError('Error processing image');
-            setUploadingFiles((prev) => prev.filter((f) => f.id !== fileId));
-          });
+  const uploadImage = async (file: File, fileId: string, onProgress: (progress: number) => void): Promise<string> => {
+    const compressedDataUrl = await compressImage(file);
+    const response = await fetch(compressedDataUrl);
+    const blob = await response.blob();
+    
+    const formData = new FormData();
+    formData.append('file', blob, file.name);
+
+    const token = getAuthToken();
+
+    const API_BASE_URL = typeof window !== 'undefined' 
+      ? (window.location.host.includes('localhost:3000') 
+         ? 'http://localhost:8080/api' 
+         : `${window.location.protocol}//${window.location.host}/api`)
+      : 'http://localhost:8080/api';
+
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${API_BASE_URL}/images/upload`, true);
+      
+      if (token) {
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
       }
-      setUploadingFiles((prev) =>
-        prev.map((f) => (f.id === fileId ? { ...f, progress } : f))
-      );
-    }, 120);
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round((event.loaded / event.total) * 100);
+          onProgress(percentComplete);
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const resObj = JSON.parse(xhr.responseText);
+            resolve(resObj.url);
+          } catch (e) {
+            reject(new Error('Invalid response from server'));
+          }
+        } else {
+          reject(new Error(xhr.responseText || 'Upload failed'));
+        }
+      };
+
+      xhr.onerror = () => {
+        reject(new Error('Network error during upload'));
+      };
+
+      xhr.send(formData);
+    });
   };
 
   const handleFiles = async (files: FileList) => {
@@ -128,8 +158,18 @@ export default function ImageUpload({ images, onChange, maxCount = 10 }: ImageUp
       const newUpload = { id, name: file.name, progress: 0 };
       setUploadingFiles((prev) => [...prev, newUpload]);
 
-      simulateProgress(id, file, (dataUrl) => {
-        onChange([...images, dataUrl]);
+      uploadImage(file, id, (progress) => {
+        setUploadingFiles((prev) =>
+          prev.map((f) => (f.id === id ? { ...f, progress } : f))
+        );
+      })
+      .then((url) => {
+        onChange([...images, url]);
+        setUploadingFiles((prev) => prev.filter((f) => f.id !== id));
+      })
+      .catch((err) => {
+        setError(err.message || 'Error uploading image');
+        setUploadingFiles((prev) => prev.filter((f) => f.id !== id));
       });
     });
   };
@@ -211,10 +251,20 @@ export default function ImageUpload({ images, onChange, maxCount = 10 }: ImageUp
     const idxToReplace = replaceIndex;
     setReplaceIndex(null);
 
-    simulateProgress(id, file, (dataUrl) => {
+    uploadImage(file, id, (progress) => {
+      setUploadingFiles((prev) =>
+        prev.map((f) => (f.id === id ? { ...f, progress } : f))
+      );
+    })
+    .then((url) => {
       const updated = [...images];
-      updated[idxToReplace] = dataUrl;
+      updated[idxToReplace] = url;
       onChange(updated);
+      setUploadingFiles((prev) => prev.filter((f) => f.id !== id));
+    })
+    .catch((err) => {
+      setError(err.message || 'Error uploading image');
+      setUploadingFiles((prev) => prev.filter((f) => f.id !== id));
     });
   };
 
@@ -294,7 +344,7 @@ export default function ImageUpload({ images, onChange, maxCount = 10 }: ImageUp
                 className="relative aspect-video rounded-xl overflow-hidden border border-gray-200 shadow-2xs group"
               >
                 <img
-                  src={url}
+                  src={resolveImageUrl(url)}
                   alt={`Upload ${index + 1}`}
                   className="w-full h-full object-cover"
                 />
@@ -437,7 +487,7 @@ export default function ImageUpload({ images, onChange, maxCount = 10 }: ImageUp
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              src={previewImage}
+              src={resolveImageUrl(previewImage)}
               alt="Preview Fullscreen"
               className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl"
               onClick={(e) => e.stopPropagation()}

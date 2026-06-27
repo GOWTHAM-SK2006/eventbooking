@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { api, getSession } from '../utils/api';
+import { api, getSession, resolveImageUrl } from '../utils/api';
 import { ArrowRight, Calendar as CalendarIcon, MapPin, Users, Sparkles, Star, Search, Flame, Clock, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ScrollReveal } from '../components/ScrollReveal';
@@ -234,7 +234,7 @@ export default function HomePage() {
                         <div className="relative h-52 bg-gray-100 overflow-hidden">
                           {(event.galleryImages && event.galleryImages.length > 0) || event.imageUrl ? (
                             <img
-                              src={(event.galleryImages && event.galleryImages[0]) || event.imageUrl}
+                              src={resolveImageUrl((event.galleryImages && event.galleryImages[0]) || event.imageUrl)}
                               alt={event.title}
                               loading="lazy"
                               className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
@@ -335,7 +335,7 @@ export default function HomePage() {
                         <div className="relative h-40 bg-gray-100">
                           {(event.galleryImages && event.galleryImages.length > 0) || event.imageUrl ? (
                             <img
-                              src={(event.galleryImages && event.galleryImages[0]) || event.imageUrl}
+                              src={resolveImageUrl((event.galleryImages && event.galleryImages[0]) || event.imageUrl)}
                               alt={event.title}
                               loading="lazy"
                               className="w-full h-full object-cover"
@@ -428,7 +428,7 @@ export default function HomePage() {
                       <div className="relative w-28 h-28 rounded-xl bg-gray-50 flex-shrink-0 overflow-hidden">
                         {(event.galleryImages && event.galleryImages.length > 0) || event.imageUrl ? (
                           <img
-                            src={(event.galleryImages && event.galleryImages[0]) || event.imageUrl}
+                            src={resolveImageUrl((event.galleryImages && event.galleryImages[0]) || event.imageUrl)}
                             alt={event.title}
                             loading="lazy"
                             className="w-full h-full object-cover"

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { api, getSession } from '../../utils/api';
+import { api, getSession, resolveImageUrl } from '../../utils/api';
 import { Heart, Loader, Calendar, MapPin, Sparkles, Trash2, ArrowRight, Award } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FloatingBlobs } from '../../components/AnimatedBackground';
@@ -115,7 +115,7 @@ export default function WishlistPage() {
               >
                 <Link href={`/events/${event.id}`} className="block">
                   <div className="relative h-48 bg-gray-100 overflow-hidden">
-                    <img src={(event.galleryImages && event.galleryImages[0]) || event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600'} alt={event.title}
+                    <img src={resolveImageUrl((event.galleryImages && event.galleryImages[0]) || event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600')} alt={event.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     
                     <button 

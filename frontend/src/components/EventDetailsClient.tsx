@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { api, getSession } from '../utils/api';
+import { api, getSession, resolveImageUrl } from '../utils/api';
 import { Calendar, MapPin, Users, ShieldAlert, Sparkles, CreditCard, Star, CheckCircle, X, QrCode, Heart, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -289,7 +289,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
       {/* Hero Banner */}
       <div className="w-full h-[40vh] md:h-[55vh] relative bg-white border-b border-[#E5E7EB]">
         <img 
-          src={(event.galleryImages && event.galleryImages[0]) || event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80'} 
+          src={resolveImageUrl((event.galleryImages && event.galleryImages[0]) || event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1600&q=80')} 
           alt={event.title} 
           className="w-full h-full object-cover opacity-80"
         />
@@ -350,7 +350,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
                     className="relative aspect-video rounded-2xl overflow-hidden border border-[#E5E7EB] bg-gray-50 cursor-pointer group hover:border-[#FFD400] hover:shadow-md transition-all duration-300"
                   >
                     <img 
-                      src={imgUrl} 
+                      src={resolveImageUrl(imgUrl)} 
                       alt={`Gallery Image ${idx + 1}`} 
                       className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" 
                     />
@@ -532,7 +532,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
                 <Link href={`/events/${e.id}`} className="group block">
                   <div className="h-48 bg-gray-100 relative overflow-hidden">
                     <img 
-                      src={(e.galleryImages && e.galleryImages[0]) || e.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600'} 
+                      src={resolveImageUrl((e.galleryImages && e.galleryImages[0]) || e.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600')} 
                       alt={e.title} 
                       loading="lazy" 
                       className="w-full h-full object-cover transform group-hover:scale-102 transition-transform duration-300"
@@ -733,7 +733,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
                 <motion.img 
                   animate={{ scale: zoomLevel }}
                   transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                  src={event.galleryImages.slice(1)[activeLightboxIndex]} 
+                  src={resolveImageUrl(event.galleryImages.slice(1)[activeLightboxIndex])} 
                   alt="Gallery Lightbox" 
                   className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl cursor-zoom-in"
                   onClick={() => setZoomLevel(prev => prev === 1 ? 1.5 : prev === 1.5 ? 2 : 1)}

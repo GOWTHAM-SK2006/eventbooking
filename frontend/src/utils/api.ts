@@ -150,3 +150,19 @@ export const api = {
     request(url, { ...options, method: 'PUT', body: body ? JSON.stringify(body) : undefined }),
   delete: (url: string, options?: FetchOptions) => request(url, { ...options, method: 'DELETE' }),
 };
+
+export function resolveImageUrl(url?: string): string {
+  if (!url) return '';
+  if (url.startsWith('data:') || url.startsWith('http:') || url.startsWith('https:')) {
+    return url;
+  }
+  if (url.startsWith('/api/images/')) {
+    const apiBase = typeof window !== 'undefined' 
+      ? (window.location.host.includes('localhost:3000') 
+         ? 'http://localhost:8080' 
+         : `${window.location.protocol}//${window.location.host}`)
+      : 'http://localhost:8080';
+    return `${apiBase}${url}`;
+  }
+  return url;
+}

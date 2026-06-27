@@ -69,6 +69,7 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/events/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/payments/config").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/images/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/coupons/validate").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { api } from '../../../utils/api';
+import { api, resolveImageUrl } from '../../../utils/api';
 import { Plus, Edit3, Trash2, Search, X, Loader, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -167,7 +167,7 @@ export default function AdminEventsPage() {
                 {/* Event Image */}
                 <div className="h-44 bg-gray-100 relative">
                   {mainImage ? (
-                    <img src={mainImage} alt={ev.title} className="w-full h-full object-cover" />
+                    <img src={resolveImageUrl(mainImage)} alt={ev.title} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-yellow-50 text-yellow-600">
                       <Calendar size={40} />
