@@ -46,6 +46,7 @@ public class ReviewService {
         return mapToResponse(review);
     }
 
+    @Transactional(readOnly = true)
     public List<ReviewResponse> getReviewsForEvent(UUID eventId) {
         return reviewRepository.findByEventIdOrderByCreatedAtDesc(eventId).stream()
                 .map(this::mapToResponse)
