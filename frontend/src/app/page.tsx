@@ -229,7 +229,13 @@ export default function HomePage() {
                 {featured.map((event) => {
                   const isFav = wishlistIds.includes(event.id);
                   return (
-                    <div key={event.id} className="premium-card flex flex-col justify-between h-full bg-white border border-[#E5E7EB] rounded-[16px] overflow-hidden transition-all duration-[250ms] hover:translate-y-[-4px] hover:shadow-md">
+                    <div key={event.id} className="relative premium-card flex flex-col justify-between h-full bg-white border border-[#E5E7EB] rounded-[16px] overflow-hidden transition-all duration-[250ms] hover:translate-y-[-4px] hover:shadow-md">
+                      <button
+                        onClick={(e) => toggleWishlist(event.id, e)}
+                        className="absolute top-4 right-4 p-2 bg-white/95 backdrop-blur-xs rounded-xl shadow-xs text-gray-400 hover:text-red-500 transition-colors z-20"
+                      >
+                        <Heart size={16} fill={isFav ? '#EF4444' : 'none'} className={isFav ? 'text-red-500' : ''} />
+                      </button>
                       <Link href={`/events/${event.id}`} className="group block">
                         <div className="relative h-52 bg-gray-100 overflow-hidden">
                           {(event.galleryImages && event.galleryImages.length > 0) || event.imageUrl ? (
@@ -244,13 +250,6 @@ export default function HomePage() {
                               <Sparkles size={40} className="opacity-80" />
                             </div>
                           )}
-
-                          <button
-                            onClick={(e) => toggleWishlist(event.id, e)}
-                            className="absolute top-4 right-4 p-2 bg-white/95 backdrop-blur-xs rounded-xl shadow-xs text-gray-400 hover:text-red-500 transition-colors z-20"
-                          >
-                            <Heart size={16} fill={isFav ? '#EF4444' : 'none'} className={isFav ? 'text-red-500' : ''} />
-                          </button>
 
                           <div className="absolute top-4 left-4 flex gap-1.5 flex-wrap">
                             <span className="bg-[#111827]/90 text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider">
@@ -327,47 +326,50 @@ export default function HomePage() {
                   {popular.map((event) => {
                     const isFav = wishlistIds.includes(event.id);
                     return (
-                      <Link
+                      <div
                         key={event.id}
-                        href={`/events/${event.id}`}
-                        className="group block bg-[#FFFFFF] border border-[#E5E7EB] rounded-xl overflow-hidden hover:border-[#FFD400] hover:shadow-xs transition-all duration-[250ms]"
+                        className="group relative bg-[#FFFFFF] border border-[#E5E7EB] rounded-xl overflow-hidden hover:border-[#FFD400] hover:shadow-xs transition-all duration-[250ms]"
                       >
-                        <div className="relative h-40 bg-gray-100">
-                          {(event.galleryImages && event.galleryImages.length > 0) || event.imageUrl ? (
-                            <img
-                              src={resolveImageUrl((event.galleryImages && event.galleryImages[0]) || event.imageUrl)}
-                              alt={event.title}
-                              loading="lazy"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-yellow-50 text-yellow-600">
-                              <Star size={32} />
-                            </div>
-                          )}
-
-                          <button
-                            onClick={(e) => toggleWishlist(event.id, e)}
-                            className="absolute top-3 right-3 p-1.5 bg-white/95 backdrop-blur-xs rounded-lg shadow-xs text-gray-400 hover:text-red-500 transition-colors z-20"
-                          >
-                            <Heart size={14} fill={isFav ? '#EF4444' : 'none'} className={isFav ? 'text-red-500' : ''} />
-                          </button>
-                        </div>
-                        <div className="p-4.5">
-                          <span className="text-[9px] font-black uppercase text-[#FFD400] tracking-widest">{event.category}</span>
-                          <h4 className="font-bold text-gray-900 line-clamp-1 group-hover:text-yellow-600 mt-1 mb-1.5 transition-colors">
-                            {event.title}
-                          </h4>
-                          <div className="flex justify-between items-center text-xs">
-                            <span className="font-extrabold text-gray-900">
-                              {event.price === 0 ? 'Free' : `₹${event.price}`}
-                            </span>
-                            <span className="text-gray-400 font-semibold flex items-center gap-1">
-                              <MapPin size={11} /> {event.location}
-                            </span>
+                        <button
+                          onClick={(e) => toggleWishlist(event.id, e)}
+                          className="absolute top-3 right-3 p-1.5 bg-white/95 backdrop-blur-xs rounded-lg shadow-xs text-gray-400 hover:text-red-500 transition-colors z-20"
+                        >
+                          <Heart size={14} fill={isFav ? '#EF4444' : 'none'} className={isFav ? 'text-red-500' : ''} />
+                        </button>
+                        <Link
+                          href={`/events/${event.id}`}
+                          className="block"
+                        >
+                          <div className="relative h-40 bg-gray-100">
+                            {(event.galleryImages && event.galleryImages.length > 0) || event.imageUrl ? (
+                              <img
+                                src={resolveImageUrl((event.galleryImages && event.galleryImages[0]) || event.imageUrl)}
+                                alt={event.title}
+                                loading="lazy"
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-yellow-50 text-yellow-600">
+                                <Star size={32} />
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      </Link>
+                          <div className="p-4.5">
+                            <span className="text-[9px] font-black uppercase text-[#FFD400] tracking-widest">{event.category}</span>
+                            <h4 className="font-bold text-gray-900 line-clamp-1 group-hover:text-yellow-600 mt-1 mb-1.5 transition-colors">
+                              {event.title}
+                            </h4>
+                            <div className="flex justify-between items-center text-xs">
+                              <span className="font-extrabold text-gray-900">
+                                {event.price === 0 ? 'Free' : `₹${event.price}`}
+                              </span>
+                              <span className="text-gray-400 font-semibold flex items-center gap-1">
+                                <MapPin size={11} /> {event.location}
+                              </span>
+                            </div>
+                          </div>
+                        </Link>
+                      </div>
                     );
                   })}
                 </div>
@@ -420,24 +422,25 @@ export default function HomePage() {
                 {upcoming.map((event) => {
                   const isFav = wishlistIds.includes(event.id);
                   return (
-                    <Link
+                    <div
                       key={event.id}
-                      href={`/events/${event.id}`}
                       className="group bg-white border border-[#E5E7EB] rounded-2xl p-5 flex items-start gap-5 hover:border-[#FFD400] hover:shadow-xs transition-all duration-[250ms]"
                     >
-                      <div className="relative w-28 h-28 rounded-xl bg-gray-50 flex-shrink-0 overflow-hidden">
-                        {(event.galleryImages && event.galleryImages.length > 0) || event.imageUrl ? (
-                          <img
-                            src={resolveImageUrl((event.galleryImages && event.galleryImages[0]) || event.imageUrl)}
-                            alt={event.title}
-                            loading="lazy"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-yellow-600 bg-yellow-50">
-                            <CalendarIcon size={24} />
-                          </div>
-                        )}
+                      <div className="relative w-28 h-28 flex-shrink-0">
+                        <Link href={`/events/${event.id}`} className="block w-full h-full rounded-xl overflow-hidden bg-gray-50">
+                          {(event.galleryImages && event.galleryImages.length > 0) || event.imageUrl ? (
+                            <img
+                              src={resolveImageUrl((event.galleryImages && event.galleryImages[0]) || event.imageUrl)}
+                              alt={event.title}
+                              loading="lazy"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-yellow-600 bg-yellow-50">
+                              <CalendarIcon size={24} />
+                            </div>
+                          )}
+                        </Link>
                         <button
                           onClick={(e) => toggleWishlist(event.id, e)}
                           className="absolute top-2 right-2 p-1.5 bg-white/95 backdrop-blur-xs rounded-lg shadow-xs text-gray-400 hover:text-red-500 transition-colors z-20"
@@ -446,7 +449,7 @@ export default function HomePage() {
                         </button>
                       </div>
 
-                      <div className="flex-1 min-w-0">
+                      <Link href={`/events/${event.id}`} className="flex-1 min-w-0 block">
                         <span className="bg-yellow-50 text-[#FFD400] text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">
                           {event.category}
                         </span>
@@ -467,8 +470,8 @@ export default function HomePage() {
                           <MapPin size={12} />
                           {event.location}
                         </p>
-                      </div>
-                    </Link>
+                      </Link>
+                    </div>
                   );
                 })}
               </div>

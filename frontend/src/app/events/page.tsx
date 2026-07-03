@@ -337,7 +337,13 @@ function EventsContent() {
           {events.map((event) => {
             const isFav = wishlistIds.includes(event.id);
             return (
-              <div key={event.id} className="premium-card flex flex-col justify-between h-full bg-white border border-[#E5E7EB] rounded-[16px] overflow-hidden transition-all duration-[250ms] hover:translate-y-[-4px] hover:shadow-md">
+              <div key={event.id} className="relative premium-card flex flex-col justify-between h-full bg-white border border-[#E5E7EB] rounded-[16px] overflow-hidden transition-all duration-[250ms] hover:translate-y-[-4px] hover:shadow-md">
+                <button
+                  onClick={(e) => toggleWishlist(event.id, e)}
+                  className="absolute top-4 right-4 p-2 bg-white/95 backdrop-blur-xs rounded-xl shadow-xs text-gray-400 hover:text-red-500 transition-colors z-20"
+                >
+                  <Heart size={16} fill={isFav ? '#EF4444' : 'none'} className={isFav ? 'text-red-500' : ''} />
+                </button>
                 <Link href={`/events/${event.id}`} className="group block">
                   <div className="h-56 bg-gray-100 relative overflow-hidden">
                     <img 
@@ -347,13 +353,6 @@ function EventsContent() {
                       className="w-full h-full object-cover transform group-hover:scale-102 transition-transform duration-300"
                     />
                     
-                    <button
-                      onClick={(e) => toggleWishlist(event.id, e)}
-                      className="absolute top-4 right-4 p-2 bg-white/95 backdrop-blur-xs rounded-xl shadow-xs text-gray-400 hover:text-red-500 transition-colors z-20"
-                    >
-                      <Heart size={16} fill={isFav ? '#EF4444' : 'none'} className={isFav ? 'text-red-500' : ''} />
-                    </button>
-
                     <span className="absolute top-4 left-4 bg-gray-900/90 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider">
                       {event.category}
                     </span>
