@@ -6,7 +6,7 @@ import { api, getSession, clearSession } from '../../utils/api';
 import { 
   User, Mail, Calendar, LogOut, Save, 
   Sparkles, Bell, Ticket, CreditCard, Gift, Settings, 
-  PhoneCall, Globe, Eye, Lock, Heart, Award, CheckCircle2, 
+  PhoneCall, Globe, Eye, Lock, Heart, CheckCircle2, 
   HelpCircle, Share2, Star, Download, ChevronDown,
   Info, CheckCircle
 } from 'lucide-react';
@@ -152,7 +152,6 @@ export default function ProfilePage() {
   const totalBookings = bookings.length;
   const upcomingEventsCount = bookings.filter(b => new Date(b.eventDate) >= new Date() && b.status === 'CONFIRMED').length;
   const wishlistCount = wishlist.length;
-  const attendedEventsCount = bookings.filter(b => new Date(b.eventDate) < new Date() && b.status === 'CONFIRMED').length;
 
   return (
     <div className="w-full max-w-4xl lg:max-w-7xl xl:max-w-[1400px] mx-auto px-6 py-12 md:py-16 min-h-screen relative flex flex-col justify-between bg-white text-[#111827]">
@@ -213,12 +212,11 @@ export default function ProfilePage() {
           {/* ===================================
               2. QUICK STATS
               =================================== */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {[
               { label: 'Total Bookings', value: totalBookings, icon: <Ticket className="text-gray-900" size={16} /> },
               { label: 'Upcoming Events', value: upcomingEventsCount, icon: <Calendar className="text-gray-900" size={16} /> },
-              { label: 'Wishlist Count', value: wishlistCount, icon: <Heart className="text-gray-900" size={16} /> },
-              { label: 'Events Attended', value: attendedEventsCount, icon: <Award className="text-gray-900" size={16} /> }
+              { label: 'Wishlist Count', value: wishlistCount, icon: <Heart className="text-gray-900" size={16} /> }
             ].map((stat, idx) => (
               <div
                 key={idx}
