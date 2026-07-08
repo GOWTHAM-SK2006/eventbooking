@@ -80,7 +80,7 @@ export default function AdminUsersPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <div className="text-3xl font-black text-gray-900 leading-none">Users</div>
+          <h1 className="text-[36px] sm:text-[48px] md:text-[60px] font-black text-gray-900 tracking-tight leading-none">Users</h1>
           <p className="text-sm text-gray-500 font-semibold mt-1">Manage user profiles, accounts status, and registration logs</p>
         </div>
       </div>

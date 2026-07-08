@@ -219,7 +219,7 @@ export default function AdminDashboardPage() {
       <div className="md:hidden space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-black text-gray-900">Dashboard</h1>
+            <h1 className="text-[36px] sm:text-[48px] md:text-[60px] font-black text-gray-900 tracking-tight leading-none">Dashboard</h1>
             <p className="text-sm text-gray-500 font-semibold mt-1">Platform overview and performance metrics</p>
           </div>
           <Link 
@@ -313,7 +313,7 @@ export default function AdminDashboardPage() {
         {/* TOP HEADER */}
         <header className="flex items-center justify-between pb-6 border-b border-gray-200/80">
           <div>
-            <div className="text-2xl font-black text-gray-900 tracking-tight">Dashboard</div>
+            <h1 className="text-[36px] sm:text-[48px] md:text-[60px] font-black text-gray-900 tracking-tight leading-none">Dashboard</h1>
             <p className="text-xs text-gray-400 font-semibold mt-1">Overview, analytics, & activity details</p>
           </div>
 

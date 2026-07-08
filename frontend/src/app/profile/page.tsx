@@ -154,6 +154,26 @@ export default function ProfilePage() {
   return (
     <div className="w-full max-w-4xl lg:max-w-7xl xl:max-w-[1400px] mx-auto px-6 py-12 md:py-16 min-h-screen relative flex flex-col justify-between bg-white text-[#111827]">
       
+      {/* Header */}
+      <div className="mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-50 border border-yellow-200 mb-4"
+        >
+          <User size={12} className="text-[#EAB308]" />
+          <span className="text-[10px] font-black text-[#111827] tracking-wider uppercase">User Account</span>
+        </motion.div>
+        <motion.h1 
+          initial={{ opacity: 0, y: -20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          className="text-[36px] sm:text-[48px] md:text-[60px] font-black tracking-tight text-[#111827] leading-none flex flex-wrap items-baseline gap-x-2 gap-y-1"
+        >
+          <span>My</span>
+          <span className="text-[32px] sm:text-[42px] md:text-[52px] text-[#EAB308]">Profile</span>
+        </motion.h1>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* ===================================

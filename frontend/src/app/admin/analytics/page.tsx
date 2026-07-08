@@ -51,7 +51,7 @@ export default function AdminAnalyticsPage() {
     <div className="space-y-10 w-full">
       {/* Header */}
       <div>
-        <div className="text-3xl font-black text-gray-900 leading-none">Analytics</div>
+        <h1 className="text-[36px] sm:text-[48px] md:text-[60px] font-black text-gray-900 tracking-tight leading-none">Analytics</h1>
         <p className="text-sm text-gray-500 font-semibold mt-1">Deep analysis, daily registration metrics, and revenue charts</p>
       </div>
 

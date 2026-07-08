@@ -77,7 +77,7 @@ export default function AdminPaymentsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <div className="text-3xl font-black text-gray-900 leading-none">Payments</div>
+          <h1 className="text-[36px] sm:text-[48px] md:text-[60px] font-black text-gray-900 tracking-tight leading-none">Payments</h1>
           <p className="text-sm text-gray-500 font-semibold mt-1">Audit transactions, refunds, and financial logs</p>
         </div>
         <button onClick={exportPayments} className="bg-white border border-gray-200 text-gray-950 font-bold px-4 py-2.5 rounded-xl text-xs hover:bg-gray-50 flex items-center gap-1.5 shadow-xs transition-all">

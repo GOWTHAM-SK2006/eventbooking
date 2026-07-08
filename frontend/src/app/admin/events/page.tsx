@@ -117,7 +117,7 @@ export default function AdminEventsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <div className="text-3xl font-black text-gray-900 leading-none">Events</div>
+          <h1 className="text-[36px] sm:text-[48px] md:text-[60px] font-black text-gray-900 tracking-tight leading-none">Events</h1>
           <p className="text-sm text-gray-500 font-semibold mt-1">Manage events, pricing, and configurations</p>
         </div>
         <Link 

@@ -80,12 +80,13 @@ export default function LoginPage() {
         >
           <motion.div variants={itemVariants} className="text-center mb-10">
             <motion.h1 
-              className="text-3xl font-black text-[#111827] tracking-tight mb-2"
+              className="text-[32px] sm:text-[36px] font-black text-[#111827] tracking-tight mb-2 flex justify-center items-baseline gap-1"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              Welcome Back
+              <span>Welcome</span>
+              <span className="text-[28px] sm:text-[32px] text-[#FACC15]">Back</span>
             </motion.h1>
             <motion.p 
               className="text-[#6B7280] font-medium"

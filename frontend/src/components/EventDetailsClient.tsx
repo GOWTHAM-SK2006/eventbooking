@@ -301,8 +301,21 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
               <span className="inline-block px-3.5 py-1 bg-[#FFD400] text-[#111827] font-bold text-xs uppercase tracking-wider rounded-lg mb-4">
                 {event.category}
               </span>
-              <h1 className="text-[#111827] font-black leading-tight mb-4" style={{ fontSize: 'clamp(2rem, 4vw, 4rem)' }}>
-                {event.title}
+              <h1 className="font-black leading-none mb-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[36px] sm:text-[48px] md:text-[60px] tracking-tight">
+                {(() => {
+                  const words = event.title.split(' ');
+                  if (words.length <= 1) {
+                    return <span className="text-[#111827]">{event.title}</span>;
+                  }
+                  const last = words.pop();
+                  const rest = words.join(' ');
+                  return (
+                    <>
+                      <span className="text-[#111827]">{rest}</span>
+                      <span className="text-[32px] sm:text-[42px] md:text-[52px] text-[#FFD400]">{last}</span>
+                    </>
+                  );
+                })()}
               </h1>
               {session && (
                 <button onClick={toggleWishlist} className="mb-4 flex items-center gap-2 text-sm font-bold text-[#111827]">

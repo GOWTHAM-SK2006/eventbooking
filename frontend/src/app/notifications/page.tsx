@@ -84,7 +84,7 @@ export default function NotificationsPage() {
           <motion.h1 
             initial={{ opacity: 0, y: -20 }} 
             animate={{ opacity: 1, y: 0 }} 
-            className="text-4xl sm:text-5xl font-black tracking-tight text-[#111827]"
+            className="text-[36px] sm:text-[48px] md:text-[60px] font-black tracking-tight text-[#111827] leading-none"
           >
             Notifications
           </motion.h1>

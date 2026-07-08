@@ -87,9 +87,10 @@ function HistoryContent() {
         <motion.h1 
           initial={{ opacity: 0, y: -20 }} 
           animate={{ opacity: 1, y: 0 }} 
-          className="text-5xl sm:text-6xl md:text-8xl font-black mb-6 tracking-tight text-[#111827] leading-none"
+          className="text-[36px] sm:text-[48px] md:text-[60px] font-black mb-6 tracking-tight text-[#111827] leading-none flex flex-wrap items-baseline gap-x-2 gap-y-1"
         >
-          My <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FACC15] to-[#EAB308]">Tickets</span>
+          <span>My</span>
+          <span className="text-[32px] sm:text-[42px] md:text-[52px] text-[#EAB308]">Tickets</span>
         </motion.h1>
         <motion.p 
           initial={{ opacity: 0, y: 10 }} 
