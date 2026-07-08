@@ -132,7 +132,7 @@ function EventsContent() {
   };
 
   return (
-    <div className="w-full max-w-7xl xl:max-w-[1400px] mx-auto px-6 py-12 md:py-16 relative min-h-screen bg-white">
+    <div className="w-full max-w-[1600px] mx-auto px-6 md:px-8 py-12 md:py-16 relative min-h-screen bg-white">
       
       {/* Header Section */}
       <div className="mb-12">

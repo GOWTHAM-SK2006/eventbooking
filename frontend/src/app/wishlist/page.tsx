@@ -49,7 +49,7 @@ export default function WishlistPage() {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-6 py-12 md:py-24 min-h-screen relative">
+    <div className="w-full max-w-[1600px] mx-auto px-6 md:px-8 py-12 md:py-24 min-h-screen relative">
       <FloatingBlobs />
 
       {/* Header */}
@@ -103,7 +103,7 @@ export default function WishlistPage() {
         </motion.div>
       ) : (
         /* Wishlist Grid */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           <AnimatePresence>
             {events.map((event, i) => (
               <motion.div 

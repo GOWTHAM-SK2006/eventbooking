@@ -152,7 +152,7 @@ export default function ProfilePage() {
   const upcomingEventsCount = bookings.filter(b => new Date(b.eventDate) >= new Date() && b.status === 'CONFIRMED').length;
 
   return (
-    <div className="w-full max-w-4xl lg:max-w-7xl xl:max-w-[1400px] mx-auto px-6 py-12 md:py-16 min-h-screen relative flex flex-col justify-between bg-white text-[#111827]">
+    <div className="w-full max-w-[1600px] mx-auto px-6 md:px-8 py-12 md:py-16 min-h-screen relative flex flex-col justify-between bg-white text-[#111827]">
       
       {/* Header */}
       <div className="mb-8">

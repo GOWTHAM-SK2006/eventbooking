@@ -67,10 +67,11 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-6 py-12 md:py-24 min-h-screen relative">
+    <div className="w-full max-w-[1600px] mx-auto px-6 md:px-8 py-12 md:py-24 min-h-screen relative">
       <FloatingBlobs />
 
-      {/* Header */}
+      <div className="max-w-3xl mx-auto">
+        {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12">
         <div>
           <motion.div
@@ -180,6 +181,7 @@ export default function NotificationsPage() {
           </AnimatePresence>
         </div>
       )}
+      </div>
     </div>
   );
 }

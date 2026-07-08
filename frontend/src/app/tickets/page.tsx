@@ -71,7 +71,7 @@ function HistoryContent() {
   ];
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto px-6 pt-6 md:pt-12 pb-16 md:pb-24 min-h-screen relative">
+    <div className="w-full max-w-[1600px] mx-auto px-6 md:px-8 pt-6 md:pt-12 pb-16 md:pb-24 min-h-screen relative">
       <FloatingBlobs />
 
       {/* Header */}
@@ -127,7 +127,7 @@ function HistoryContent() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8">
           {[1, 2, 3, 4].map(n => (
             <div key={n} className="h-64 bg-white border border-gray-150 rounded-[24px] animate-pulse flex flex-col justify-between p-6 md:p-8">
               <div className="space-y-4">
@@ -170,7 +170,7 @@ function HistoryContent() {
         </div>
       ) : (
         /* Bookings List */
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8">
           {filtered.map((booking, i) => (
             <motion.div 
               key={booking.id} 

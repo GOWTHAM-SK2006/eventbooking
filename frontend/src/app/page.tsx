@@ -115,7 +115,7 @@ export default function HomePage() {
     <div className="w-full min-h-screen bg-[#FFFFFF] text-[#111827] flex flex-col items-center relative overflow-hidden pb-12">
       
       {/* HERO SECTION */}
-      <section className="w-full max-w-6xl mx-auto px-6 pt-16 pb-20 md:pt-28 md:pb-24 text-center flex flex-col items-center relative z-10">
+      <section className="w-full max-w-[1600px] mx-auto px-6 md:px-8 pt-16 pb-20 md:pt-28 md:pb-24 text-center flex flex-col items-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -199,7 +199,7 @@ export default function HomePage() {
           <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#FFD400]"></div>
         </div>
       ) : !hasAnyEvents ? (
-        <div className="w-full max-w-6xl mx-auto px-6 py-20 text-center text-gray-400">
+        <div className="w-full max-w-[1600px] mx-auto px-6 md:px-8 py-20 text-center text-gray-400">
           <CalendarIcon size={48} className="mx-auto mb-4 opacity-50" />
           <p className="font-semibold text-lg">No active events found. Check back later!</p>
         </div>
@@ -208,7 +208,7 @@ export default function HomePage() {
           
           {/* FEATURED EVENTS */}
           {featured.length > 0 && (
-            <section className="w-full max-w-6xl mx-auto px-6">
+            <section className="w-full max-w-[1600px] mx-auto px-6 md:px-8">
               <ScrollReveal direction="up" className="flex justify-between items-end mb-8">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -225,7 +225,7 @@ export default function HomePage() {
                 </Link>
               </ScrollReveal>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {featured.map((event) => {
                   const isFav = wishlistIds.includes(event.id);
                   return (
@@ -305,7 +305,7 @@ export default function HomePage() {
           {/* POPULAR EVENTS */}
           {popular.length > 0 && (
             <section className="w-full bg-[#FFFFFF] border-y border-gray-100 py-16">
-              <div className="w-full max-w-6xl mx-auto px-6">
+              <div className="w-full max-w-[1600px] mx-auto px-6 md:px-8">
                 <ScrollReveal direction="up" className="flex justify-between items-end mb-8">
                   <div>
                     <div className="flex items-center gap-2 mb-1.5">
@@ -378,7 +378,7 @@ export default function HomePage() {
           )}
 
           {/* POPULAR CATEGORIES */}
-          <section className="w-full max-w-6xl mx-auto px-6">
+          <section className="w-full max-w-[1600px] mx-auto px-6 md:px-8">
             <ScrollReveal direction="up" className="mb-8">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1">Browse by Topic</span>
               <h2 className="text-3xl sm:text-4xl font-black text-gray-900">Popular Categories</h2>
@@ -401,7 +401,7 @@ export default function HomePage() {
 
           {/* UPCOMING EVENTS */}
           {upcoming.length > 0 && (
-            <section className="w-full max-w-6xl mx-auto px-6">
+            <section className="w-full max-w-[1600px] mx-auto px-6 md:px-8">
               <ScrollReveal direction="up" className="flex justify-between items-end mb-8">
                 <div>
                   <div className="flex items-center gap-2 mb-1.5">
@@ -418,7 +418,7 @@ export default function HomePage() {
                 </Link>
               </ScrollReveal>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
                 {upcoming.map((event) => {
                   const isFav = wishlistIds.includes(event.id);
                   return (
@@ -480,7 +480,7 @@ export default function HomePage() {
 
           {/* TESTIMONIALS SECTION */}
           <section className="w-full bg-[#FFFFFF] border-t border-gray-100 py-16">
-            <div className="w-full max-w-6xl mx-auto px-6">
+            <div className="w-full max-w-[1600px] mx-auto px-6 md:px-8">
               <ScrollReveal direction="up" className="text-center mb-12">
                 <span className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1">Trusted Reviews</span>
                 <h2 className="text-3xl sm:text-4xl font-black text-gray-900">What Our Users Say</h2>
@@ -507,7 +507,7 @@ export default function HomePage() {
       )}
 
       {/* FOOTER */}
-      <footer className="w-full max-w-6xl mx-auto px-6 py-12 mt-16 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-400 text-xs font-semibold">
+      <footer className="w-full max-w-[1600px] mx-auto px-6 md:px-8 py-12 mt-16 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-400 text-xs font-semibold">
         <div>
           <span className="text-[#111827] font-black tracking-tight">EventBooking.</span> Premium Event Management
         </div>

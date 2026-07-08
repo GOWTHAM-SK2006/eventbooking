@@ -296,7 +296,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
         <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
         
         <div className="absolute bottom-0 w-full px-6 pb-8 pt-20">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 items-end justify-between">
+          <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row gap-8 items-end justify-between">
             <div className="flex-1">
               <span className="inline-block px-3.5 py-1 bg-[#FFD400] text-[#111827] font-bold text-xs uppercase tracking-wider rounded-lg mb-4">
                 {event.category}
@@ -332,7 +332,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 mt-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="max-w-[1600px] mx-auto px-6 md:px-8 mt-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
         
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-12">
@@ -537,9 +537,9 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
 
       {/* Related Events Section */}
       {relatedEvents.length > 0 && (
-        <div className="max-w-7xl mx-auto px-6 mt-16 pt-16 border-t border-[#E5E7EB]">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-8 mt-16 pt-16 border-t border-[#E5E7EB]">
           <h2 className="font-black mb-8 text-[#111827]" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.5rem)' }}>Related Events</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {relatedEvents.map((e: any) => (
               <div key={e.id} className="premium-card flex flex-col justify-between h-full bg-white border border-[#E5E7EB] rounded-[16px] overflow-hidden transition-all duration-[250ms] hover:translate-y-[-4px] hover:shadow-md">
                 <Link href={`/events/${e.id}`} className="group block">
