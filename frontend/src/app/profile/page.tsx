@@ -149,7 +149,6 @@ export default function ProfilePage() {
   const member = getMembershipInfo();
   const userName = `${firstName} ${lastName}`.trim() || 'User Account';
 
-  const totalBookings = bookings.length;
   const upcomingEventsCount = bookings.filter(b => new Date(b.eventDate) >= new Date() && b.status === 'CONFIRMED').length;
 
   return (
@@ -208,30 +207,7 @@ export default function ProfilePage() {
         {/* RIGHT COLUMN: Quick Stats + Accordion Menu */}
         <div className="lg:col-span-8 space-y-8">
 
-          {/* ===================================
-              2. QUICK STATS
-              =================================== */}
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              { label: 'Total Bookings', value: totalBookings, icon: <Ticket className="text-gray-900" size={16} /> },
-              { label: 'Upcoming Events', value: upcomingEventsCount, icon: <Calendar className="text-gray-900" size={16} /> }
-            ].map((stat, idx) => (
-              <div
-                key={idx}
-                className="bg-white border border-[#E5E7EB] p-5 rounded-2xl flex flex-col justify-between shadow-xs transition-all duration-[200ms] hover:translate-y-[-2px] hover:border-[#FFD400]"
-              >
-                <div className="flex justify-between items-start">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider leading-tight">{stat.label}</span>
-                  <div className="p-1.5 bg-yellow-50 rounded-lg">
-                    {stat.icon}
-                  </div>
-                </div>
-                <p className="text-3xl font-black text-gray-900 mt-4 tracking-tight text-center">
-                  {stat.value}
-                </p>
-              </div>
-            ))}
-          </div>
+
 
           {/* ===================================
               3. INTERACTIVE ACCORDION MENU
