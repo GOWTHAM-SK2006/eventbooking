@@ -312,7 +312,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
                   return (
                     <>
                       <span className="text-[#111827]">{rest}</span>
-                      <span className="text-[32px] sm:text-[42px] md:text-[52px] text-[#FFD400]">{last}</span>
+                      <span className="text-[#FFD400]">{last}</span>
                     </>
                   );
                 })()}

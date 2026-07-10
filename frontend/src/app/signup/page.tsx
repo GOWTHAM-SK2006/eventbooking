@@ -87,7 +87,7 @@ export default function SignupPage() {
               transition={{ duration: 0.5, delay: 0.1 }}
             >
               <span>Create</span>
-              <span className="text-[28px] sm:text-[32px] text-[#FACC15]">Account</span>
+              <span className="text-[#FACC15]">Account</span>
             </motion.h1>
             <motion.p 
               className="text-[#6B7280] font-medium"

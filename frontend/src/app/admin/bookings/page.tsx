@@ -79,7 +79,7 @@ export default function AdminBookingsPage() {
         <div>
           <h1 className="text-[36px] sm:text-[48px] md:text-[60px] font-black tracking-tight text-gray-900 leading-none flex flex-wrap items-baseline gap-x-2 gap-y-1">
             <span>Booking</span>
-            <span className="text-[32px] sm:text-[42px] md:text-[52px] text-[#EAB308]">Summary</span>
+            <span className="text-[#EAB308]">Summary</span>
           </h1>
           <p className="text-sm text-gray-500 font-semibold mt-1">Audit customer ticket reservations and registration records</p>
         </div>

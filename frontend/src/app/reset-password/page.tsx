@@ -37,7 +37,7 @@ function ResetPasswordForm() {
       </div>
       <h1 className="text-[32px] sm:text-[36px] font-black tracking-tight mb-2 text-[#111827] flex items-baseline gap-1">
         <span>Reset</span>
-        <span className="text-[28px] sm:text-[32px] text-[#FACC15]">Password</span>
+        <span className="text-[#FACC15]">Password</span>
       </h1>
       <p className="text-[#6B7280] mb-8">Enter your new password below.</p>
       <form onSubmit={handleSubmit} className="space-y-4">

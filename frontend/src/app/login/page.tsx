@@ -86,7 +86,7 @@ export default function LoginPage() {
               transition={{ duration: 0.5, delay: 0.1 }}
             >
               <span>Welcome</span>
-              <span className="text-[28px] sm:text-[32px] text-[#FACC15]">Back</span>
+              <span className="text-[#FACC15]">Back</span>
             </motion.h1>
             <motion.p 
               className="text-[#6B7280] font-medium"

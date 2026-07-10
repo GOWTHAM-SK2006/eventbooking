@@ -28,7 +28,7 @@ function VerifyContent() {
           <CheckCircle size={64} className="text-green-500 mx-auto mb-4" />
           <h1 className="text-[28px] sm:text-[32px] font-black tracking-tight mb-2 text-[#111827] flex justify-center items-baseline gap-1">
             <span>Email</span>
-            <span className="text-[24px] sm:text-[28px] text-[#FACC15]">Verified!</span>
+            <span className="text-[#FACC15]">Verified!</span>
           </h1>
           <p className="text-[#6B7280] mb-6">{message}</p>
           <Link href="/login" className="btn-primary inline-block py-3 px-8">Go to Login</Link>
@@ -39,7 +39,7 @@ function VerifyContent() {
           <XCircle size={64} className="text-red-500 mx-auto mb-4" />
           <h1 className="text-[28px] sm:text-[32px] font-black tracking-tight mb-2 text-[#111827] flex justify-center items-baseline gap-1">
             <span>Verification</span>
-            <span className="text-[24px] sm:text-[28px] text-[#FACC15]">Failed</span>
+            <span className="text-[#FACC15]">Failed</span>
           </h1>
           <p className="text-[#6B7280]">{message}</p>
         </>

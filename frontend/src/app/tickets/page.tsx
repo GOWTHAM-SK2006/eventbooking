@@ -90,7 +90,7 @@ function HistoryContent() {
           className="text-[36px] sm:text-[48px] md:text-[60px] font-black mb-6 tracking-tight text-[#111827] leading-none flex flex-wrap items-baseline gap-x-2 gap-y-1"
         >
           <span>My</span>
-          <span className="text-[32px] sm:text-[42px] md:text-[52px] text-[#EAB308]">Tickets</span>
+          <span className="text-[#EAB308]">Tickets</span>
         </motion.h1>
         <motion.p 
           initial={{ opacity: 0, y: 10 }} 

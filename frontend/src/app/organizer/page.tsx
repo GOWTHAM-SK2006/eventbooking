@@ -51,7 +51,7 @@ export default function OrganizerPage() {
     <div className="w-full max-w-[1600px] mx-auto px-6 md:px-8 py-12">
       <h1 className="text-[36px] sm:text-[48px] md:text-[60px] font-black tracking-tight text-gray-900 leading-none flex flex-wrap items-baseline gap-x-2 gap-y-1 mb-2">
         <span>Organizer</span>
-        <span className="text-[32px] sm:text-[42px] md:text-[52px] text-[#FACC15]">Hub</span>
+        <span className="text-[#FACC15]">Hub</span>
       </h1>
       <p className="text-[#6B7280] mb-10">Manage your events and track performance</p>
 

@@ -70,7 +70,7 @@ export default function AdminCreateEventPage() {
         <div>
           <h1 className="text-[36px] sm:text-[48px] md:text-[60px] font-black tracking-tight text-gray-900 leading-none flex flex-wrap items-baseline gap-x-2 gap-y-1">
             <span>Create</span>
-            <span className="text-[32px] sm:text-[42px] md:text-[52px] text-[#EAB308]">Event</span>
+            <span className="text-[#EAB308]">Event</span>
           </h1>
           <p className="text-xs text-gray-400 font-semibold mt-1">Publish a new event to the catalog</p>
         </div>
