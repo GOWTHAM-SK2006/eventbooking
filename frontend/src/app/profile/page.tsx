@@ -27,7 +27,7 @@ const MenuItem = ({ title, subtitle, href, icon, iconBg, onClick, badge }: MenuI
     <motion.div 
       whileHover={{ x: 3 }}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-      className="w-full py-4.5 flex items-center justify-between px-4.5 hover:bg-slate-50/80 active:bg-slate-100/50 rounded-xl transition-all duration-200 cursor-pointer group"
+      className="w-full py-3.5 flex items-center justify-between px-4 hover:bg-slate-50/80 active:bg-slate-100/50 rounded-xl transition-all duration-200 cursor-pointer group"
     >
       <div className="flex items-center gap-4">
         {/* Rounded Icon Wrapper */}
@@ -275,7 +275,7 @@ export default function ProfilePage() {
             {/* GROUP 1: Activity & Access */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-6.5 flex flex-col justify-between"
+              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-6 flex flex-col h-fit"
             >
               <div>
                 <div className="flex items-center gap-2 px-1 pb-3.5 mb-3.5 border-b border-slate-100">
@@ -284,7 +284,7 @@ export default function ProfilePage() {
                   </div>
                   <span className="text-[9.5px] font-black text-slate-400 uppercase tracking-widest block">Activity & Access</span>
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-2">
                   <MenuItem 
                     title="Your Bookings & Purchases" 
                     subtitle="View order history & transaction receipts"
@@ -326,7 +326,7 @@ export default function ProfilePage() {
             {/* GROUP 2: Inbox & Offers */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-6.5 flex flex-col justify-between"
+              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-6 flex flex-col h-fit"
             >
               <div>
                 <div className="flex items-center gap-2 px-1 pb-3.5 mb-3.5 border-b border-slate-100">
@@ -335,7 +335,7 @@ export default function ProfilePage() {
                   </div>
                   <span className="text-[9.5px] font-black text-slate-400 uppercase tracking-widest block">Inbox & Offers</span>
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-2">
                   <MenuItem 
                     title="Notifications" 
                     subtitle="System messages, updates & alerts"
@@ -372,7 +372,7 @@ export default function ProfilePage() {
             {/* GROUP 3: Settings & Support */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-6.5 flex flex-col justify-between"
+              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-6 flex flex-col h-fit"
             >
               <div>
                 <div className="flex items-center gap-2 px-1 pb-3.5 mb-3.5 border-b border-slate-100">
@@ -381,7 +381,7 @@ export default function ProfilePage() {
                   </div>
                   <span className="text-[9.5px] font-black text-slate-400 uppercase tracking-widest block">Settings & Support</span>
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-2">
                   <MenuItem 
                     title="Account & Settings" 
                     subtitle="Modify credentials & preferences"
@@ -417,7 +417,7 @@ export default function ProfilePage() {
             {/* GROUP 4: App & Legal */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-6.5 flex flex-col justify-between"
+              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-6 flex flex-col h-fit"
             >
               <div>
                 <div className="flex items-center gap-2 px-1 pb-3.5 mb-3.5 border-b border-slate-100">
@@ -426,7 +426,7 @@ export default function ProfilePage() {
                   </div>
                   <span className="text-[9.5px] font-black text-slate-400 uppercase tracking-widest block">App & Legal</span>
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-2">
                   <MenuItem 
                     title="Share App" 
                     subtitle="Recommend EventBooking to friends"
