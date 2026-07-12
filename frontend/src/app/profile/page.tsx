@@ -27,7 +27,7 @@ const MenuItem = ({ title, subtitle, href, icon, iconBg, onClick, badge }: MenuI
     <motion.div 
       whileHover={{ x: 3 }}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-      className="w-full py-3 flex items-center justify-between px-3.5 hover:bg-slate-50/80 active:bg-slate-100/50 rounded-xl transition-all duration-200 cursor-pointer group"
+      className="w-full py-4.5 flex items-center justify-between px-4.5 hover:bg-slate-50/80 active:bg-slate-100/50 rounded-xl transition-all duration-200 cursor-pointer group"
     >
       <div className="flex items-center gap-4">
         {/* Rounded Icon Wrapper */}
@@ -191,10 +191,10 @@ export default function ProfilePage() {
           {/* LEFT COLUMN: Profile Info Card */}
           <motion.div 
             variants={itemVariants}
-            className="lg:col-span-4 space-y-5"
+            className="lg:col-span-4 space-y-6"
           >
             {/* White & Yellow Profile Card */}
-            <div className="bg-white border border-slate-200/60 rounded-3xl p-6.5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] relative overflow-hidden group">
+            <div className="bg-white border border-slate-200/60 rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.015)] relative overflow-hidden group">
               {/* Radial gradient reflections */}
               <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#FFD400]/5 rounded-full blur-3xl pointer-events-none group-hover:bg-[#FFD400]/10 transition-all duration-500" />
               <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-yellow-550/5 rounded-full blur-3xl pointer-events-none group-hover:bg-yellow-550/10 transition-all duration-500" />
@@ -233,14 +233,14 @@ export default function ProfilePage() {
                 {/* Edit Profile Action */}
                 <Link 
                   href="/profile/settings" 
-                  className="w-full bg-[#FFD400] hover:bg-[#E6BE00] text-slate-950 font-black text-xs py-3 px-6 rounded-xl transition-all border border-[#FFD400]/60 hover:border-[#E6BE00] flex items-center justify-center gap-1.5 shadow-3xs"
+                  className="w-full bg-[#FFD400] hover:bg-[#E6BE00] text-slate-950 font-black text-xs py-3.5 px-6 rounded-xl transition-all border border-[#FFD400]/60 hover:border-[#E6BE00] flex items-center justify-center gap-1.5 shadow-3xs"
                 >
                   <Settings size={13} className="stroke-[2.5]" />
                   <span>Edit Profile Details</span>
                 </Link>
 
                 {/* Quick Stats Grid */}
-                <div className="w-full grid grid-cols-3 gap-2 pt-5 mt-5 border-t border-slate-100">
+                <div className="w-full grid grid-cols-3 gap-2 pt-6 mt-6 border-t border-slate-100">
                   <div className="flex flex-col items-center">
                     <span className="text-[8.5px] font-black uppercase tracking-wider text-slate-400">Bookings</span>
                     <span className="text-base font-black text-slate-800 mt-1">{bookings.length}</span>
@@ -261,7 +261,7 @@ export default function ProfilePage() {
             {/* Logout Button */}
             <button 
               onClick={handleLogout}
-              className="w-full py-3 bg-white hover:bg-slate-50 text-slate-705 hover:text-red-600 font-extrabold text-xs rounded-2xl border border-slate-200/80 hover:border-red-200 transition-all duration-200 flex items-center justify-center gap-1.5 shadow-3xs"
+              className="w-full py-4 bg-white hover:bg-slate-50 text-slate-705 hover:text-red-600 font-extrabold text-xs rounded-2xl border border-slate-200/80 hover:border-red-200 transition-all duration-200 flex items-center justify-center gap-1.5 shadow-3xs"
             >
               <LogOut size={13} />
               <span>Log Out Account</span>
@@ -270,15 +270,15 @@ export default function ProfilePage() {
           </motion.div>
 
           {/* RIGHT COLUMN: Interactive Groups */}
-          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* GROUP 1: Activity & Access */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-4.5 flex flex-col justify-between"
+              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-6.5 flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center gap-2 px-1 pb-2.5 mb-2.5 border-b border-slate-100">
+                <div className="flex items-center gap-2 px-1 pb-3.5 mb-3.5 border-b border-slate-100">
                   <div className="w-5.5 h-5.5 rounded-md bg-yellow-50 flex items-center justify-center border border-yellow-100/65">
                     <Compass size={11} className="text-[#EAB308]" />
                   </div>
@@ -326,10 +326,10 @@ export default function ProfilePage() {
             {/* GROUP 2: Inbox & Offers */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-4.5 flex flex-col justify-between"
+              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-6.5 flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center gap-2 px-1 pb-2.5 mb-2.5 border-b border-slate-100">
+                <div className="flex items-center gap-2 px-1 pb-3.5 mb-3.5 border-b border-slate-100">
                   <div className="w-5.5 h-5.5 rounded-md bg-orange-50 flex items-center justify-center border border-orange-100/65">
                     <Mail size={11} className="text-orange-550" />
                   </div>
@@ -372,10 +372,10 @@ export default function ProfilePage() {
             {/* GROUP 3: Settings & Support */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-4.5 flex flex-col justify-between"
+              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-6.5 flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center gap-2 px-1 pb-2.5 mb-2.5 border-b border-slate-100">
+                <div className="flex items-center gap-2 px-1 pb-3.5 mb-3.5 border-b border-slate-100">
                   <div className="w-5.5 h-5.5 rounded-md bg-blue-50 flex items-center justify-center border border-blue-100/65">
                     <Settings size={11} className="text-blue-550" />
                   </div>
@@ -417,10 +417,10 @@ export default function ProfilePage() {
             {/* GROUP 4: App & Legal */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-4.5 flex flex-col justify-between"
+              className="bg-white border border-slate-200/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 p-6.5 flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center gap-2 px-1 pb-2.5 mb-2.5 border-b border-slate-100">
+                <div className="flex items-center gap-2 px-1 pb-3.5 mb-3.5 border-b border-slate-100">
                   <div className="w-5.5 h-5.5 rounded-md bg-indigo-50 flex items-center justify-center border border-indigo-100/65">
                     <Info size={11} className="text-indigo-550" />
                   </div>
