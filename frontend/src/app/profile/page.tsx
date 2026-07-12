@@ -201,14 +201,14 @@ export default function ProfilePage() {
               
               <div className="flex flex-col items-center text-center relative z-10">
                 {/* Avatar with glowing ring */}
-                <div className="relative mb-4 group/avatar">
-                  <div className="absolute inset-0 bg-[#FFD400]/20 rounded-full blur-md opacity-35 group-hover/avatar:opacity-50 transition-opacity" />
+                <div className="relative w-[84px] h-[84px] mb-4 group/avatar flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[#FFD400]/25 rounded-full blur-md opacity-35 group-hover/avatar:opacity-50 transition-opacity" />
                   <motion.div 
                     animate={{ rotate: 360 }}
                     transition={{ repeat: Infinity, duration: 16, ease: "linear" }}
-                    className="absolute -inset-1 rounded-full bg-gradient-to-tr from-[#FFD400] via-yellow-300 to-[#FFD400]/45 opacity-75 group-hover/avatar:opacity-100 transition-opacity" 
+                    className="absolute -inset-1 rounded-full bg-gradient-to-tr from-[#FFD400] via-[#FFF3B0] to-[#EAB308] opacity-75 group-hover/avatar:opacity-100 transition-opacity" 
                   />
-                  <div className="w-[84px] h-[84px] rounded-full bg-[#FFD400] text-slate-950 font-black text-3xl flex items-center justify-center border-4 border-white relative z-10 shadow-sm transition-transform duration-300 group-hover/avatar:scale-102">
+                  <div className="w-full h-full rounded-full bg-[#FFD400] text-slate-950 font-black text-3xl flex items-center justify-center border-4 border-white relative z-10 shadow-sm transition-transform duration-300 group-hover/avatar:scale-102">
                     <span className="text-slate-950">
                       {session?.firstName?.charAt(0) || 'U'}
                     </span>
