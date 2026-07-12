@@ -7,6 +7,7 @@ import { api, getSession, resolveImageUrl } from '../utils/api';
 import { ArrowRight, Calendar as CalendarIcon, MapPin, Users, Sparkles, Star, Search, Flame, Clock, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ScrollReveal } from '../components/ScrollReveal';
+import { EventCardSkeleton } from '../components/Skeletons';
 
 export default function HomePage() {
   const router = useRouter();
@@ -195,8 +196,44 @@ export default function HomePage() {
 
       {/* MAIN CONTAINER */}
       {loading ? (
-        <div className="flex justify-center items-center py-20 min-h-[40vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#FFD400]"></div>
+        <div className="w-full space-y-24 max-w-[1600px] mx-auto px-6 md:px-8 py-12">
+          {/* Featured Events Skeleton */}
+          <div>
+            <div className="flex justify-between items-end mb-8">
+              <div className="space-y-2">
+                <div className="w-32 h-4.5 shimmer rounded" />
+                <div className="w-48 h-8 shimmer rounded" />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <EventCardSkeleton key={i} />
+              ))}
+            </div>
+          </div>
+
+          {/* Popular Events Skeleton */}
+          <div className="pt-8">
+            <div className="flex justify-between items-end mb-8">
+              <div className="space-y-2">
+                <div className="w-32 h-4.5 shimmer rounded" />
+                <div className="w-48 h-8 shimmer rounded" />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden p-4 space-y-4">
+                  <div className="w-full h-36 shimmer rounded-lg" />
+                  <div className="w-16 h-3 shimmer rounded" />
+                  <div className="w-11/12 h-5 shimmer rounded" />
+                  <div className="flex justify-between pt-1">
+                    <div className="w-10 h-4 shimmer rounded" />
+                    <div className="w-20 h-4 shimmer rounded" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       ) : !hasAnyEvents ? (
         <div className="w-full max-w-[1600px] mx-auto px-6 md:px-8 py-20 text-center text-gray-400">

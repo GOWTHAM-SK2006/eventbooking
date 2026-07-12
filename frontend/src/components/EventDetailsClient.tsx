@@ -7,6 +7,7 @@ import { api, getSession, resolveImageUrl } from '../utils/api';
 import { Calendar, MapPin, Users, ShieldAlert, Sparkles, CreditCard, Star, CheckCircle, X, QrCode, Heart, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
+import { EventDetailsSkeleton } from '../components/Skeletons';
 
 declare global {
   interface Window {
@@ -237,11 +238,7 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-[70vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#FFD400]"></div>
-      </div>
-    );
+    return <EventDetailsSkeleton />;
   }
   
   if (!event) {
@@ -639,12 +636,19 @@ export default function EventDetailsClient({ id: propsId }: EventDetailsClientPr
 
                     {bookingError && <p className="text-red-500 text-xs font-bold text-center mb-4 bg-red-50 p-2.5 rounded-lg border border-red-100">{bookingError}</p>}
 
-                    <button 
+                     <button 
                       onClick={paymentMethod === 'UPI' && event.price > 0 ? () => confirmPaymentAndBook(`UPI-${upiTransactionId}`) : handlePaymentNext}
                       disabled={processingPayment || (paymentMethod === 'UPI' && event.price > 0 && !upiTransactionId.trim())}
                       className="btn-primary w-full py-3 text-sm flex items-center justify-center gap-2"
                     >
-                      {processingPayment ? 'Processing...' : `Pay & Book`}
+                      {processingPayment ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                          <span>Processing...</span>
+                        </>
+                      ) : (
+                        `Pay & Book`
+                      )}
                     </button>
                   </div>
                 </div>

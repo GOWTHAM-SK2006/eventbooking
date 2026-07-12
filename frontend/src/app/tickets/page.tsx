@@ -129,16 +129,16 @@ function HistoryContent() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8">
           {[1, 2, 3, 4].map(n => (
-            <div key={n} className="h-64 bg-white border border-gray-150 rounded-[24px] animate-pulse flex flex-col justify-between p-6 md:p-8">
+            <div key={n} className="h-64 bg-white border border-gray-150 rounded-[24px] flex flex-col justify-between p-6 md:p-8 shadow-sm">
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <div className="h-5 w-24 bg-gray-100 rounded-full" />
-                  <div className="h-4 w-16 bg-gray-100 rounded" />
+                  <div className="h-5 w-24 rounded-full shimmer" />
+                  <div className="h-4 w-16 rounded shimmer" />
                 </div>
-                <div className="h-8 w-3/4 bg-gray-100 rounded-xl" />
-                <div className="h-5 w-1/2 bg-gray-100 rounded" />
+                <div className="h-8 w-3/4 rounded-xl shimmer" />
+                <div className="h-5 w-1/2 rounded shimmer" />
               </div>
-              <div className="h-12 w-full bg-gray-50 rounded-xl mt-4" />
+              <div className="h-12 w-full rounded-xl mt-4 shimmer" />
             </div>
           ))}
         </div>

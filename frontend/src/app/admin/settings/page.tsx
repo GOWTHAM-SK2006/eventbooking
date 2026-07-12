@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../../../utils/api';
 import { Settings, Shield, Mail, Loader } from 'lucide-react';
+import { AdminSkeleton } from '../../../components/Skeletons';
 
 export default function AdminSettingsPage() {
   const [razorpayKeyId, setRazorpayKeyId] = useState('');
@@ -75,11 +76,7 @@ export default function AdminSettingsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <div className="w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <AdminSkeleton />;
   }
 
   return (

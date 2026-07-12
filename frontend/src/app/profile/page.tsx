@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { FloatingBlobs } from '../../components/AnimatedBackground';
+import { ProfileSkeleton } from '../../components/Skeletons';
 
 interface MenuItemProps {
   title: string;
@@ -74,6 +75,7 @@ export default function ProfilePage() {
   const [session, setSession] = useState<any>(null);
   const [bookings, setBookings] = useState<any[]>([]);
   const [wishlistCount, setWishlistCount] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const sess = getSession();
@@ -84,16 +86,23 @@ export default function ProfilePage() {
     setSession(sess);
     
     // Fetch user details
-    api.get('/bookings')
-      .then(setBookings)
-      .catch(() => []);
-
-    api.get('/wishlist')
-      .then(data => {
-        setWishlistCount(data?.length || 0);
-      })
-      .catch(() => []);
+    Promise.all([
+      api.get('/bookings')
+        .then(setBookings)
+        .catch(() => []),
+      api.get('/wishlist')
+        .then(data => {
+          setWishlistCount(data?.length || 0);
+        })
+        .catch(() => [])
+    ]).finally(() => {
+      setLoading(false);
+    });
   }, []);
+
+  if (loading) {
+    return <ProfileSkeleton />;
+  }
 
   const handleLogout = () => {
     clearSession();

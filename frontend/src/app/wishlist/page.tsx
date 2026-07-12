@@ -7,6 +7,7 @@ import { api, getSession, resolveImageUrl } from '../../utils/api';
 import { Heart, Loader, Calendar, MapPin, Sparkles, Trash2, ArrowRight, Award } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FloatingBlobs } from '../../components/AnimatedBackground';
+import { EventGridSkeleton } from '../../components/Skeletons';
 import type { Event } from '../../types';
 
 export default function WishlistPage() {
@@ -80,11 +81,7 @@ export default function WishlistPage() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[1, 2, 3].map(n => (
-            <div key={n} className="h-[400px] bg-white border border-gray-200 rounded-3xl animate-pulse" />
-          ))}
-        </div>
+        <EventGridSkeleton count={3} />
       ) : events.length === 0 ? (
         /* Empty State */
         <motion.div 

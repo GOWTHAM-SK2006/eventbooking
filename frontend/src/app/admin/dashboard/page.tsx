@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { AdminSkeleton } from '../../../components/Skeletons';
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<any>(null);
@@ -44,14 +45,7 @@ export default function AdminDashboardPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-bold text-gray-400">Loading dashboard analytics...</span>
-        </div>
-      </div>
-    );
+    return <AdminSkeleton />;
   }
 
   // Calculate upcoming events

@@ -7,12 +7,14 @@ import { api, getSession, resolveImageUrl } from '../../utils/api';
 import { Search, MapPin, Users, Filter, Sparkles, Calendar as CalendarIcon, Heart, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ScrollReveal } from '../../components/ScrollReveal';
+import { EventCardSkeleton, EventGridSkeleton } from '../../components/Skeletons';
 
 export default function EventsPage() {
   return (
     <Suspense fallback={
-      <div className="flex justify-center items-center h-[70vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#FFD400]"></div>
+      <div className="w-full max-w-[1600px] mx-auto px-6 md:px-8 py-10 space-y-8">
+        <div className="w-full h-40 bg-gray-50 shimmer rounded-3xl" />
+        <EventGridSkeleton count={6} />
       </div>
     }>
       <EventsContent />
@@ -312,11 +314,7 @@ function EventsContent() {
 
       {/* Skeletons */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {[1, 2, 3, 4, 5, 6].map((n) => (
-            <div key={n} className="h-[400px] bg-white border border-[#E5E7EB] rounded-2xl animate-pulse" />
-          ))}
-        </div>
+        <EventGridSkeleton count={8} />
       ) : events.length === 0 ? (
         /* Empty State */
         <div className="bg-white p-16 text-center rounded-3xl border border-[#E5E7EB] max-w-2xl mx-auto flex flex-col items-center justify-center">
