@@ -193,30 +193,30 @@ export default function ProfilePage() {
             variants={itemVariants}
             className="lg:col-span-4 space-y-5"
           >
-            {/* VIP Profile Card */}
-            <div className="bg-gradient-to-br from-slate-950 to-slate-900 text-white rounded-3xl p-6.5 shadow-md relative overflow-hidden border border-white/5 group">
+            {/* White & Yellow Profile Card */}
+            <div className="bg-white border border-slate-200/60 rounded-3xl p-6.5 shadow-[0_8px_30px_rgb(0,0,0,0.015)] relative overflow-hidden group">
               {/* Radial gradient reflections */}
               <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#FFD400]/5 rounded-full blur-3xl pointer-events-none group-hover:bg-[#FFD400]/10 transition-all duration-500" />
-              <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/10 transition-all duration-500" />
+              <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-yellow-550/5 rounded-full blur-3xl pointer-events-none group-hover:bg-yellow-550/10 transition-all duration-500" />
               
               <div className="flex flex-col items-center text-center relative z-10">
                 {/* Avatar with glowing ring */}
                 <div className="relative mb-4 group/avatar">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-[#FFD400] to-yellow-300 rounded-full blur-md opacity-20 group-hover/avatar:opacity-40 transition-opacity" />
+                  <div className="absolute inset-0 bg-[#FFD400]/20 rounded-full blur-md opacity-35 group-hover/avatar:opacity-50 transition-opacity" />
                   <motion.div 
                     animate={{ rotate: 360 }}
                     transition={{ repeat: Infinity, duration: 16, ease: "linear" }}
-                    className="absolute -inset-1 rounded-full bg-gradient-to-tr from-[#FFD400] via-yellow-400 to-[#FFD400]/10 opacity-60 group-hover/avatar:opacity-90 transition-opacity" 
+                    className="absolute -inset-1 rounded-full bg-gradient-to-tr from-[#FFD400] via-yellow-300 to-[#FFD400]/45 opacity-75 group-hover/avatar:opacity-100 transition-opacity" 
                   />
-                  <div className="w-[84px] h-[84px] rounded-full bg-slate-900 text-white font-black text-3xl flex items-center justify-center border-4 border-slate-950 relative z-10 shadow-md transition-transform duration-300 group-hover/avatar:scale-102">
-                    <span className="bg-gradient-to-tr from-white to-yellow-100 bg-clip-text text-transparent">
+                  <div className="w-[84px] h-[84px] rounded-full bg-[#FFD400] text-slate-950 font-black text-3xl flex items-center justify-center border-4 border-white relative z-10 shadow-sm transition-transform duration-300 group-hover/avatar:scale-102">
+                    <span className="text-slate-950">
                       {session?.firstName?.charAt(0) || 'U'}
                     </span>
                   </div>
                 </div>
 
                 {/* Name */}
-                <h3 className="font-extrabold text-lg tracking-tight text-white mb-1.5">
+                <h3 className="font-extrabold text-lg tracking-tight text-slate-800 mb-1.5">
                   {session ? `${session.firstName} ${session.lastName}` : 'Guest User'}
                 </h3>
                 
@@ -226,32 +226,32 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Email */}
-                <p className="text-[11px] text-slate-400 font-semibold mb-5 break-all max-w-[220px]">
+                <p className="text-[11.5px] text-slate-400 font-bold mb-5 break-all max-w-[220px]">
                   {session?.email || 'loading...'}
                 </p>
 
                 {/* Edit Profile Action */}
                 <Link 
                   href="/profile/settings" 
-                  className="w-full bg-white/5 hover:bg-[#FFD400] hover:text-slate-950 text-white font-extrabold text-xs py-2.5 px-6 rounded-xl transition-all border border-white/10 hover:border-[#FFD400] flex items-center justify-center gap-1.5 shadow-3xs"
+                  className="w-full bg-[#FFD400] hover:bg-[#E6BE00] text-slate-950 font-black text-xs py-3 px-6 rounded-xl transition-all border border-[#FFD400]/60 hover:border-[#E6BE00] flex items-center justify-center gap-1.5 shadow-3xs"
                 >
-                  <Settings size={13} />
+                  <Settings size={13} className="stroke-[2.5]" />
                   <span>Edit Profile Details</span>
                 </Link>
 
                 {/* Quick Stats Grid */}
-                <div className="w-full grid grid-cols-3 gap-2 pt-5 mt-5 border-t border-white/5">
+                <div className="w-full grid grid-cols-3 gap-2 pt-5 mt-5 border-t border-slate-100">
                   <div className="flex flex-col items-center">
-                    <span className="text-[8.5px] font-black uppercase tracking-wider text-slate-500">Bookings</span>
-                    <span className="text-base font-black text-white mt-1">{bookings.length}</span>
+                    <span className="text-[8.5px] font-black uppercase tracking-wider text-slate-400">Bookings</span>
+                    <span className="text-base font-black text-slate-800 mt-1">{bookings.length}</span>
                   </div>
-                  <div className="flex flex-col items-center border-x border-white/5">
-                    <span className="text-[8.5px] font-black uppercase tracking-wider text-slate-500">Tickets</span>
-                    <span className="text-base font-black text-[#FFD400] mt-1">{activeTicketsCount}</span>
+                  <div className="flex flex-col items-center border-x border-slate-150/60">
+                    <span className="text-[8.5px] font-black uppercase tracking-wider text-slate-400">Tickets</span>
+                    <span className="text-base font-black text-[#EAB308] mt-1">{activeTicketsCount}</span>
                   </div>
                   <div className="flex flex-col items-center">
-                    <span className="text-[8.5px] font-black uppercase tracking-wider text-slate-500">Wishlist</span>
-                    <span className="text-base font-black text-white mt-1">{wishlistCount}</span>
+                    <span className="text-[8.5px] font-black uppercase tracking-wider text-slate-400">Wishlist</span>
+                    <span className="text-base font-black text-slate-800 mt-1">{wishlistCount}</span>
                   </div>
                 </div>
 
@@ -261,7 +261,7 @@ export default function ProfilePage() {
             {/* Logout Button */}
             <button 
               onClick={handleLogout}
-              className="w-full py-3 bg-white hover:bg-red-50 text-slate-700 hover:text-red-650 font-extrabold text-xs rounded-2xl border border-slate-200/80 hover:border-red-200 transition-all duration-200 flex items-center justify-center gap-1.5 shadow-3xs"
+              className="w-full py-3 bg-white hover:bg-slate-50 text-slate-705 hover:text-red-600 font-extrabold text-xs rounded-2xl border border-slate-200/80 hover:border-red-200 transition-all duration-200 flex items-center justify-center gap-1.5 shadow-3xs"
             >
               <LogOut size={13} />
               <span>Log Out Account</span>
